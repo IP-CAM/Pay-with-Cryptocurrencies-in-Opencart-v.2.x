@@ -8,8 +8,8 @@ class ModelExtensionPaymentEzpay extends Model {
 			  `ezpay_coin_id` varchar(255),
 			  `order` int(11) NOT NULL,
               `logo` varchar(255),
+		      `symbol` varchar(255),
 			  `name` varchar(255) NOT NULL,
-		      `full_name` varchar(255),
 			  `discount` int(11),
 		      `payment_lifetime` int(11),
 		      `wallet_address` varchar(255) NOT NULL,
@@ -24,23 +24,37 @@ class ModelExtensionPaymentEzpay extends Model {
         $this->db->query("DROP TABLE IF EXISTS `" . DB_PREFIX . "ezpay_coin`;");
     }
 
-    public function updateCoin($data) {
+    public function updateCoins($data) {
         foreach($data as $key => $coinRecord) {
-            if(isset($coinRecord['coin-wallet-address'])) {
-                $this->db->query("INSERT INTO `" . DB_PREFIX . "ezpay_coin` SET `ezpay_coin_id` = '" . $this->db->escape($coinRecord['coin-id']) .
-                    "', `order` = '" . (int)$coinRecord['coin-order'] .
-                    "', `logo` = '" . $this->db->escape($coinRecord['coin-logo']) .
-                    "', `name` = '" . $this->db->escape($coinRecord['coin-symbol']) .
-                    "', `full_name` = '" . $this->db->escape($coinRecord['coin-name']) .
-                    "', `discount` = '" .(int)$coinRecord['coin-discount'] .
-                    "', `payment_lifetime` = '" . (int)$coinRecord['coin-payment-life-time'].
-                    "', `wallet_address` = '" . $this->db->escape($coinRecord['coin-wallet-address']) .
-                    "', `safe_block_distant` = '" . (int)$coinRecord['coin-safe-block-distant'] .
+            if(isset($coinRecord['coin_wallet_address'])) {
+                $this->db->query("INSERT INTO `" . DB_PREFIX . "ezpay_coin` SET `ezpay_coin_id` = '" . $this->db->escape($coinRecord['coin_id']) .
+                    "', `order` = '" . (int)$coinRecord['coin_order'] .
+                    "', `logo` = '" . $this->db->escape($coinRecord['coin_logo']) .
+                    "', `symbol` = '" . $this->db->escape($coinRecord['coin_symbol']) .
+                    "', `name` = '" . $this->db->escape($coinRecord['coin_name']) .
+                    "', `discount` = '" .(int)$coinRecord['coin_discount'] .
+                    "', `payment_lifetime` = '" . (int)$coinRecord['coin_payment_life_time'].
+                    "', `wallet_address` = '" . $this->db->escape($coinRecord['coin_wallet_address']) .
+                    "', `safe_block_distant` = '" . (int)$coinRecord['coin_safe_block_distant'] .
                     "', `created` = now(), `modified` = now()");
             } else {
-                $this->db->query("UPDATE `" . DB_PREFIX . "ezpay_coin` SET `order` = " . (int)$coinRecord['coin-order'] . ", `created` = now(), `modified` = now()" ." WHERE `ezpay_coin_id` ='". $this->db->escape($coinRecord['coin-id'])."'");
+                $this->db->query("UPDATE `" . DB_PREFIX . "ezpay_coin` SET `order` = " . (int)$coinRecord['coin_order'] . ", `modified` = now()" ." WHERE `ezpay_coin_id` ='". $this->db->escape($coinRecord['coin_id'])."'");
             }
         }
+    }
+
+    public function updateCoinConfig($dataUpdate) {
+        $coinId = $dataUpdate['coin_id'];
+        $discount = $dataUpdate['discount'];
+        $paymentLifetime = $dataUpdate['payment_lifetime'];
+        $walletAddress = $dataUpdate['wallet_address'];
+        $safeBlockDistant = $dataUpdate['safe_block_distant'];
+
+         return $this->db->query("UPDATE `" . DB_PREFIX . "ezpay_coin` SET `discount` = '" . (int)$discount .
+            "', `payment_lifetime` = '". (int)$paymentLifetime.
+            "', `wallet_address` = '". $this->db->escape($walletAddress).
+            "', `safe_block_distant` = '". (int)$safeBlockDistant.
+            "', `modified` = now()" ." WHERE `ezpay_coin_id` ='". $this->db->escape($coinId)."'");
     }
 
     public function checkUniqueCoinConfig($coinIds) {
@@ -56,8 +70,6 @@ class ModelExtensionPaymentEzpay extends Model {
 
         $query = $this->db->query($sql);
 
-        echo "<pre>";
-        print_r($query);die;
 
         if ($query->num_rows) {
             return ['unique_coins' => true];
@@ -75,6 +87,10 @@ class ModelExtensionPaymentEzpay extends Model {
         } else {
             return false;
         }
+    }
+
+    public function deleteCoinConfigByCoinId($coinId) {
+        return $this->db->query("DELETE FROM `" . DB_PREFIX . "ezpay_coin` WHERE `ezpay_coin_id` = '".$coinId."'");
     }
 
     public function getAllCoinAvailable($apiUrl, $keyword) {

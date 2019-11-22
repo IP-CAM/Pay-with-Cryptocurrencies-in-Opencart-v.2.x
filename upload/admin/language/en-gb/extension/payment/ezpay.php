@@ -1,6 +1,6 @@
 <?php
 // Heading
-$_['heading_title']		 = 'ezPay';
+$_['heading_title']		 = 'ezDeFi';
 
 // Text
 $_['text_edit']		   = 'Edit Stripe';
@@ -8,61 +8,48 @@ $_['text_payment']		= 'Payment';
 $_['text_extension']		= 'Extension';
 $_['text_payments']		= 'Payments';
 $_['text_success']		= 'Success: You have modified Stripe Payment Module!';
-$_['text_stripe']			= '<img src="view/image/payment/stripe_logo.png" alt="Stripe" title="Stripe" style="border: 1px solid #EEEEEE;" />';
+$_['text_ezpay']			= '<img src="view/image/payment/ezpay.png" alt="ezpay" title="ezpay" style="border: 1px solid #EEEEEE;" />';
 $_['text_next']			= 'Next';
 $_['text_live']			= 'Live (Production)';
 $_['text_test']			= 'Test (Sandbox)';
 
-// Tab
-$_['tab_general']			= 'General';
-$_['tab_secret_test']	= 'Test Secret';
-$_['tab_secret_live']	= 'Live Secret';
 
 // Entry
-$_['entry_environment'] = 'Environment';
-$_['entry_environment_help'] = 'Please choose an environment. Test for Testing (Sandbox) account and Live for Production account';
+$_['entry_enable_extension'] = 'Enable ezPay';
+$_['entry_gateway_api_url'] = 'GATEWAY API URL';
+$_['entry_api_key'] = 'API KEY';
+$_['entry_order_status'] = 'ORDER STATUS';
 
-$_['entry_status'] = 'Status';
-$_['entry_status_help'] = 'Enable this to accept payment using Stripe';
+//Button
+$_['button_add'] = 'Add more';
+$_['button_close'] = 'Close';
+$_['button_save'] = 'Save';
+$_['button_yes'] = 'Yes';
 
-$_['entry_sort_order'] = 'Sort Order';
+// Tab
+$_['tab_edit_general'] = 'Edit ezDeFi';
+$_['tab_edit_coin_config'] = 'Coins config';
 
-$_['entry_order_success_status'] = 'Order Success Status';
-$_['entry_order_success_status_help'] = 'Order status that will set for Successful Payment';
+// text
+$_['text_symbol'] = 'Name';
+$_['text_name'] = 'Full Name';
+$_['text_discount'] = 'Discount';
+$_['text_payment_lifetime'] = 'Payment lifetime';
+$_['text_wallet_address'] = 'Wallet address';
+$_['text_safe_block_distant'] = 'Safe block distant';
+$_['text_edit'] = 'Edit';
+$_['text_delete'] = 'Delete';
 
-$_['entry_order_failed_status'] = 'Order Failed Status';
-$_['entry_order_failed_status_help'] = 'Order status that will set for Failed Payment';
-
-$_['entry_stripe_currency'] = 'Currency';
-$_['entry_stripe_currency_help'] = 'Select Currency';
-
-$_['entry_store_card'] = 'Store Customer Card';
-$_['entry_store_card_help'] = 'Enable this if you want to allow customers to save their cards.';
-
-$_['entry_test_public_key'] = 'Test Public Key';
-$_['entry_test_public_key_help'] = 'Public Key for Sandbox Accuont';
-
-$_['entry_test_secret_key'] = 'Test Secret Key';
-$_['entry_test_secret_key_help'] = 'Secret Key for Sandbox Accuont';
-
-$_['entry_live_public_key'] = 'Live Public Key';
-$_['entry_live_public_key_help'] = 'Public Key for Production Accuont';
-
-$_['entry_live_secret_key'] = 'Live Secret Key';
-$_['entry_live_secret_key_help'] = 'Secret Key for Production Accuont';
-
-$_['entry_debug'] = 'Debug';
-$_['entry_debug_help'] = 'Enable this will write Stripe Payment logs to help you finding any issue';
 
 // Error
 $_['error_permission']	= 'Warning: You do not have permission to modify Stripe Payment!';
-$_['error_gateway_api_url'] = 'error_order_status';
-$_['error_api_key'] = 'error_order_status';
-$_['error_order_status'] = 'error_order_status';
+$_['error_gateway_api_url'] = 'Gateway api url is required';
+$_['error_api_key'] = 'Gateway api url is required';
+$_['error_order_status'] = 'Order status is required';
 
-$_['error_name'] = 'error_name';
-$_['error_full_name'] = 'error_full_name';
-$_['error_discount'] = 'error_discount';
-$_['error_lifetime'] = 'error_lifetime';
-$_['error_wallet_address'] = 'error_wallet_address';
-$_['error_safe_block_distant'] = 'error_safe_block_distant';
+$_['error_name'] = 'Name is required';
+$_['error_full_name'] = 'Full name is required';
+$_['error_discount'] = 'Discount should be integer and less than 100';
+$_['error_lifetime'] = 'Payment lifetime should be integer';
+$_['error_wallet_address'] = 'Wallet address is invalid';
+$_['error_safe_block_distant'] = 'Safe block distant should be integer';

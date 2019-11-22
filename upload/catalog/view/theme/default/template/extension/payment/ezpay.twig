@@ -1,18 +1,15 @@
 <link rel="stylesheet" type="text/css" href="{{ store_url }}catalog/view/theme/default/stylesheet/ezpay.css">
-
+<script src="{{ store_url }}catalog/view/javascript/ezpay.js"></script>
 <div class="payment-form-wrapper">
-{% if test_mode %}
-<small class="text-info">{{ text_debug }}</small>
-{% endif %}
-
-
+	<input type="hidden" id="url-check-order-complete" value="{{ url_check_order_complete }}">
+	<input type="hidden" id="order-id" value="{{ order_id }}">
 	<div class="ezpay-select-coin-box">
 		<div class="ezpay-select-coin__list">
 			<table class="table">
 				{% for coin_config in coins_config %}
 					<tr>
 						<td>
-							<input type="radio" name="coin-selected-to-order" value="{{ coin_config.ezpay_coin_id }}">
+							<input type="radio" name="coin-selected-to-order" value="{{ coin_config.ezpay_coin_id }}" data-discount="{{ coin_config.discount }}">
 						</td>
 						<td>
 							<img src="{{ coin_config.logo }}" alt="" class="ezpay-select-coin__logo">
@@ -21,104 +18,65 @@
 						<td>{{coin_config.full_name}}</td>
 						<td> Discount {{ coin_config.discount }}%</td>
 						<td>
-							<a href="#" data-toggle="tooltip" title="Hooray!">Ho</a>
+							<a href="#" data-toggle="tooltip" title="Description"><i class="fa fa-info" aria-hidden="true"></i></a>
 						</td>
 					</tr>
 				{% endfor %}
 			</table>
 		</div>
 
-		<a href="#" class="ezapy-guide-link">Hướng dẫn thanh toán</a>
+		<a href="#" class="ezapy-guide-link">{{ text_guide }}</a>
 
-		<button id="ezpay-btn-create-payment" data-url_get_qr_code="{{ url_get_create_payment }}" disabled> Tiếp theo </button>
+		<button class="ezpay-btn-create-payment" data-url_create_payment="{{ url_create_payment }}" disabled> Tiếp theo </button>
 	</div>
 
 	<div class="ezpay-payment-box">
 		<div class="ezpay-payment__header">
-			<img src="https://s2.coinmarketcap.com/static/img/coins/64x64/3957.png" alt="" class="ezpay-payment__coin-logo">
-			<span class="ezpay-payment__coin-name">BTC/Bitcoin</span>
-			<button class="ezpay-payment__btn-charge-coin">Charge</button>
+			<img src="https://s2.coinmarketcap.com/static/img/coins/64x64/3957.png" alt="" class="ezpay-payment__coin-logo tooltip-show-discount" data-toggle="tooltip" title="Discount: 0%">
+			<span class="ezpay-payment__coin-name tooltip-show-discount" data-toggle="tooltip" title="Discount: 0%" ></span>
+			<span class="wide-space"></span>
+			<button class="ezpay-payment__btn-charge-coin">{{ text_charge }}</button>
 		</div>
-		<div class="ezpay-payment__info">
+
+		<div class="ezpay-charge-coin-box margin-top-md">
+			<div class="ezpay-select-coin__list">
+				<table class="table">
+					{% for coin_config in coins_config %}
+						<tr>
+							<td>
+								<input type="radio" name="coin-selected-to-order" value="{{ coin_config.ezpay_coin_id }}" data-discount="{{ coin_config.discount }}">
+							</td>
+							<td>
+								<img src="{{ coin_config.logo }}" alt="" class="ezpay-select-coin__logo">
+							</td>
+							<td>{{coin_config.name}}</td>
+							<td>{{coin_config.full_name}}</td>
+							<td> Discount {{ coin_config.discount }}%</td>
+							<td>
+								<a href="#" data-toggle="tooltip" title="Hooray!"><i class="fa fa-info" aria-hidden="true"></i></a>
+							</td>
+						</tr>
+					{% endfor %}
+				</table>
+			</div>
+			<button class="ezpay-btn-create-payment margin-top-md" data-url_create_payment="{{ url_create_payment }}" disabled> Confirm </button>
+		</div>
+
+		<div class="ezpay-payment__content">
 			<div class="ezpay-payment__value">
-				<span class="ezpay-payment__origin-value">120.000Đ</span>
-				<span class="ezpay-payment__icon-convert">...</span>
-				<span class="ezpay-payment__currency-value"> 12 BTC</span>
+				<span class="ezpay-payment__origin-value"></span>
+				<span class="ezpay-payment__icon-convert"><i class="fa fa-retweet" aria-hidden="true"></i></span>
+				<span class="ezpay-payment__currency-value"></span>
 			</div>
 			<div class="ezpay-payment__countdown-box">
-				you have <span class="ezpay-payment__countdown-lifetime"></span> to scan this QRcode
+				<input type="hidden" id="payment-id">
+				{{ text_notify_countdown_for_payment }}
 			</div>
 			<img src="" alt="" class="ezpay-payment__qr-code">
 			<div class="ezpay-payment__download-link">
-				<a href="#">Download ezPay for IOS</a>
-				<a href="#">Download ezPay for Android</a>
+				<a href="{{ link_download_app_ios }}">{{ text_download_app_ios }}</a>
+				<a href="{{ link_download_app_android }}">{{ text_download_app_android }}</a>
 			</div>
 		</div>
 	</div>
 </div>
-<script>
-	var selectors = {
-		btnGetQrCode: '#ezpay-btn-create-payment',
-		coinIdToPaymentInput: 'input[name="coin-selected-to-order"]',
-		selectCoinBox: '.ezpay-select-coin-box',
-		paymentBox: '.ezpay-payment-box',
-		qrCodeImg: '.ezpay-payment__qr-code',
-		countDownTime: '.ezpay-payment__countdown-lifeTime',
-		originValue: '.ezpay-payment__origin-value',
-		currencyValue: '.ezpay-payment__currency-value',
-		logoCoinSelected: '.ezpay-payment__coin-logo',
-		nameCoinSelected: '.ezpay-payment__coin-name'
-	}
-
-	$(selectors.coinIdToPaymentInput).click(function () {
-		if($(this).is(':checked')) {
-			$(selectors.btnGetQrCode).prop("disabled", false);
-		}
-	});
-
-	$(selectors.btnGetQrCode).click(function () {
-		var url = $(this).data('url_get_qr_code');
-		var coinId = $(selectors.coinIdToPaymentInput+':checked').val();
-
-		$.ajax({
-			url: url,
-			method: "GET",
-			data: { coin_id: coinId },
-			success: function (response) {
-				var data = JSON.parse(response).data;
-				countDownTime(data.expiredTime);
-
-				$(selectors.originValue).html(data.originValue + data.originCurrency);
-				$(selectors.currencyValue).html(data.value * Math.pow(10, data.decimal) + data.currency);
-
-				$(selectors.logoCoinSelected).prop('src', data.chain.logo);
-				$(selectors.nameCoinSelected).html(data.chain.symbol + '/' + data.chain.name);
-
-				$(selectors.selectCoinBox).css('display', 'none');
-				$('.ezpay-payment-box').css('display','block');
-				$(selectors.qrCodeImg).prop('src', data.qr);
-			}
-		})
-	});
-
-	var countDownTime = function (expiredTime) {
-		var countDownInterval = setInterval(function () {
-			var timestampCountdown = new Date(expiredTime) - new Date();
-			var secondToCountdown = Math.floor(timestampCountdown/1000);
-			if(secondToCountdown >= 0) {
-				var hours = Math.floor(secondToCountdown / 3600);
-				secondToCountdown %= 3600;
-				var minutes = Math.floor(secondToCountdown / 60);
-				var seconds = secondToCountdown % 60;
-				if(hours > 0 ) {
-					$('.ezpay-payment__countdown-lifetime').html(hours +':'+ minutes +':' + seconds);
-				} else {
-					$('.ezpay-payment__countdown-lifetime').html(minutes +':' + seconds);
-				}
-			} else {
-				clearInterval(countDownInterval);
-			}
-		}, 1000);
-	}
-
-</script>

@@ -1,0 +1,118 @@
+.ezpay-select-coin-box {
+    width: 100%;
+}
+.ezpay-select-coin__list {
+    max-height: 300px;
+    overflow-x: auto;
+    border: 1px solid #aaa;
+}
+
+.ezpay-select-coin__logo {
+    width: 50px;
+}
+
+.ezpay-select-coin-box table>tbody>tr>td {
+    vertical-align: inherit;
+}
+
+.ezpay-select-coin-box table>tbody>tr>td input {
+    -webkit-appearance:radio;
+    -moz-appearance:radio;
+}
+
+
+.ezapy-guide-link {
+    display: block;
+    padding: 15px 0;
+    font-size: 14px;
+}
+
+.ezpay-btn-create-payment {
+    display: block;
+    margin: 0 auto;
+    width: 300px;
+    height: 50px;
+    background: cornflowerblue;
+    color: white;
+    border: none;
+}
+
+.ezpay-btn-create-payment:disabled {
+    background: darkgray;
+}
+
+.ezpay-charge-coin-box {
+    /*display: none;*/
+}
+
+.ezpay-payment-box {
+    width: 100%;
+    display: none;
+}
+
+.ezpay-payment__header {
+    width: 100%;
+    border-radius: 10px;
+    background-color: #eee;
+    padding: 7px 20px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+}
+
+.ezpay-payment__coin-logo {
+    width: 50px;
+    flex-grow: 0;
+}
+
+.ezpay-payment__coin-name {
+    padding-left: 15px;
+    flex-grow: 0;
+}
+
+.ezpay-payment__btn-charge-coin {
+    flex-grow: 0;
+    margin-right: 20px;
+    border: none;
+    background-color: inherit;
+    color: cornflowerblue;
+
+}
+
+.ezpay-payment__info {
+    width: 100%;
+}
+
+.ezpay-payment__value {
+    margin: 10px 0;
+    text-align: center;
+}
+
+.ezpay-payment__countdown-box {
+    text-align: center;
+}
+
+.ezpay-payment__countdown-lifetime {
+    color: red;
+    font-weight: bold;
+}
+
+.ezpay-payment__qr-code {
+    margin: 0 auto;
+    display: block;
+}
+
+.ezpay-payment__download-link {
+    text-align: center;
+}
+
+.ezpay-payment__download-link>a {
+    display: block;
+}
+/* General */
+.margin-top-md {
+    margin-top: 20px;
+}
+.wide-space {
+    flex-grow: 1;
+}
