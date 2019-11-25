@@ -1,7 +1,7 @@
 $( function() {
     const selectors = {
-        formConfig: '#ezpay-form-config',
-        selectCoinConfig: '.ezpay-select-coin',
+        formConfig: '#ezdefi-form-config',
+        selectCoinConfig: '.ezdefi-select-coin',
         coinConfigTable: '#coin-config__table',
         cloneRowCoinConfig: '.coin-config-clone',
         btnAdd: '#btn-add',
@@ -21,7 +21,7 @@ $( function() {
         coinSafeBlockDistantInput: '.coin-config__safe-block-distant',
     };
 
-    var oc_ezpay_admin = function() {
+    var oc_ezdefi_admin = function() {
         $(selectors.btnAdd).click(this.addCoinConfigListener.bind(this));
         $(selectors.btnDelete).click(this.deleteCoinConfig);
         $(selectors.btnEdit).click(this.editCoinConfig);
@@ -29,7 +29,7 @@ $( function() {
         this.initValidate();
     }
 
-    oc_ezpay_admin.prototype.initValidate = function() {
+    oc_ezdefi_admin.prototype.initValidate = function() {
         $.validator.addMethod("integer", function(value, element) {
             return this.optional( element ) || Math.floor(value) == value && $.isNumeric(value);
         }, "This field should be integer");
@@ -53,7 +53,7 @@ $( function() {
         this.validateWalletAddress();
     }
 
-    oc_ezpay_admin.prototype.validateWalletAddress = function() {
+    oc_ezdefi_admin.prototype.validateWalletAddress = function() {
         $(selectors.coinWalletAddressInput).each(function () {
             var inputName = $(this).attr('name');
             $(`input[name="${inputName}"]`).rules('add', {
@@ -73,7 +73,7 @@ $( function() {
         });
     }
 
-    oc_ezpay_admin.prototype.validateAllInput = function(selector, rules) {
+    oc_ezdefi_admin.prototype.validateAllInput = function(selector, rules) {
         $(selector).each(function () {
             var inputName = $(this).attr('name');
             if(inputName) {
@@ -86,7 +86,7 @@ $( function() {
         });
     }
 
-    oc_ezpay_admin.prototype.deleteCoinConfig = function() {
+    oc_ezdefi_admin.prototype.deleteCoinConfig = function() {
         var url = $(this).data('url_delete');
         var coinId = $(this).data('coin_id');
 
@@ -107,7 +107,7 @@ $( function() {
         });
     };
 
-    oc_ezpay_admin.prototype.editCoinConfig = function() {
+    oc_ezdefi_admin.prototype.editCoinConfig = function() {
         var url = $(this).data('url_edit');
         var coinId = $(this).data('coin_id');
         var discount = $('#edit-discount-' + coinId).val();
@@ -150,7 +150,7 @@ $( function() {
         });
     };
 
-    oc_ezpay_admin.prototype.addCoinConfigListener = function() {
+    oc_ezdefi_admin.prototype.addCoinConfigListener = function() {
         var url = $(selectors.btnAdd).data('list_coin_url');
         var container = `<tr class="${this.formatSelectorToClassName(selectors.cloneRowCoinConfig)}">
                 <td class="sortable-handle">
@@ -176,9 +176,9 @@ $( function() {
         $(selectors.selectCoinConfig).on('select2:select', this.selectCoinListener.bind(this));
     }
 
-    oc_ezpay_admin.prototype.initSelectCoinConfig = function() {
+    oc_ezdefi_admin.prototype.initSelectCoinConfig = function() {
         var that = this;
-        $("select.ezpay-select-coin").select2({
+        $("select.ezdefi-select-coin").select2({
             ajax: {
                 url: $(selectors.selectCoinConfig).data('list_coin_url'),
                 dataType: 'json',
@@ -205,7 +205,7 @@ $( function() {
             placeholder: "Enter name"
         });
 
-        // $("select.ezpay-select-coin").select2({
+        // $("select.ezdefi-select-coin").select2({
         //     ajax: {
         //         url: "https://api.github.com/search/repositories",
         //             dataType: 'json',
@@ -241,7 +241,7 @@ $( function() {
         return repo.full_name || repo.text;
     }
 
-    oc_ezpay_admin.prototype.selectCoinListener = function (e) {
+    oc_ezdefi_admin.prototype.selectCoinListener = function (e) {
         var data = e.params.data;
         var order = !$( selectors.coinConfigTable + ' input[name="coin_order"]').last().val() ? 0 : parseInt($(selectors.coinConfigTable +' input[name="coin_order"]').last().val()) + 1;
         var duplicate = false;
@@ -283,11 +283,11 @@ $( function() {
         }
     }
 
-    oc_ezpay_admin.prototype.formatRepoSelection = function(repo) {
+    oc_ezdefi_admin.prototype.formatRepoSelection = function(repo) {
         return repo.id;
     }
 
-    oc_ezpay_admin.prototype.formatRepo = function(repo) {
+    oc_ezdefi_admin.prototype.formatRepo = function(repo) {
         if (repo.loading) {
             return repo.text;
         }
@@ -303,7 +303,7 @@ $( function() {
             </div>`;
     }
 
-    oc_ezpay_admin.prototype.initSortable= function() {
+    oc_ezdefi_admin.prototype.initSortable= function() {
         var that = this;
         $( selectors.coinConfigTable ).sortable({
             handle: '.sortable-handle',
@@ -313,15 +313,15 @@ $( function() {
         });
     }
 
-    oc_ezpay_admin.prototype.updateCoinConfigOrder = function () {
+    oc_ezdefi_admin.prototype.updateCoinConfigOrder = function () {
         $(selectors.coinOrderInput).each(function(order) {
             $(this).val(order);
         })
     }
 
-    oc_ezpay_admin.prototype.formatSelectorToClassName = function(selector) {
+    oc_ezdefi_admin.prototype.formatSelectorToClassName = function(selector) {
         return selector.slice(1, selectors.length);
     }
 
-    new oc_ezpay_admin();
+    new oc_ezdefi_admin();
 });

@@ -1,11 +1,11 @@
 
 <?php
-class ControllerExtensionPaymentEzpay extends Controller {
+class ControllerExtensionPaymentEzdefi extends Controller {
     const PENDING = 0;
     const DONE = 2;
 
     public function index() {
-        $this->load->language('extension/payment/ezpay');
+        $this->load->language('extension/payment/ezdefi');
 
         if ($this->request->server['HTTPS']) {
             $data['store_url'] = HTTPS_SERVER;
@@ -26,30 +26,30 @@ class ControllerExtensionPaymentEzpay extends Controller {
         $order_info = $this->model_checkout_order->getOrder($this->session->data['order_id']);
         $data['order_id'] = $this->session->data['order_id'];
 
-        $data['url_create_payment'] = $this->url->link('extension/payment/ezpay/createPayment', '', true);
-        $data['url_check_order_complete'] = $this->url->link('extension/payment/ezpay/checkOrderComplete', '', true);
+        $data['url_create_payment'] = $this->url->link('extension/payment/ezdefi/createPayment', '', true);
+        $data['url_check_order_complete'] = $this->url->link('extension/payment/ezdefi/checkOrderComplete', '', true);
 
-        $this->load->model('extension/payment/ezpay');
-        $data['coins_config'] = $this->model_extension_payment_ezpay->getCoinsConfig();
+        $this->load->model('extension/payment/ezdefi');
+        $data['coins_config'] = $this->model_extension_payment_ezdefi->getCoinsConfig();
 
-        return $this->load->view('extension/payment/ezpay', $data);
+        return $this->load->view('extension/payment/ezdefi', $data);
     }
 
 
     public function createPayment() {
         $this->load->model('setting/setting');
-        $apiUrl = $this->config->get('payment_ezpay_gateway_api_url');
-        $apiKey = $this->config->get('payment_ezpay_api_key');
+        $apiUrl = $this->config->get('payment_ezdefi_gateway_api_url');
+        $apiKey = $this->config->get('payment_ezdefi_api_key');
 
         $this->load->model('checkout/order');
         $orderInfo = $this->model_checkout_order->getOrder($this->session->data['order_id']);
 
-//                $callback = $this->url->link('extension/payment/ezpay/callbackConfirmOrder', '', true);
-        $callback = 'http://bc6547e2.ngrok.io/opencart/upload/index.php?route=extension/payment/ezpay/callbackConfirmOrder';
+//                $callback = $this->url->link('extension/payment/ezdefi/callbackConfirmOrder', '', true);
+        $callback = 'http://bc6547e2.ngrok.io/opencart/upload/index.php?route=extension/payment/ezdefi/callbackConfirmOrder';
         $coinId = $this->request->get['coin_id'];
 
-        $this->load->model('extension/payment/ezpay');
-        $paymentInfo = $this->model_extension_payment_ezpay->createEzpayPayment($apiUrl, $apiKey, $coinId, $orderInfo, $callback);
+        $this->load->model('extension/payment/ezdefi');
+        $paymentInfo = $this->model_extension_payment_ezdefi->createEzdefiPayment($apiUrl, $apiKey, $coinId, $orderInfo, $callback);
         return $this->response->setOutput($paymentInfo);
     }
 
@@ -57,11 +57,11 @@ class ControllerExtensionPaymentEzpay extends Controller {
         $orderId = $this->request->get['uoid'];
 
         $this->load->model('setting/setting');
-        $apiUrl = $this->config->get('payment_ezpay_gateway_api_url');
-        $apiKey = $this->config->get('payment_ezpay_api_key');
+        $apiUrl = $this->config->get('payment_ezdefi_gateway_api_url');
+        $apiKey = $this->config->get('payment_ezdefi_api_key');
 
-        $this->load->model('extension/payment/ezpay');
-        $paymentStatus = $this->model_extension_payment_ezpay->checkPaymentComplete($apiUrl, $apiKey, $this->request->get['paymentid']);
+        $this->load->model('extension/payment/ezdefi');
+        $paymentStatus = $this->model_extension_payment_ezdefi->checkPaymentComplete($apiUrl, $apiKey, $this->request->get['paymentid']);
 
         if($paymentStatus['status'] == 'DONE') {
             $this->load->model('checkout/order');

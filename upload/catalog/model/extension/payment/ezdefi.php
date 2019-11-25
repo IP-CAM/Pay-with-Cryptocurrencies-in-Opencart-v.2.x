@@ -1,10 +1,10 @@
 <?php
-class ModelExtensionPaymentEzpay extends Model {
+class ModelExtensionPaymentEzdefi extends Model {
     const PENDING = 0;
     const DONE = 2;
 
 	public function getMethod($address, $total) {
-		$this->load->language('extension/payment/ezpay');
+		$this->load->language('extension/payment/ezdefi');
 
 		$status = true;
 
@@ -17,10 +17,10 @@ class ModelExtensionPaymentEzpay extends Model {
 
 		if ($status) {
 			$method_data = array(
-				'code'       => 'ezpay',
+				'code'       => 'ezdefi',
 				'title'      => $this->language->get('text_title'),
 				'terms'      => '',
-				'sort_order' => $this->config->get('payment_ezpay_sort_order')
+				'sort_order' => $this->config->get('payment_ezdefi_sort_order')
 			);
 		}
 
@@ -29,7 +29,7 @@ class ModelExtensionPaymentEzpay extends Model {
 
 
 	public function getCoinsConfig() {
-        $query = $this->db->query("SELECT * FROM `" . DB_PREFIX . "ezpay_coin` WHERE 1 ORDER BY `order` ASC");
+        $query = $this->db->query("SELECT * FROM `" . DB_PREFIX . "ezdefi_coin` WHERE 1 ORDER BY `order` ASC");
 
         if ($query->num_rows) {
             $order = $query->rows;
@@ -39,8 +39,8 @@ class ModelExtensionPaymentEzpay extends Model {
         }
     }
 
-    public function createEzpayPayment($apiUrl, $apiKey, $coinId, $orderInfo, $callback) {
-        $coinConfig = $this->getCoinConfigByEzPayCoinId($coinId);
+    public function createEzdefiPayment($apiUrl, $apiKey, $coinId, $orderInfo, $callback) {
+        $coinConfig = $this->getCoinConfigByEzdefiCoinId($coinId);
 //        $params = '?uoid='.$orderInfo['order_id'].'&to='.$coinConfig['wallet_address'].'&value='.$orderInfo['total'].'&currency='.$orderInfo['currency_code'].'%3A'.$coinConfig['symbol'].'&duration='.$coinConfig['payment_lifetime'].'&callback='.$callback;
 
         $orderInfo['total'] = 1;
@@ -73,8 +73,8 @@ class ModelExtensionPaymentEzpay extends Model {
         }
     }
 
-    public function getCoinConfigByEzPayCoinId($coinId) {
-        $query = $this->db->query("SELECT * FROM `" . DB_PREFIX . "ezpay_coin` WHERE `ezpay_coin_id` ='".$coinId."' LIMIT 1");
+    public function getCoinConfigByEzdefiCoinId($coinId) {
+        $query = $this->db->query("SELECT * FROM `" . DB_PREFIX . "ezdefi_coin` WHERE `ezdefi_coin_id` ='".$coinId."' LIMIT 1");
 
         if ($query->num_rows) {
             $coinConfig = $query->rows;

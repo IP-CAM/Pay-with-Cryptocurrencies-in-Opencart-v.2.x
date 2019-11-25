@@ -8,14 +8,14 @@ $_['text_payment']		= 'Payment';
 $_['text_extension']		= 'Extension';
 $_['text_payments']		= 'Payments';
 $_['text_success']		= 'Success: You have modified Stripe Payment Module!';
-$_['text_ezpay']			= '<img src="view/image/payment/ezpay.png" alt="ezpay" title="ezpay" style="border: 1px solid #EEEEEE;" />';
+$_['text_ezdefi']			= '<img src="view/image/payment/ezdefi.png" alt="ezdefi" title="ezdefi" style="border: 1px solid #EEEEEE;" />';
 $_['text_next']			= 'Next';
 $_['text_live']			= 'Live (Production)';
 $_['text_test']			= 'Test (Sandbox)';
 
 
 // Entry
-$_['entry_enable_extension'] = 'Enable ezPay';
+$_['entry_enable_extension'] = 'Enable ezdefi';
 $_['entry_gateway_api_url'] = 'GATEWAY API URL';
 $_['entry_api_key'] = 'API KEY';
 $_['entry_order_status'] = 'ORDER STATUS';

@@ -1,21 +1,21 @@
 $(function () {
     var selectors = {
-        btnGetQrCode: '.ezpay-btn-create-payment',
+        btnGetQrCode: '.ezdefi-btn-create-payment',
         coinIdToPaymentInput: 'input[name="coin-selected-to-order"]',
-        selectCoinBox: '.ezpay-select-coin-box',
-        chargeCoinBox: '.ezpay-charge-coin-box',
-        paymentbox: '.ezpay-payment-box',
-        paymentContent: '.ezpay-payment__content',
-        qrCodeImg: '.ezpay-payment__qr-code',
-        countDownTime: '.ezpay-payment__countdown-lifeTime',
-        originValue: '.ezpay-payment__origin-value',
-        currencyValue: '.ezpay-payment__currency-value',
-        logoCoinSelected: '.ezpay-payment__coin-logo',
-        nameCoinSelected: '.ezpay-payment__coin-name',
+        selectCoinBox: '.ezdefi-select-coin-box',
+        chargeCoinBox: '.ezdefi-charge-coin-box',
+        paymentbox: '.ezdefi-payment-box',
+        paymentContent: '.ezdefi-payment__content',
+        qrCodeImg: '.ezdefi-payment__qr-code',
+        countDownTime: '.ezdefi-payment__countdown-lifeTime',
+        originValue: '.ezdefi-payment__origin-value',
+        currencyValue: '.ezdefi-payment__currency-value',
+        logoCoinSelected: '.ezdefi-payment__coin-logo',
+        nameCoinSelected: '.ezdefi-payment__coin-name',
         urlCheckOrderCompleteInput: '#url-check-order-complete',
         orderIdInput: '#order-id',
         paymentIdInput: '#payment-id',
-        btnCharge: '.ezpay-payment__btn-charge-coin',
+        btnCharge: '.ezdefi-payment__btn-charge-coin',
         tooltipShowDiscount: '.tooltip-show-discount'
     };
 
@@ -119,9 +119,9 @@ $(function () {
                     var minutes = Math.floor(secondToCountdown / 60);
                     var seconds = secondToCountdown % 60;
                     if(hours > 0 ) {
-                        $('.ezpay-payment__countdown-lifetime').html(hours +':'+ minutes +':' + seconds);
+                        $('.ezdefi-payment__countdown-lifetime').html(hours +':'+ minutes +':' + seconds);
                     } else {
-                        $('.ezpay-payment__countdown-lifetime').html(minutes +':' + seconds);
+                        $('.ezdefi-payment__countdown-lifetime').html(minutes +':' + seconds);
                     }
                 } else {
                     clearInterval(global.countDownInterval);
