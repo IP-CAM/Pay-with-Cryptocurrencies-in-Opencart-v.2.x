@@ -4,8 +4,7 @@ class ModelExtensionPaymentEzdefi extends Model {
     public function install() {
         $this->db->query("
 			CREATE TABLE IF NOT EXISTS `" . DB_PREFIX . "ezdefi_coin` (
-			  `coin_id` int(11) NOT NULL AUTO_INCREMENT,
-			  `ezdefi_coin_id` varchar(255),
+			  `coin_id` varchar(255),
 			  `order` int(11) NOT NULL,
               `logo` varchar(255),
 		      `symbol` varchar(255),
@@ -17,11 +16,25 @@ class ModelExtensionPaymentEzdefi extends Model {
 			  `created` DATETIME NOT NULL,
 			  `modified` DATETIME NOT NULL,
 			  PRIMARY KEY (`coin_id`)
-			) ENGINE=MyISAM DEFAULT COLLATE=utf8_general_ci;");
+			) ENGINE=MyISAM DEFAULT COLLATE=utf8_general_ci;
+			
+			CREATE TABLE IF NOT EXISTS `" . DB_PREFIX . "ezdefi_amount_id_log` (
+			  `price` DECIMAL(15,4) NOT NULL,
+			  `amount_id` DECIMAL(25,14) NOT NULL,
+			  `currency` varchar(255) NOT NULL,
+			  `decimal` integer(11) NOT NULL,
+              `valid` varchar(255) NOT NULL DEFAULT 0,
+              `expire_timestamp` int() NOT NULL,
+			  `created` DATETIME NOT NULL,
+			  `modified` DATETIME NOT NULL,
+			  PRIMARY KEY (`currency`, `amount_id`)
+			) ENGINE=MyISAM DEFAULT COLLATE=utf8_general_ci;
+			");
     }
 
     public function uninstall() {
         $this->db->query("DROP TABLE IF EXISTS `" . DB_PREFIX . "ezdefi_coin`;");
+        $this->db->query("DROP TABLE IF EXISTS `" . DB_PREFIX . "ezdefi_amount_id_log`;");
     }
 
     public function updateCoins($data) {
@@ -69,8 +82,6 @@ class ModelExtensionPaymentEzdefi extends Model {
         }
 
         $query = $this->db->query($sql);
-
-
         if ($query->num_rows) {
             return ['unique_coins' => true];
         } else {

@@ -16,6 +16,12 @@ class ControllerExtensionPaymentEzdefi extends Controller {
         $data['url_delete'] = $this->url->link('extension/payment/ezdefi/deleteCoinConfig', 'user_token=' . $this->session->data['user_token'], true);
         $data['url_edit'] = $this->url->link('extension/payment/ezdefi/editCoinConfig', 'user_token=' . $this->session->data['user_token'], true);
 
+
+        if($this->config->has('payment_ezdefi_status')){
+            $data['payment_ezdefi_status'] = $this->config->get('payment_ezdefi_status');
+        } else {
+            $data['payment_ezdefi_status'] = '';
+        }
         if($this->config->has('payment_ezdefi_gateway_api_url')){
             $data['payment_ezdefi_gateway_api_url'] = $this->config->get('payment_ezdefi_gateway_api_url');
         } else {
@@ -34,10 +40,25 @@ class ControllerExtensionPaymentEzdefi extends Controller {
             $data['payment_ezdefi_order_status'] = '';
         }
 
-        if($this->config->has('payment_ezdefi_status')){
-            $data['payment_ezdefi_status'] = $this->config->get('payment_ezdefi_status');
+        if($this->config->has('payment_ezdefi_enable_simple_pay')){
+            $data['payment_ezdefi_enable_simple_pay'] = $this->config->get('payment_ezdefi_enable_simple_pay');
         } else {
-            $data['payment_ezdefi_status'] = '';
+            $data['payment_ezdefi_enable_simple_pay'] = '';
+        }
+        if($this->config->has('payment_ezdefi_enable_escrow_pay')){
+            $data['payment_ezdefi_enable_escrow_pay'] = $this->config->get('payment_ezdefi_enable_escrow_pay');
+        } else {
+            $data['payment_ezdefi_enable_escrow_pay'] = '';
+        }
+        if($this->config->has('payment_ezdefi_decimal')){
+            $data['payment_ezdefi_decimal'] = $this->config->get('payment_ezdefi_decimal');
+        } else {
+            $data['payment_ezdefi_decimal'] = '';
+        }
+        if($this->config->has('payment_ezdefi_variation')){
+            $data['payment_ezdefi_variation'] = $this->config->get('payment_ezdefi_variation');
+        } else {
+            $data['payment_ezdefi_variation'] = '';
         }
 
         $data['coins_config'] = $this->model_extension_payment_ezdefi->getCoinsConfig();
@@ -61,6 +82,7 @@ class ControllerExtensionPaymentEzdefi extends Controller {
 
     public function update() {
         if (($this->request->server['REQUEST_METHOD'] == 'POST') && ($this->validate())) {
+
             $dataSetting['payment_ezdefi_gateway_api_url'] = $this->request->post['payment_ezdefi_gateway_api_url'];
             $dataSetting['payment_ezdefi_api_key'] = $this->request->post['payment_ezdefi_api_key'];
             $dataSetting['payment_ezdefi_order_status'] = $this->request->post['payment_ezdefi_order_status'];
@@ -71,6 +93,16 @@ class ControllerExtensionPaymentEzdefi extends Controller {
             if(isset($this->request->post['payment_ezdefi_status'])) {
                 $dataSetting['payment_ezdefi_status'] = $this->request->post['payment_ezdefi_status'];
                 unset($this->request->post['payment_ezdefi_status']);
+            }
+            if(isset($this->request->post['payment_ezdefi_enable_simple_pay'])) {
+                $dataSetting['payment_ezdefi_enable_simple_pay'] = $this->request->post['payment_ezdefi_enable_simple_pay'];
+                $dataSetting['payment_ezdefi_decimal'] = $this->request->post['payment_ezdefi_decimal'];
+                $dataSetting['payment_ezdefi_variation'] = $this->request->post['payment_ezdefi_variation'];
+                unset($this->request->post['payment_ezdefi_enable_simple_pay']);
+            }
+            if(isset($this->request->post['payment_ezdefi_enable_escrow_pay'])) {
+                $dataSetting['payment_ezdefi_enable_escrow_pay'] = $this->request->post['payment_ezdefi_enable_escrow_pay'];
+                unset($this->request->post['payment_ezdefi_enable_escrow_pay']);
             }
 
             $this->load->model('extension/payment/ezdefi');
@@ -99,6 +131,18 @@ class ControllerExtensionPaymentEzdefi extends Controller {
         if (!$this->request->post['payment_ezdefi_order_status']) {
             $this->error['order_status'] = $this->language->get('error_order_status');
         }
+        if (!isset($this->request->post['payment_ezdefi_enable_simple_pay']) && !isset($this->request->post['payment_ezdefi_enable_escrow_pay'])) {
+            $this->error['choose_payment_method'] = $this->language->get('error_order_status');
+        }
+
+        if (isset($this->request->post['payment_ezdefi_enable_simple_pay']) && trim($this->request->post['payment_ezdefi_enable_simple_pay']) !== '') {
+           if(!isset($this->request->post['payment_ezdefi_decimal']) || trim($this->request->post['payment_ezdefi_decimal']) === '' || !filter_var($this->request->post['payment_ezdefi_decimal'], FILTER_VALIDATE_INT)) {
+               $this->error['decimal'] = $this->language->get('error_decimal');
+           }
+            if(!isset($this->request->post['payment_ezdefi_variation']) || trim($this->request->post['payment_ezdefi_variation']) === '' || !filter_var($this->request->post['payment_ezdefi_variation'], FILTER_VALIDATE_INT)) {
+                $this->error['variation'] = $this->language->get('error_variation');
+            }
+        }
 
         $coinsConfigData = $this->request->post;
         unset($coinsConfigData['payment_ezdefi_order_status']);
@@ -106,6 +150,12 @@ class ControllerExtensionPaymentEzdefi extends Controller {
         unset($coinsConfigData['payment_ezdefi_gateway_api_url']);
         if(isset($coinsConfigData['payment_ezdefi_status'])) {
             unset($coinsConfigData['payment_ezdefi_status']);
+        }
+        if(isset($coinsConfigData['payment_ezdefi_enable_simple_pay'])) {
+            unset($coinsConfigData['payment_ezdefi_enable_simple_pay']);
+        }
+        if(isset($coinsConfigData['payment_ezdefi_enable_escrow_pay'])) {
+            unset($coinsConfigData['payment_ezdefi_enable_escrow_pay']);
         }
 
         if (count($coinsConfigData) > 0) {

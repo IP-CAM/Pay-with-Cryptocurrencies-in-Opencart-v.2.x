@@ -5,67 +5,78 @@ class ControllerExtensionPaymentEzdefi extends Controller {
     const DONE = 2;
 
     public function index() {
+        $this->load->model('checkout/order');
+        $this->load->model('setting/setting');
+        $this->load->model('extension/payment/ezdefi');
         $this->load->language('extension/payment/ezdefi');
 
-        if ($this->request->server['HTTPS']) {
-            $data['store_url'] = HTTPS_SERVER;
-        } else {
-            $data['store_url'] = HTTP_SERVER;
-        }
+        $data['store_url'] = HTTPS_SERVER;
 
-        if($this->config->get('payment_stripe_environment') == 'live') {
-            $data['payment_stripe_public_key'] = $this->config->get('payment_stripe_live_public_key');
-            $data['test_mode'] = false;
-        } else {
-            $data['payment_stripe_public_key'] = $this->config->get('payment_stripe_test_public_key');
-            $data['test_mode'] = true;
-        }
-
-        // get order info
-        $this->load->model('checkout/order');
-        $order_info = $this->model_checkout_order->getOrder($this->session->data['order_id']);
         $data['order_id'] = $this->session->data['order_id'];
-
-        $data['url_create_payment'] = $this->url->link('extension/payment/ezdefi/createPayment', '', true);
-        $data['url_check_order_complete'] = $this->url->link('extension/payment/ezdefi/checkOrderComplete', '', true);
-
-        $this->load->model('extension/payment/ezdefi');
         $data['coins_config'] = $this->model_extension_payment_ezdefi->getCoinsConfig();
+        $data['enable_simple_pay'] = $this->config->get('payment_ezdefi_enable_simple_pay');
+        $data['enable_escrow_pay'] = $this->config->get('payment_ezdefi_enable_escrow_pay');
+
+        $data['url_check_order_complete'] = $this->url->link('extension/payment/ezdefi/checkOrderComplete', '', true);
+        $data['url_create_simple_payment'] = $this->url->link('extension/payment/ezdefi/createSimplePayment', '', true);
+        $data['url_create_escrow_payment'] = $this->url->link('extension/payment/ezdefi/createEscrowPayment', '', true);
 
         return $this->load->view('extension/payment/ezdefi', $data);
     }
 
-
-    public function createPayment() {
+    public function createSimplePayment() {
         $this->load->model('setting/setting');
-        $apiUrl = $this->config->get('payment_ezdefi_gateway_api_url');
-        $apiKey = $this->config->get('payment_ezdefi_api_key');
+        $enableSimplePay = $this->config->get('payment_ezdefi_enable_simple_pay');
 
-        $this->load->model('checkout/order');
-        $orderInfo = $this->model_checkout_order->getOrder($this->session->data['order_id']);
-
-//                $callback = $this->url->link('extension/payment/ezdefi/callbackConfirmOrder', '', true);
-        $callback = 'http://bc6547e2.ngrok.io/opencart/upload/index.php?route=extension/payment/ezdefi/callbackConfirmOrder';
+        $callback = 'http://85d99cf3.ngrok.io/opencart/upload/index.php?route=extension/payment/ezdefi/callbackConfirmOrder';
         $coinId = $this->request->get['coin_id'];
 
-        $this->load->model('extension/payment/ezdefi');
-        $paymentInfo = $this->model_extension_payment_ezdefi->createEzdefiPayment($apiUrl, $apiKey, $coinId, $orderInfo, $callback);
-        return $this->response->setOutput($paymentInfo);
+        if ($enableSimplePay) {
+            $this->load->model('extension/payment/ezdefi');
+            $paymentInfo = $this->model_extension_payment_ezdefi->createPaymentSimple($coinId, $callback);
+            if ($paymentInfo) {
+                return $this->response->setOutput($paymentInfo);
+            } else {
+                return $this->response->setOutput(['data' => ['status'=> 'failure', 'message'=>$this->language->get('error_cant_create_payment')]]);
+            }
+        } else {
+            return $this->response->setOutput(['data' => ['status'=> 'failure', 'message'=>$this->language->get('error_enable_simple_pay')]]);
+        }
+    }
+
+    public function createEscrowPayment() {
+        $this->load->model('setting/setting');
+        $enableEscrowPay = $this->config->get('payment_ezdefi_enable_escrow_pay');
+        $callback = 'http://85d99cf3.ngrok.io/opencart/upload/index.php?route=extension/payment/ezdefi/callbackConfirmOrder';
+        $coinId = $this->request->get['coin_id'];
+        if ($enableEscrowPay) {
+            $this->load->model('extension/payment/ezdefi');
+            $paymentInfo = $this->model_extension_payment_ezdefi->createPaymentEscrow($coinId, $callback);
+            if ($paymentInfo) {
+                return $this->response->setOutput($paymentInfo);
+            } else {
+                return $this->response->setOutput(['data' => ['status'=> 'failure', 'message'=>$this->language->get('error_cant_create_payment')]]);
+            }
+        } else {
+            return $this->response->setOutput(['data' => ['status'=> 'failure', 'message'=>$this->language->get('error_enable_escrow_pay')]]);
+        }
     }
 
     public function callbackConfirmOrder() {
-        $orderId = $this->request->get['uoid'];
+        $uoidInfoArr = explode("-",$this->request->get['uoid']);
+        $orderId = $uoidInfoArr[0];
+        $hasAmountId = $uoidInfoArr[1];
 
         $this->load->model('setting/setting');
         $apiUrl = $this->config->get('payment_ezdefi_gateway_api_url');
         $apiKey = $this->config->get('payment_ezdefi_api_key');
 
         $this->load->model('extension/payment/ezdefi');
-        $paymentStatus = $this->model_extension_payment_ezdefi->checkPaymentComplete($apiUrl, $apiKey, $this->request->get['paymentid']);
+        $paymentStatus = $this->model_extension_payment_ezdefi->checkPaymentComplete($apiUrl, $apiKey, $this->request->get['paymentid'], $hasAmountId);
 
         if($paymentStatus['status'] == 'DONE') {
             $this->load->model('checkout/order');
-            $message = 'Payment Intent ID: '. $this->request->get['paymentid'] .', Status: '.$paymentStatus['status'];
+            $message = 'Payment Intent ID: '. $this->request->get['paymentid'] .', Status: '.$paymentStatus['status'].' Has amountId:'. $hasAmountId ? "true" : 'false';
             $this->model_checkout_order->addOrderHistory($orderId, $paymentStatus['code'], $message, false);
         }
         return;

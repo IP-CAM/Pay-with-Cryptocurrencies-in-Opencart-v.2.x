@@ -76,8 +76,50 @@
     border: none;
     background-color: inherit;
     color: cornflowerblue;
-
 }
+
+.ezdefi-payment__content {
+    display: grid;
+    grid-template-columns: auto auto;
+}
+
+.ezdefi-payment__content > div{
+    display: none;
+}
+
+.btn-choose-payment-type {
+    margin-top: 20px;
+    padding: 10px;
+    text-align: center;
+    border-bottom: 1px solid #999;
+    color: cornflowerblue;
+}
+.btn-choose-payment-type:hover {
+    background: #eee;
+    color: #888;
+    border-radius: 4px 4px 0 0;
+}
+#ezdefi-show-payment--simple:checked ~ .btn-show-payment--simple, #ezdefi-show-payment--escrow:checked ~ .btn-show-payment--escrow {
+    background: #ffffff;
+    color: #666;
+    border: 1px solid #999;
+    border-bottom-color: transparent;
+    border-radius: 4px 4px 0 0;
+}
+
+#ezdefi-show-payment--simple:checked ~ div.simple-pay-box, #ezdefi-show-payment--escrow:checked ~ div.escrow-pay-box {
+    display: block;
+}
+
+div.escrow-pay-box, div.simple-pay-box {
+    grid-column: 1/-1;
+}
+
+.ezdefi-payment__content > input {
+    display: none;
+}
+
+
 
 .ezdefi-payment__info {
     width: 100%;
@@ -92,14 +134,15 @@
     text-align: center;
 }
 
-.ezdefi-payment__countdown-lifetime {
+.ezdefi-countdown-lifetime {
     color: red;
     font-weight: bold;
 }
 
-.ezdefi-payment__qr-code {
+.payment-box {
     margin: 0 auto;
     display: block;
+    text-align: center;
 }
 
 .ezdefi-payment__download-link {
@@ -109,6 +152,7 @@
 .ezdefi-payment__download-link>a {
     display: block;
 }
+
 /* General */
 .margin-top-md {
     margin-top: 20px;

@@ -23,27 +23,52 @@
                 </div>
                 <div class="panel-body">
                     <div class="form-group">
-                        <label class="control-label col-md-3" for="enable">{{ entry_enable_extension }}</label>
+                        <label class="control-label col-md-3" for="enable-ezdefi">{{ entry_enable_extension }}</label>
                         <div class="col-sm-9">
-                            <input type="checkbox" id="enable" class="form-control" name="payment_ezdefi_status" {{ payment_ezdefi_status ? 'checked': ''}}>
+                            <input type="checkbox" id="enable-ezdefi" class="form-control" name="payment_ezdefi_status" {{ payment_ezdefi_status ? 'checked': ''}}>
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="control-label col-sm-3" for="gateway-api-url"> {{ entry_gateway_api_url }} </label>
                         <div class="col-md-9">
-                            <input type="text" id="gateway-api-url" class="form-control" name="payment_ezdefi_gateway_api_url" value="{{ payment_ezdefi_gateway_api_url }}">
+                            <input type="text" id="gateway-api-url-input" class="form-control" name="payment_ezdefi_gateway_api_url" value="{{ payment_ezdefi_gateway_api_url }}">
                         </div>
                     </div>
+
                     <div class="form-group">
                         <label class="control-label col-sm-3" for="gateway-api-url"> {{ entry_api_key }} </label>
                         <div class="col-md-9">
-                            <input type="text" id="api-key" class="form-control col-md-9" name="payment_ezdefi_api_key" value="{{ payment_ezdefi_api_key }}">
+                            <input type="text" id="api-key-input" class="form-control col-md-9" name="payment_ezdefi_api_key" value="{{ payment_ezdefi_api_key }}">
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="control-label col-sm-3" for="order-status"> {{ entry_order_status }} </label>
                         <div class="col-md-9">
-                            <input type="text" id="order-status" class="form-control col-md-9" name="payment_ezdefi_order_status" value="{{ payment_ezdefi_order_status }}">
+                            <input type="text" id="order-status-input" class="form-control col-md-9" name="payment_ezdefi_order_status" value="{{ payment_ezdefi_order_status }}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-3" for="enable-escrow-pay"> Escrow pay </label>
+                        <div class="col-md-3`">
+                            <input type="checkbox" name="payment_ezdefi_enable_escrow_pay" id="enable-escrow-pay" {{ payment_ezdefi_enable_escrow_pay ? 'checked' : '' }}>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-3" for="enable-simple-pay"> Simple Pay </label>
+                        <div class="col-md-3`">
+                            <input type="checkbox" name="payment_ezdefi_enable_simple_pay" id="enable-simple-pay" {{ payment_ezdefi_enable_simple_pay ? 'checked' : '' }}>
+                        </div>
+                    </div>
+                    <div class="form-group decimal-input-box">
+                        <label class="control-label col-sm-3" for="decimal-input"> decimal </label>
+                        <div class="col-md-9">
+                            <input type="text" class="form-control" name="payment_ezdefi_decimal" id="decimal-input" value="{{ payment_ezdefi_decimal }}">
+                        </div>
+                    </div>
+                    <div class="form-group variation-input-box">
+                        <label class="control-label col-sm-3" for="variable-input"> variation </label>
+                        <div class="col-md-9">
+                            <input type="text" class="form-control" name="payment_ezdefi_variation" id="variation-input" value="{{ payment_ezdefi_variation }}">
                         </div>
                     </div>
                 </div>

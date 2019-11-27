@@ -1,7 +1,7 @@
 $(function () {
     var selectors = {
         btnGetQrCode: '.ezdefi-btn-create-payment',
-        coinIdToPaymentInput: 'input[name="coin-selected-to-order"]',
+        coinSelectedToPaymentInput: 'input[name="coin-selected-to-order"]',
         selectCoinBox: '.ezdefi-select-coin-box',
         chargeCoinBox: '.ezdefi-charge-coin-box',
         paymentbox: '.ezdefi-payment-box',
@@ -16,9 +16,9 @@ $(function () {
         orderIdInput: '#order-id',
         paymentIdInput: '#payment-id',
         btnCharge: '.ezdefi-payment__btn-charge-coin',
-        tooltipShowDiscount: '.tooltip-show-discount'
+        tooltipShowDiscount: '.tooltip-show-discount',
+        countDownLabel: '.ezdefi-countdown-lifetime'
     };
-
 
     var global = {};
 
@@ -31,59 +31,105 @@ $(function () {
         $(selectors.originValue).html('');
         $(selectors.currencyValue).html('');
         $(selectors.btnCharge).css('display','none');
-        $(selectors.coinIdToPaymentInput).each(function () {
+        $(selectors.coinSelectedToPaymentInput).each(function () {
             $(this).prop("checked", false);
         });
         $(selectors.btnGetQrCode).prop("disabled", true);
-        // $(selectors.logoCoinSelected).prop('src', '');
-        // $(selectors.nameCoinSelected).html('');
+        $("#check-created-payment--simple").prop('checked', false);
+        $("#check-created-payment--escrow").prop('checked', false);
     });
 
-    $(selectors.coinIdToPaymentInput).click(function () {
+    $(selectors.coinSelectedToPaymentInput).click(function () {
         if($(this).is(':checked')) {
             $(selectors.btnGetQrCode).prop("disabled", false);
         }
     });
 
-    $(selectors.btnGetQrCode).click(function () {
-        var url = $(this).data('url_create_payment');
-        var coinId = $(selectors.coinIdToPaymentInput+':checked').val();
-        var discount = $(selectors.coinIdToPaymentInput+':checked').data('discount');
+    $('.btn-choose-payment-type').click(function () {
+        var paymentType = $(this).data('suffixes');
+        var gotPayment = $('#check-created-payment'+paymentType).is(':checked');
+        $('.ezdefi-show-payment').prop('checked',false);
+        $('#ezdefi-show-payment'+paymentType).prop('checked', true);
+        if(!gotPayment) {
+            console.log(1111);
+            var url = $("#url-create-payment"+paymentType).val();
+            var coinId = $('#selected-coin-id').val();
+            var discount = $('#selected-coin-discount').val();
+            $.ajax({
+                url: url,
+                method: "GET",
+                data: { coin_id: coinId },
+                success: function (response) {
+                    var data = JSON.parse(response).data;
+                    if(data.status === 'failure') {
+                        alert(data.message);
+                    } else {
+                        renderPayment(paymentType, data, discount);
+                    }
+                }
+            })
+        }
+    });
 
+    $(selectors.btnGetQrCode).click(function () {
+        var enableSimplePay = $('#enable_simple_pay_input').is(':checked');
+        var enableEscrowPay = $('#enable_escrow_pay_input').is(':checked');
+        if(enableSimplePay) {
+            var url = $("#url-create-payment--simple").val();
+            $("#ezdefi-show-payment--simple").prop('checked', true);
+            $("#ezdefi-show-payment--esrow").prop('checked', false);
+            var suffixes = '--simple';
+        } else if(enableEscrowPay) {
+            var url = $("#url-create-payment--escrow").val();
+            var suffixes = '--escrow';
+        } else {
+            alert('Some thing error');
+        }
+        var coinId = $(selectors.coinSelectedToPaymentInput+':checked').val();
+        var discount = $(selectors.coinSelectedToPaymentInput+':checked').data('discount');
+        $('#selected-coin-id').val(coinId);
+        $('#selected-coin-discount').val(discount);
         $.ajax({
             url: url,
             method: "GET",
             data: { coin_id: coinId },
             success: function (response) {
                 var data = JSON.parse(response).data;
-                console.log(data);
-                var paymentId = data._id;
-
-                $(selectors.paymentIdInput).val(paymentId);
-                countDownTime(paymentId, data.expiredTime);
-                checkOrderComplete();
-
-                $(selectors.originValue).html(data.originValue + data.originCurrency);
-                $(selectors.currencyValue).html(parseInt(data.value) * Math.pow(10, -data.decimal) + data.currency);
-
-                $(selectors.logoCoinSelected).prop('src', data.token.logo);
-                $(selectors.nameCoinSelected).html(  data.token.symbol.toUpperCase() + '/' + data.token.name);
-
-                $(selectors.tooltipShowDiscount).tooltip('hide')
-                    .attr('data-original-title', 'Discount: ' + discount + '%')
-                    .tooltip('fixTitle')
-                    .tooltip('show')
-                $(selectors.selectCoinBox).css('display', 'none');
-                $(selectors.chargeCoinBox).css('display', 'none');
-                $(selectors.btnCharge).css('display','block');
-                $(selectors.paymentbox).css('display','block');
-                $(selectors.paymentContent).css('display','block');
-                $(selectors.qrCodeImg).prop('src', data.qr);
+                if(data.status === 'failure') {
+                    alert(data.message);
+                } else {
+                    renderPayment(suffixes,data,discount);
+                }
             }
         })
     });
 
+    var renderPayment = function (suffixes,data,discount ) {
+        var paymentId = data._id;
+
+        $(selectors.paymentIdInput+suffixes).val(paymentId);
+        countDownTime(paymentId, data.expiredTime, suffixes);
+
+
+        $(selectors.originValue+suffixes).html(data.originValue + data.originCurrency);
+        $(selectors.currencyValue+suffixes).html(parseInt(data.value) * Math.pow(10, -data.decimal) + data.currency);
+        $("#check-created-payment"+suffixes).prop('checked', true);
+        $(selectors.logoCoinSelected).prop('src', data.token.logo);
+        $(selectors.nameCoinSelected).html(  data.token.symbol.toUpperCase() + '/' + data.token.name);
+
+        $(selectors.tooltipShowDiscount)
+            .attr('data-original-title', 'Discount: ' + discount + '%')
+            .tooltip('fixTitle');
+        $(selectors.selectCoinBox).css('display', 'none');
+        $(selectors.chargeCoinBox).css('display', 'none');
+        $(selectors.btnCharge).css('display','block');
+        $(selectors.paymentbox).css('display','block');
+        $(selectors.paymentContent).css('display','grid');
+        $(selectors.qrCodeImg+suffixes).prop('src', data.qr);
+    };
+
     var checkOrderComplete = function () {
+        if(global.checkOrderCompleteInterval) return;
         var url = $(selectors.urlCheckOrderCompleteInput).val();
         var orderId =$(selectors.orderIdInput).val();
 
@@ -103,11 +149,11 @@ $(function () {
                 }
             });
         }, 500);
-    }
+    };
 
-    var countDownTime = function (paymentId, expiredTime) {
+    var countDownTime = function (paymentId, expiredTime, suffixes) {
         global.countDownInterval = setInterval(function () {
-            var currentPaymentId = $(selectors.paymentIdInput).val();
+            var currentPaymentId = $(selectors.paymentIdInput+suffixes).val();
             if(currentPaymentId !== paymentId) {
                 clearInterval(global.countDownInterval);
             } else {
@@ -119,14 +165,15 @@ $(function () {
                     var minutes = Math.floor(secondToCountdown / 60);
                     var seconds = secondToCountdown % 60;
                     if(hours > 0 ) {
-                        $('.ezdefi-payment__countdown-lifetime').html(hours +':'+ minutes +':' + seconds);
+                        $(selectors.countDownLabel + suffixes).html(hours +':'+ minutes +':' + seconds);
                     } else {
-                        $('.ezdefi-payment__countdown-lifetime').html(minutes +':' + seconds);
+                        $(selectors.countDownLabel + suffixes).html(minutes +':' + seconds);
                     }
                 } else {
                     clearInterval(global.countDownInterval);
                 }
             }
         }, 1000);
-    }
-})
+    };
+    checkOrderComplete();
+});

@@ -8,9 +8,15 @@ $( function() {
         btnDelete: '.btn-confirm-delete',
         btnEdit: '.btn-submit-edit',
         btnCancel: '.btn-cancel',
-        gatewayApiUrlInput: "#gateway-api-url",
-        apiKeyInput: "#api-key",
-        orderStatusInput: "#order-status",
+        gatewayApiUrlInput: "#gateway-api-url-input",
+        apiKeyInput: "#api-key-input",
+        orderStatusInput: "#order-status-input",
+        enableSimplePayInput: "#enable-simple-pay",
+        enableEscrowPayInput: "#enable-escrow-pay",
+        decimalInput: "#decimal-input",
+        variationInput: "#variation-input",
+        decimalBox: ".decimal-input-box",
+        variationBox: ".variation-input-box",
         coinIdInput: '.coin-config__id',
         coinOrderInput: '.coin-config__order',
         coinSymbolInput: '.coin-config__fullname',
@@ -25,6 +31,9 @@ $( function() {
         $(selectors.btnAdd).click(this.addCoinConfigListener.bind(this));
         $(selectors.btnDelete).click(this.deleteCoinConfig);
         $(selectors.btnEdit).click(this.editCoinConfig);
+        $(selectors.enableSimplePayInput).click(this.showSimplePayConfig);
+        $(selectors.enableSimplePayInput).load(this.showSimplePayConfig);
+
         this.initSortable();
         this.initValidate();
     }
@@ -49,6 +58,11 @@ $( function() {
         this.validateAllInput(selectors.coinSymbolInput, {required: true});
         this.validateAllInput(selectors.coinPaymentLifetimeInput, {integer: true});
         this.validateAllInput(selectors.coinSafeBlockDistantInput, {integer: true});
+        this.validateAllInput(selectors.coinSafeBlockDistantInput, {integer: true});
+        this.validateAllInput(selectors.variationInput, {integer: true, required: () => $(selectors.enableSimplePayInput).is(':checked')});
+        this.validateAllInput(selectors.decimalInput, {integer: true, required: () => $(selectors.enableSimplePayInput).is(':checked')});
+        this.validateAllInput(selectors.enableSimplePayInput, {required: () => !$(selectors.enableEscrowPayInput).is(':checked'), messages: {required: 'choose at least one payment method'}});
+        this.validateAllInput(selectors.enableEscrowPayInput, {required: () => !$(selectors.enableSimplePayInput).is(':checked'), messages: {required: 'choose at least one payment method'}});
 
         this.validateWalletAddress();
     }
@@ -84,6 +98,16 @@ $( function() {
             }
 
         });
+    }
+
+    oc_ezdefi_admin.prototype.showSimplePayConfig = function() {
+        if($(this).is(':checked')) {
+            $(selectors.decimalBox).css('display','block');
+            $(selectors.variationBox).css('display','block');
+        } else {
+            $(selectors.decimalBox).css('display','none');
+            $(selectors.variationBox).css('display','none');
+        }
     }
 
     oc_ezdefi_admin.prototype.deleteCoinConfig = function() {
@@ -128,7 +152,6 @@ $( function() {
             success: function (response) {
                 var data = JSON.parse(response).data;
                 if(data.status === 'success') {
-                    console.log(discount === '');
                     discount = discount === '' ? 0 : discount;
                     $('#config-row-'+coinId).find('.coin-discount').html(discount +'%');
                     $('#config-row-'+coinId).find('.coin-payment-lifetime').html(paymentLifetime ? 0 :paymentLifetime);
