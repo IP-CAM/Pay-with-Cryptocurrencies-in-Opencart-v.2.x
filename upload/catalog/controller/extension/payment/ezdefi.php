@@ -13,6 +13,9 @@ class ControllerExtensionPaymentEzdefi extends Controller {
         $data['store_url'] = HTTPS_SERVER;
 
         $data['order_id'] = $this->session->data['order_id'];
+        $order = $this->model_checkout_order->getOrder($this->session->data['order_id']);
+        $data['origin_value'] = (float)$order['total'];
+        $data['origin_currency'] = $order['currency_code'];
         $data['coins_config'] = $this->model_extension_payment_ezdefi->getCoinsConfig();
         $data['enable_simple_pay'] = $this->config->get('payment_ezdefi_enable_simple_pay');
         $data['enable_escrow_pay'] = $this->config->get('payment_ezdefi_enable_escrow_pay');
@@ -27,8 +30,7 @@ class ControllerExtensionPaymentEzdefi extends Controller {
     public function createSimplePayment() {
         $this->load->model('setting/setting');
         $enableSimplePay = $this->config->get('payment_ezdefi_enable_simple_pay');
-
-        $callback = 'http://85d99cf3.ngrok.io/opencart/upload/index.php?route=extension/payment/ezdefi/callbackConfirmOrder';
+        $callback = 'http://c1a673a7.ngrok.io/opencart/upload/index.php?route=extension/payment/ezdefi/callbackConfirmOrder';
         $coinId = $this->request->get['coin_id'];
 
         if ($enableSimplePay) {
@@ -47,7 +49,7 @@ class ControllerExtensionPaymentEzdefi extends Controller {
     public function createEscrowPayment() {
         $this->load->model('setting/setting');
         $enableEscrowPay = $this->config->get('payment_ezdefi_enable_escrow_pay');
-        $callback = 'http://85d99cf3.ngrok.io/opencart/upload/index.php?route=extension/payment/ezdefi/callbackConfirmOrder';
+        $callback = 'http://c1a673a7.ngrok.io/opencart/upload/index.php?route=extension/payment/ezdefi/callbackConfirmOrder';
         $coinId = $this->request->get['coin_id'];
         if ($enableEscrowPay) {
             $this->load->model('extension/payment/ezdefi');
@@ -72,12 +74,15 @@ class ControllerExtensionPaymentEzdefi extends Controller {
         $apiKey = $this->config->get('payment_ezdefi_api_key');
 
         $this->load->model('extension/payment/ezdefi');
-        $paymentStatus = $this->model_extension_payment_ezdefi->checkPaymentComplete($apiUrl, $apiKey, $this->request->get['paymentid'], $hasAmountId);
+        $payment = $this->model_extension_payment_ezdefi->checkPaymentComplete($apiUrl, $apiKey, $this->request->get['paymentid'], $hasAmountId);
 
-        if($paymentStatus['status'] == 'DONE') {
+        if($payment['status'] == 'DONE') {
             $this->load->model('checkout/order');
-            $message = 'Payment Intent ID: '. $this->request->get['paymentid'] .', Status: '.$paymentStatus['status'].' Has amountId:'. $hasAmountId ? "true" : 'false';
-            $this->model_checkout_order->addOrderHistory($orderId, $paymentStatus['code'], $message, false);
+            $message = 'Payment Intent ID: '. $this->request->get['paymentid'] .', Status: '.$payment['status'].' Has amountId:'. $hasAmountId ? "true" : 'false';
+            $this->model_checkout_order->addOrderHistory($orderId, $payment['code'], $message, false);
+        }
+        if($payment['status'] == 'EXPIRED_DONE') {
+            $this->model_extension_payment_ezdefi->setPaidForException($orderId, $payment['currency'], $payment['value'], $hasAmountId);
         }
         return;
     }

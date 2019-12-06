@@ -19,11 +19,13 @@
 						<td>
 							<img src="{{ coin_config.logo }}" alt="" class="ezdefi-select-coin__logo">
 						</td>
+						<td style="text-transform: uppercase">{{coin_config.symbol}}</td>
 						<td>{{coin_config.name}}</td>
-						<td>{{coin_config.full_name}}</td>
 						<td> Discount {{ coin_config.discount }}%</td>
 						<td>
-							<a href="#" data-toggle="tooltip" title="Description"><i class="fa fa-info" aria-hidden="true"></i></a>
+
+{#							<a href="#" data-toggle="tooltip" title="Description"><i class="fa fa-info" aria-hidden="true"></i></a>#}
+							<a data-toggle="popover" title="Coin Description" data-placement="top" data-content="Description ...."><i class="fa fa-info" aria-hidden="true"></i></a>
 						</td>
 					</tr>
 				{% endfor %}
@@ -40,8 +42,10 @@
 		<div class="ezdefi-payment__header">
             <input type="hidden" id="selected-coin-id">
             <input type="hidden" id="selected-coin-discount">
-			<img src="https://s2.coinmarketcap.com/static/img/coins/64x64/3957.png" alt="" class="ezdefi-payment__coin-logo tooltip-show-discount" data-toggle="tooltip" title="Discount: 0%">
-			<span class="ezdefi-payment__coin-name tooltip-show-discount" data-toggle="tooltip" title="Discount: 0%" ></span>
+{#			<img src="https://s2.coinmarketcap.com/static/img/coins/64x64/3957.png" alt="" class="ezdefi-payment__coin-logo tooltip-show-discount" data-toggle="tooltip" title="Discount: 0%">#}
+			<img src="https://s2.coinmarketcap.com/static/img/coins/64x64/3957.png" alt="" class="ezdefi-payment__coin-logo tooltip-show-discount" data-toggle="popover" title="Discount" data-placement="top" data-content="Discount:">
+{#			<span class="ezdefi-payment__coin-name tooltip-show-discount" data-toggle="tooltip" title="Discount: 0%" ></span>#}
+			<span class="ezdefi-payment__coin-name tooltip-show-discount" data-toggle="popover" title="Discount" data-placement="top" data-content="Discount:" ></span>
 			<span class="wide-space"></span>
 			<button class="ezdefi-payment__btn-charge-coin">{{ text_charge }}</button>
 		</div>
@@ -56,8 +60,8 @@
 							<td>
 								<img src="{{ coin_config.logo }}" alt="" class="ezdefi-select-coin__logo">
 							</td>
+							<td style="text-transform: uppercase">{{coin_config.symbol}}</td>
 							<td>{{coin_config.name}}</td>
-							<td>{{coin_config.full_name}}</td>
 							<td> Discount {{ coin_config.discount }}%</td>
 							<td>
 								<a href="#" data-toggle="tooltip" title="Hooray!"><i class="fa fa-info" aria-hidden="true"></i></a>
@@ -90,7 +94,7 @@
             {% if enable_simple_pay %}
                 <div class="payment-box simple-pay-box">
                     <div class="ezdefi-payment__value">
-                        <span class="ezdefi-payment__origin-value--simple"></span>
+                        <span class="ezdefi-payment__origin-value--simple">{{ origin_value }} {{ origin_currency }}</span>
                         <span class="ezdefi-payment__icon-convert"><i class="fa fa-retweet" aria-hidden="true"></i></span>
                         <span class="ezdefi-payment__currency-value--simple"></span>
                     </div>
@@ -98,17 +102,18 @@
                         <input type="hidden" id="payment-id--simple">
                         {{ ezdefi_countdown_lifetime_simple }}
                     </div>
-                    <img src="" alt="" class="ezdefi-payment__qr-code--simple">
-                    <div class="ezdefi-payment__download-link">
-                        <a href="{{ link_download_app_ios }}">{{ text_download_app_ios }}</a>
-                        <a href="{{ link_download_app_android }}">{{ text_download_app_android }}</a>
-                    </div>
+					<a href="" target="_blank" class="ezdefi-payment__deeplink--simple">
+						<img src="" alt="" class="ezdefi-payment__qr-code--simple">
+					</a>
+                    <p><b>Address:</b> <span class="ezdefi-payment__wallet-address--simple"></span></p>
+                    <p><b>Amount:</b> <span class="ezdefi-payment__amount--simple"></span></p>
+                    <p class="margin-top-md">You have to pay an exact amount so that you payment can be recognized.</p>
                 </div>
             {% endif %}
             {% if enable_escrow_pay %}
                 <div class="payment-box escrow-pay-box">
                     <div class="ezdefi-payment__value">
-                        <span class="ezdefi-payment__origin-value--escrow"></span>
+                        <span class="ezdefi-payment__origin-value--escrow">{{ origin_value }}</span>
                         <span class="ezdefi-payment__icon-convert"><i class="fa fa-retweet" aria-hidden="true"></i></span>
                         <span class="ezdefi-payment__currency-value--escrow"></span>
                     </div>
@@ -116,7 +121,9 @@
                         <input type="hidden" id="payment-id--escrow">
                         {{ ezdefi_countdown_lifetime_escrow }}
                     </div>
-                    <img src="" alt="" class="ezdefi-payment__qr-code ezdefi-payment__qr-code--escrow">
+					<a href="" class="ezdefi-payment__deeplink ezdefi-payment__deeplink--escrow" target="_blank">
+						<img src="" alt="" class="ezdefi-payment__qr-code ezdefi-payment__qr-code--escrow">
+					</a>
                     <div class="ezdefi-payment__download-link">
                         <a href="{{ link_download_app_ios }}">{{ text_download_app_ios }}</a>
                         <a href="{{ link_download_app_android }}">{{ text_download_app_android }}</a>

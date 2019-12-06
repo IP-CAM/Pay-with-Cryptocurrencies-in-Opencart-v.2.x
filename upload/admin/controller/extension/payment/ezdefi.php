@@ -1,6 +1,9 @@
 <?php
 
 class ControllerExtensionPaymentEzdefi extends Controller {
+    const DONE = 2;
+    const PENDING = 0;
+
     private $error = array();
 
     public function index() {
@@ -15,7 +18,9 @@ class ControllerExtensionPaymentEzdefi extends Controller {
         $data['url_validate_wallet'] = $this->url->link('extension/payment/ezdefi/checkWalletAddress', 'user_token=' . $this->session->data['user_token'], true);
         $data['url_delete'] = $this->url->link('extension/payment/ezdefi/deleteCoinConfig', 'user_token=' . $this->session->data['user_token'], true);
         $data['url_edit'] = $this->url->link('extension/payment/ezdefi/editCoinConfig', 'user_token=' . $this->session->data['user_token'], true);
-
+        $data['url_get_exception'] = $this->url->link('extension/payment/ezdefi/getExceptions', 'user_token=' . $this->session->data['user_token'], true);
+        $data['url_delete_exception'] = $this->url->link('extension/payment/ezdefi/deleteException', 'user_token=' . $this->session->data['user_token'], true);
+        $data['url_confirm_paid_exception'] = $this->url->link('extension/payment/ezdefi/confirmException', 'user_token=' . $this->session->data['user_token'], true);
 
         if($this->config->has('payment_ezdefi_status')){
             $data['payment_ezdefi_status'] = $this->config->get('payment_ezdefi_status');
@@ -62,16 +67,41 @@ class ControllerExtensionPaymentEzdefi extends Controller {
         }
 
         $data['coins_config'] = $this->model_extension_payment_ezdefi->getCoinsConfig();
+        $data['total_exception'] = $this->model_extension_payment_ezdefi->getTotalException();
 
         $this->document->addStyle('//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css');
         $this->document->addStyle('https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/css/select2.min.css');
         $this->document->addStyle('https://jqueryvalidation.org/files/demo/site-demos.css');
+        $this->document->addStyle('https://pagination.js.org/dist/2.0.7/pagination.css');
         $this->document->addStyle('view/stylesheet/ezdefi.css');
 
         $this->document->addScript('https://code.jquery.com/ui/1.12.1/jquery-ui.js');
         $this->document->addScript('https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/js/select2.min.js');
         $this->document->addScript('https://cdn.jsdelivr.net/npm/jquery-validation@1.19.1/dist/jquery.validate.min.js');
+        $this->document->addScript('https://pagination.js.org/dist/2.1.5/pagination.js');
         $this->document->addScript('view/javascript/ezdefi/ezdefi.js');
+
+        // API login
+        $this->load->model('user/api');
+
+        $api_info = $this->model_user_api->getApi($this->config->get('config_api_id'));
+
+        if ($api_info && $this->user->hasPermission('modify', 'sale/order')) {
+            $session = new Session($this->config->get('session_engine'), $this->registry);
+
+            $session->start();
+
+            $this->model_user_api->deleteApiSessionBySessonId($session->getId());
+
+            $this->model_user_api->addApiSession($api_info['api_id'], $session->getId(), $this->request->server['REMOTE_ADDR']);
+
+            $session->data['api_id'] = $api_info['api_id'];
+
+            $api_token = $session->getId();
+        } else {
+            $api_token = '';
+        }
+        $data['url_add_order_history'] = HTTPS_CATALOG . 'index.php?route=api/order/history&api_token=' . $api_token;
 
         $data['header'] = $this->load->controller('common/header');
         $data['column_left'] = $this->load->controller('common/column_left');
@@ -139,9 +169,9 @@ class ControllerExtensionPaymentEzdefi extends Controller {
            if(!isset($this->request->post['payment_ezdefi_decimal']) || trim($this->request->post['payment_ezdefi_decimal']) === '' || !filter_var($this->request->post['payment_ezdefi_decimal'], FILTER_VALIDATE_INT)) {
                $this->error['decimal'] = $this->language->get('error_decimal');
            }
-            if(!isset($this->request->post['payment_ezdefi_variation']) || trim($this->request->post['payment_ezdefi_variation']) === '' || !filter_var($this->request->post['payment_ezdefi_variation'], FILTER_VALIDATE_INT)) {
-                $this->error['variation'] = $this->language->get('error_variation');
-            }
+//            if(!isset($this->request->post['payment_ezdefi_variation']) || trim($this->request->post['payment_ezdefi_variation']) === '' || !filter_var($this->request->post['payment_ezdefi_variation'], FILTER_VALIDATE_INT)) {
+//                $this->error['variation'] = $this->language->get('error_variation');
+//            }
         }
 
         $coinsConfigData = $this->request->post;
@@ -229,7 +259,7 @@ class ControllerExtensionPaymentEzdefi extends Controller {
         $apiUrl = $this->config->get('payment_ezdefi_gateway_api_url');
         $apiKey = $this->config->get('payment_ezdefi_api_key');
         $this->load->model('extension/payment/ezdefi');
-        return $this->model_extension_payment_ezdefi->checkWalletAddress($apiUrl, $apiKey, $this->request->get['address']);
+        return $this->response->setOutput($this->model_extension_payment_ezdefi->checkWalletAddress($apiUrl, $apiKey, $this->request->get['address']));
     }
 
     public function install() {
@@ -246,6 +276,53 @@ class ControllerExtensionPaymentEzdefi extends Controller {
         $this->load->model('setting/setting');
         $apiUrl = $this->config->get('payment_ezdefi_gateway_api_url');
         $this->load->model('extension/payment/ezdefi');
-        return $this->model_extension_payment_ezdefi->getAllCoinAvailable($apiUrl,  $this->request->get['keyword']);
+        return $this->response->setOutput($this->model_extension_payment_ezdefi->getAllCoinAvailable($apiUrl,  $this->request->get['keyword']));
     }
+
+    public function getExceptions() {
+        $page = isset($this->request->get['pageNumber']) ? $this->request->get['pageNumber'] : 1;
+        $this->load->model('extension/payment/ezdefi');
+        $total_exception = $this->model_extension_payment_ezdefi->getTotalException();
+        $exceptions = $this->model_extension_payment_ezdefi->getExceptions($page, 10);
+
+//        $pagination = new Pagination();
+//        $pagination->total = $total_exception;
+//        $pagination->page = $page;
+//        $pagination->limit = 10;
+//        $pagination->url = $this->url->link('extension/payment/ezdefi/getExceptions', 'user_token=' . $this->session->data['user_token'] . '&page={page}', true);
+
+        return $this->response->setOutput(json_encode($exceptions));
+
+//        $a = $pagination->render();
+//        echo json_encode($exceptions);
+//        echo $a;
+//        return $this->response->setOutput(json_encode($exceptions));
+
+//        $data['pagination'] = $pagination->render();
+    }
+
+    public function deleteException() {
+        if ($this->request->server['REQUEST_METHOD'] == 'POST' && $this->user->hasPermission('modify', 'extension/payment/ezdefi') && isset($this->request->post['exception_id'])) {
+            $this->load->model('extension/payment/ezdefi');
+            $this->load->language('extension/payment/ezdefi');
+
+            $exception_id = $this->request->post['exception_id'];
+            $this->model_extension_payment_ezdefi->deleteExceptionById($exception_id);
+            return $this->response->setOutput(json_encode(['data' => ['status' => 'success', 'message' => $this->language->get('text_success')]]));
+        } else {
+            return $this->response->setOutput(json_encode(['data' => ['status' => 'failure', 'message' => $this->language->get('something_error')]]));
+        }
+    }
+
+//    public function confirmPaidException() {
+//        if ($this->request->server['REQUEST_METHOD'] == 'POST' && $this->user->hasPermission('modify', 'extension/payment/ezdefi') && isset($this->request->post['exception_id'])) {
+//            $this->load->model('extension/payment/ezdefi');
+//            $this->load->language('extension/payment/ezdefi');
+//
+//            $exception_id = $this->request->get['exception_id'];
+//            $this->model_extension_payment_ezdefi->deleteExceptionById($exception_id);
+//        } else {
+//            return $this->response->setOutput(json_encode(['data' => ['status' => 'failure', 'message' => $this->language->get('something_error')]]));
+//        }
+//    }
 }

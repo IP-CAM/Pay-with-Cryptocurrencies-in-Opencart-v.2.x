@@ -1,6 +1,9 @@
 <?php
 
 class ModelExtensionPaymentEzdefi extends Model {
+    const TIME_REMOVE_AMOUNT_ID = 3;
+    const TIME_REMOVE_EXCEPTION = 7;
+
     public function install() {
         $this->db->query("
 			CREATE TABLE IF NOT EXISTS `" . DB_PREFIX . "ezdefi_coin` (
@@ -13,23 +16,40 @@ class ModelExtensionPaymentEzdefi extends Model {
 		      `payment_lifetime` int(11),
 		      `wallet_address` varchar(255) NOT NULL,
 		      `safe_block_distant` int(11),
+		      `decimal` int(11) DEFAULT 8,
 			  `created` DATETIME NOT NULL,
 			  `modified` DATETIME NOT NULL,
 			  PRIMARY KEY (`coin_id`)
-			) ENGINE=MyISAM DEFAULT COLLATE=utf8_general_ci;
+			) ENGINE=InnoDB DEFAULT COLLATE=utf8_general_ci;
 			
-			CREATE TABLE IF NOT EXISTS `" . DB_PREFIX . "ezdefi_amount_id_log` (
-			  `price` DECIMAL(15,4) NOT NULL,
-			  `amount_id` DECIMAL(25,14) NOT NULL,
-			  `currency` varchar(255) NOT NULL,
-			  `decimal` integer(11) NOT NULL,
-              `valid` varchar(255) NOT NULL DEFAULT 0,
-              `expire_timestamp` int() NOT NULL,
-			  `created` DATETIME NOT NULL,
-			  `modified` DATETIME NOT NULL,
-			  PRIMARY KEY (`currency`, `amount_id`)
-			) ENGINE=MyISAM DEFAULT COLLATE=utf8_general_ci;
-			");
+			CREATE TABLE IF NOT EXISTS `" . DB_PREFIX . "ezdefi_tag_amount` (
+                `id`         int auto_increment,
+                `temp`       INT not null,
+                `amount`     DECIMAL(15, 4) not null,
+                `tag_amount` DECIMAL(25, 14) not null,
+                `expiration` TIMESTAMP  not null,
+                `currency`   varchar(255) not null,
+                primary key (id),
+                constraint tag_amount
+                    unique (tag_amount, currency)
+            ) ENGINE=InnoDB DEFAULT COLLATE=utf8_general_ci;
+            
+            CREATE TABLE IF NOT EXISTS `" . DB_PREFIX . "ezdefi_exception` (
+                `exception_id` int auto_increment,
+			    `order_id` int(11) NOT NULL,
+                `amount_id` varchar(255),
+                `currency` varchar(255)
+		        `status` varchar(255),
+			    PRIMARY KEY (`exception_id`)
+			) ENGINE=InnoDB DEFAULT COLLATE=utf8_general_ci;
+             
+            CREATE EVENT `ezdefi_remove_amount_id_event`
+            ON SCHEDULE EVERY ".self::TIME_REMOVE_AMOUNT_ID." DAY
+            STARTS DATE(NOW())
+            DO
+            DELETE FROM `" . DB_PREFIX . "ezdefi_tag_amount` WHERE DATEDIFF( NOW( ) ,  expiration ) >= 86400;
+            SET GLOBAL event_scheduler='ON';
+        ");
     }
 
     public function uninstall() {
@@ -105,47 +125,20 @@ class ModelExtensionPaymentEzdefi extends Model {
     }
 
     public function getAllCoinAvailable($apiUrl, $keyword) {
-        $param = "?keyword=$keyword";
+        $url = $apiUrl . "/token/list?keyword=$keyword";
+        $listCoinSupport = $this->sendCurl($url, "GET");
 
-        $curl = curl_init();
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => $apiUrl . '/token/list'.$param,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => "GET",
-            CURLOPT_HTTPHEADER => array(
-                "accept: application/xml",
-            ),
-        ));
-        $response = curl_exec($curl);
-        $err = curl_error($curl);
-        curl_close($curl);
-        if ($err) {
-            echo "cURL Error #:" . $err;
+        if($listCoinSupport) {
+            return $listCoinSupport;
         } else {
-            echo $response;
+            return json_encode(['status' => 'failure', 'message' => 'Something error when get coins']);
         }
     }
 
-    public function checkWalletAddress($apiUrl, $apiKey, $address) {
-        $curl = curl_init();
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => $apiUrl . '/user/list_wallet',
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => "GET",
-            CURLOPT_HTTPHEADER => array(
-                'accept: application/xml',
-                'api-key: '.$apiKey
-            ),
-        ));
-        $response = curl_exec($curl);
-        $err = curl_error($curl);
-        curl_close($curl);
-        if ($err) {
-            echo "cURL Error #:" . $err;
-        } else {
-            $WalletsData = json_decode($response)->data;
+    public function checkWalletAddress($apiUrl, $api_key, $address) {
+        $listWallet = $this->sendCurl($apiUrl . '/user/list_wallet', "GET", $api_key);
+        if ($listWallet) {
+            $WalletsData = json_decode($listWallet)->data;
             foreach ($WalletsData as $key => $WalletData) {
                 if($WalletData->address === $address) {
                     echo "true";
@@ -153,8 +146,65 @@ class ModelExtensionPaymentEzdefi extends Model {
                 }
             }
             echo "false";
+        } else {
+            return json_encode(['status' => 'failure', 'message' => 'Something error when get list wallet']);
         }
+
+    }
+
+    //-------------------------------------------------Exception------------------------------------------------------
+    public function getTotalException() {
+        $query = $this->db->query("SELECT count(id) as total_exception FROM `".DB_PREFIX."ezdefi_exception` group by amount_id, currency");
+        return $query->row['total_exception'];
+    }
+
+    public function getExceptions($page, $limit) {
+        $start = ($page-1) * $limit;
+        $exceptions = $this->db->query("select amount_id, currency, GROUP_CONCAT(oc_ezdefi_exception.id , '--', oc_order.order_id, '--', oc_order.email, '--', oc_ezdefi_exception.expiration, '--', oc_ezdefi_exception.paid, '--', oc_ezdefi_exception.has_amount ORDER BY paid DESC) group_order
+            from `".DB_PREFIX."ezdefi_exception`
+                left join `".DB_PREFIX."order` on oc_ezdefi_exception.order_id = oc_order.order_id
+            group by amount_id, currency
+            LIMIT ".$start.",".$limit);
+
+        return $exceptions->rows;
+    }
+
+    public function getExceptionById($exception_id) {
+        $query = $this->db->query("SELECT * FROM `".DB_PREFIX."ezdefi_exception` WHERE `id`=".$exception_id);
+        return $query->row;
+    }
+
+    public function deleteExceptionById($exception_id) {
+        $this->db->query("DELETE FROM `".DB_PREFIX."ezdefi_exception` WHERE `id`=".$exception_id);
     }
 
 
+    /**
+     * @param $url
+     * @param $method
+     * @param null $api_key
+     * @return bool|string
+     */
+    public function sendCurl($url, $method, $api_key = null) {
+        $curlopt_httpheader = ['accept: application/xml'];
+        if ($api_key) {
+            $curlopt_httpheader[] =  'api-key: '.$api_key;
+        }
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => $url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => $method,
+            CURLOPT_HTTPHEADER => $curlopt_httpheader,
+        ));
+        $response = curl_exec($curl);
+        $err = curl_error($curl);
+        curl_close($curl);
+        if ($err) {
+            return false;
+        } else {
+            return $response;
+        }
+    }
 }

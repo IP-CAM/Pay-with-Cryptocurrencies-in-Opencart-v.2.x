@@ -6,6 +6,7 @@ $(function () {
         chargeCoinBox: '.ezdefi-charge-coin-box',
         paymentbox: '.ezdefi-payment-box',
         paymentContent: '.ezdefi-payment__content',
+        deeplink: '.ezdefi-payment__deeplink',
         qrCodeImg: '.ezdefi-payment__qr-code',
         countDownTime: '.ezdefi-payment__countdown-lifeTime',
         originValue: '.ezdefi-payment__origin-value',
@@ -22,13 +23,14 @@ $(function () {
 
     var global = {};
 
+    $('[data-toggle="popover"]').popover();
+
     $(selectors.btnCharge).click(function () {
         clearInterval(global.countDownInterval);
-        clearInterval(global.checkOrderCompleteInterval);
         $(selectors.chargeCoinBox).css('display', 'block');
         $(selectors.paymentContent).css('display', 'none');
         $(selectors.qrCodeImg).prop('src', '');
-        $(selectors.originValue).html('');
+        $(selectors.deeplink).attr('href', '');
         $(selectors.currencyValue).html('');
         $(selectors.btnCharge).css('display','none');
         $(selectors.coinSelectedToPaymentInput).each(function () {
@@ -94,6 +96,9 @@ $(function () {
             method: "GET",
             data: { coin_id: coinId },
             success: function (response) {
+                if(JSON.parse(response).error) {
+                    alert("Something error, server can't create payment");
+                }
                 var data = JSON.parse(response).data;
                 if(data.status === 'failure') {
                     alert(data.message);
@@ -104,28 +109,26 @@ $(function () {
         })
     });
 
-    var renderPayment = function (suffixes,data,discount ) {
+    var renderPayment = function (suffixes, data, discount ) {
         var paymentId = data._id;
 
         $(selectors.paymentIdInput+suffixes).val(paymentId);
         countDownTime(paymentId, data.expiredTime, suffixes);
 
-
-        $(selectors.originValue+suffixes).html(data.originValue + data.originCurrency);
+        $(selectors.deeplink+suffixes).attr('href', data.deepLink);
         $(selectors.currencyValue+suffixes).html(parseInt(data.value) * Math.pow(10, -data.decimal) + data.currency);
         $("#check-created-payment"+suffixes).prop('checked', true);
         $(selectors.logoCoinSelected).prop('src', data.token.logo);
         $(selectors.nameCoinSelected).html(  data.token.symbol.toUpperCase() + '/' + data.token.name);
-
-        $(selectors.tooltipShowDiscount)
-            .attr('data-original-title', 'Discount: ' + discount + '%')
-            .tooltip('fixTitle');
+        $(selectors.tooltipShowDiscount).attr('data-content', 'Discount: ' + discount + '%');
         $(selectors.selectCoinBox).css('display', 'none');
         $(selectors.chargeCoinBox).css('display', 'none');
         $(selectors.btnCharge).css('display','block');
         $(selectors.paymentbox).css('display','block');
         $(selectors.paymentContent).css('display','grid');
         $(selectors.qrCodeImg+suffixes).prop('src', data.qr);
+        $('.ezdefi-payment__wallet-address'+suffixes).html(data.to);
+        $('.ezdefi-payment__amount'+suffixes).html(parseInt(data.value) * Math.pow(10, -data.decimal) + data.currency);
     };
 
     var checkOrderComplete = function () {
@@ -170,6 +173,7 @@ $(function () {
                         $(selectors.countDownLabel + suffixes).html(minutes +':' + seconds);
                     }
                 } else {
+                    $(selectors.countDownLabel + suffixes).html('0:0');
                     clearInterval(global.countDownInterval);
                 }
             }

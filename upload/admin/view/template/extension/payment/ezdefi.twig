@@ -1,23 +1,37 @@
 {{ header }} {{ column_left }}
-
 <div id="content">
-    <form action="{{ action }}" class="form-horizontal" method="POST" id="ezdefi-form-config" data-url_validate_wallet="{{ url_validate_wallet }}">
-        <div class="page-header">
-            <div class="container-fluid">
-                <div class="pull-right">
-                    <button type="submit" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary" form="ezdefi-form-config"><i class="fa fa-save"></i></button>
-                    <a href="{{ action.cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a>
-                </div>
-                    <h1>{{ heading_title }}</h1>
-                <ul class="breadcrumb">
-                    {% for breadcrumb in breadcrumbs %}
-    {#                    <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>#}
-                    {% endfor %}
-                </ul>
-            </div>
-        </div>
+    <input type="hidden" id="url-delete-exception" value="{{ url_delete_exception }}">
+    <input type="hidden" id="url-add-order-history" value="{{ url_add_order_history }}">
+
+    {# Ezdefi header #}
+    <div class="page-header">
         <div class="container-fluid">
-            <div class="panel panel-default">
+            <div class="pull-right">
+                <button type="submit" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary" form="ezdefi-form-config"><i class="fa fa-save"></i></button>
+                <a href="{{ action.cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a>
+            </div>
+                <h1>{{ heading_title }}</h1>
+            <ul class="breadcrumb">
+                {% for breadcrumb in breadcrumbs %}
+{#                    <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>#}
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    {# End ezdefi header #}
+
+
+    <div class="container-fluid ezdefi-admin-content-box">
+        {# Tab choose setting or show payment exception #}
+        <input type="radio" id="ezdefi-config-tab" name="btn-radio-choose-tab" class="hidden" checked>
+        <input type="radio" id="ezdefi-exception-tab" name="btn-radio-choose-tab" class="hidden">
+        <label class="ezdefi-btn-tab ezdefi-btn-config-tab" for="ezdefi-config-tab"> coin config </label>
+        <label class="ezdefi-btn-tab ezdefi-btn-exception-tab" for="ezdefi-exception-tab"> payment exception </label>
+        {# End tab choose setting or show payment exception #}
+
+        <div class="panel panel-default config-content-tab">
+            {# Setting form #}
+            <form action="{{ action }}" class="form-horizontal" method="POST" id="ezdefi-form-config" data-url_validate_wallet="{{ url_validate_wallet }}">
                 <div class="panel-heading">
                     <h3 class="panel-title"><i class="fa fa-pencil"></i> {{tab_edit_general}} </h3>
                 </div>
@@ -84,9 +98,10 @@
                                 <th>{{ text_symbol }}</th>
                                 <th>{{ text_name }}</th>
                                 <th>{{ text_discount }}</th>
-                                <th>{{text_payment_lifetime}}</th>
-                                <th>{{text_wallet_address}}</th>
+                                <th>{{ text_payment_lifetime }}</th>
+                                <th>{{ text_wallet_address }}</th>
                                 <th>{{ text_safe_block_distant }}</th>
+                                <th>{{ text_decimal }}</th>
                             </tr>
                         </thead>
                         <tbody id="coin-config__table">
@@ -110,6 +125,7 @@
                                 <td class="coin-payment-lifetime">{{ coin_config.payment_lifetime }}</td>
                                 <td class="coin-wallet-address">{{ coin_config.wallet_address }}</td>
                                 <td class="coin-safe-block-distant">{{ coin_config.safe_block_distant }}</td>
+                                <td class="coin-safe-block-distant">{{ coin_config.decimal }}</td>
                             </tr>
                         {% endfor %}
                         </tbody>
@@ -118,47 +134,92 @@
                         {{ button_add }}
                     </button>
                 </div>
-            </div>
-        </div>
-        {% for coin_config in coins_config %}
-            <div id="modal-edit-{{ coin_config.ezdefi_coin_id }}" class="modal fade" role="dialog">
-                <div class="modal-dialog">
-                    <!-- Modal content-->
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal">&times;</button>
-                            <h4 class="modal-title">EDIT</h4>
-                        </div>
-                        <div class="modal-body">
-                            <img src="{{ coin_config.logo }}" alt=""> <span style="padding-left: 20px"> {{ coin_config.symbol }}/{{ coin_config.name }} </span>
-                            <div>
-                                <div class="form-group">
-                                    <label>Discount</label>
-                                    <input type="text" class="form-control coin-config__discount" id="edit-discount-{{ coin_config.ezdefi_coin_id }}" value="{{ coin_config.discount }}" name="{{ coin_config.ezdefi_coin_id }}['edit_discount']">
-                                </div>
-                                <div class="form-group">
-                                    <label>Payment lifetime</label>
-                                    <input type="text" class="form-control coin-config__payment-lifetime" id="edit-payment-lifetime-{{ coin_config.ezdefi_coin_id }}" value="{{ coin_config.payment_lifetime }}" name="{{ coin_config.ezdefi_coin_id }}['edit_payment_lifetime']">
-                                </div>
-                                <div class="form-group">
-                                    <label>Wallet address </label>
-                                    <input type="text" class="form-control coin-config__wallet-address" id="edit-wallet-address-{{ coin_config.ezdefi_coin_id }}" value="{{ coin_config.wallet_address }}" name="{{ coin_config.ezdefi_coin_id }}['edit_wallet_address']">
-                                </div>
-                                <div class="form-group">
-                                    <label>Safe block distant</label>
-                                    <input type="text" class="form-control coin-config__safe-block-distant" id="edit-safe-block-distant-{{ coin_config.ezdefi_coin_id }}" value="{{ coin_config.safe_block_distant }}" name="{{ coin_config.ezdefi_coin_id }}['edit_coin_safe_block_distant']">
+                {% for coin_config in coins_config %}
+                <div id="modal-edit-{{ coin_config.ezdefi_coin_id }}" class="modal fade" role="dialog">
+                    <div class="modal-dialog">
+                        <!-- Modal content-->
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                <h4 class="modal-title">EDIT</h4>
+                            </div>
+                            <div class="modal-body">
+                                <img src="{{ coin_config.logo }}" alt=""> <span style="padding-left: 20px"> {{ coin_config.symbol }}/{{ coin_config.name }} </span>
+                                <div>
+                                    <div class="form-group">
+                                        <label>Discount</label>
+                                        <input type="text" class="form-control coin-config__discount" id="edit-discount-{{ coin_config.ezdefi_coin_id }}" value="{{ coin_config.discount }}" name="{{ coin_config.ezdefi_coin_id }}['edit_discount']">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Payment lifetime</label>
+                                        <input type="text" class="form-control coin-config__payment-lifetime" id="edit-payment-lifetime-{{ coin_config.ezdefi_coin_id }}" value="{{ coin_config.payment_lifetime }}" name="{{ coin_config.ezdefi_coin_id }}['edit_payment_lifetime']">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Wallet address </label>
+                                        <input type="text" class="form-control coin-config__wallet-address" id="edit-wallet-address-{{ coin_config.ezdefi_coin_id }}" value="{{ coin_config.wallet_address }}" name="{{ coin_config.ezdefi_coin_id }}['edit_wallet_address']">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Safe block distant</label>
+                                        <input type="text" class="form-control coin-config__safe-block-distant" id="edit-safe-block-distant-{{ coin_config.ezdefi_coin_id }}" value="{{ coin_config.safe_block_distant }}" name="{{ coin_config.ezdefi_coin_id }}['edit_coin_safe_block_distant']">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Decimal</label>
+                                        <input type="text" class="form-control coin-config__decimal" id="edit-decimal-{{ coin_config.ezdefi_coin_id }}" value="{{ coin_config.decimal }}" name="{{ coin_config.ezdefi_coin_id }}['edit_coin_safe_block_distant']">
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="modal-footer" style="text-align: center">
-                            <button type="button" class="btn btn-danger" data-dismiss="modal">{{ button_close }}</button>
-                            <button type="button" class="btn btn-primary btn-submit-edit" data-coin_id="{{ coin_config.ezdefi_coin_id }}" data-url_edit="{{ url_edit }}">{{ button_save }}</button>
+                            <div class="modal-footer" style="text-align: center">
+                                <button type="button" class="btn btn-danger" data-dismiss="modal">{{ button_close }}</button>
+                                <button type="button" class="btn btn-primary btn-submit-edit" data-coin_id="{{ coin_config.ezdefi_coin_id }}" data-url_edit="{{ url_edit }}">{{ button_save }}</button>
+                            </div>
                         </div>
                     </div>
                 </div>
+
+                <div id="modal-delete-{{ coin_config.ezdefi_coin_id }}" class="modal fade" role="dialog">
+                    <div class="modal-dialog">
+                        <!-- Modal content-->
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                <h4 class="modal-title">Delete config</h4>
+                            </div>
+                            <div class="modal-body">
+                                <p>Do you want to delete this config</p>
+                                <div>
+                                    <img src="{{ coin_config.logo }}" alt=""> <span style="padding-left: 20px"> {{ coin_config.symbol }}/{{ coin_config.name }} </span>
+                                </div>
+                            </div>
+                            <div class="modal-footer" style="text-align: center">
+                                <button type="button" class="btn btn-danger" data-dismiss="modal">{{ button_close }}</button>
+                                <button type="button" class="btn btn-primary btn-confirm-delete" data-coin_id="{{ coin_config.ezdefi_coin_id }}" data-url_delete="{{ url_delete }}">{{ button_yes }}</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </form>
+            {# End setting form #}
+        </div>
+
+        {# Payment exception #}
+        <div class="panel panel-defaul exception-content-tab">
+            <input type="hidden" id="url-get-exception" value="{{ url_get_exception }}">
+            <input type="hidden" id="total-exception" value="{{ total_exception }}">
+
+            <div class="panel-heading">
+                <h3 class="panel-title"><i class="fa fa-pencil"></i> {{tab_edit_general}} </h3>
+            </div>
+            <div class="panel-body">
+                <div class="ezdefi-search-box">
+                    <input type="text" class="extention-search-input">
+                </div>
+                <div class="data-container"></div>
+                <div id="exception-content-box">
+                </div>
             </div>
 
-            <div id="modal-delete-{{ coin_config.ezdefi_coin_id }}" class="modal fade" role="dialog">
+            <div id="delete-order-exception" class="modal fade" role="dialog">
                 <div class="modal-dialog">
                     <!-- Modal content-->
                     <div class="modal-content">
@@ -168,19 +229,37 @@
                         </div>
                         <div class="modal-body">
                             <p>Do you want to delete this config</p>
-                            <div>
-                                <img src="{{ coin_config.logo }}" alt=""> <span style="padding-left: 20px"> {{ coin_config.symbol }}/{{ coin_config.name }} </span>
-                            </div>
+                            <input type="text" id="exception-delete-id">
                         </div>
                         <div class="modal-footer" style="text-align: center">
                             <button type="button" class="btn btn-danger" data-dismiss="modal">{{ button_close }}</button>
-                            <button type="button" class="btn btn-primary btn-confirm-delete" data-coin_id="{{ coin_config.ezdefi_coin_id }}" data-url_delete="{{ url_delete }}">{{ button_yes }}</button>
+                            <button type="button" class="btn btn-primary" id="btn-delete-exception" data-url-delete="{{ url_delete_exception }}">{{ button_yes }}</button>
                         </div>
                     </div>
                 </div>
             </div>
-        {% endfor %}
-    </form>
-</div>
+            <div id="confirm-paid-order-exception" class="modal fade" role="dialog">
+                <div class="modal-dialog">
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">Confirm config</h4>
+                        </div>
+                        <div class="modal-body">
+                            <p>Do you want to confirm this order</p>
+                            <input type="text" id="exception-confirm-id">
+                        </div>
+                        <div class="modal-footer" style="text-align: center">
+                            <button type="button" class="btn btn-danger" data-dismiss="modal">{{ button_close }}</button>
+                            <button type="button" class="btn btn-primary" id="btn-confirm-paid-exception" data-url-delete="{{ url_delete_exception }}" data-url-add-order-history="{{ url_add_order_history }}">{{ button_yes }}</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {# End payment exception #}
 
+    </div>
+</div>
 {{ footer }}

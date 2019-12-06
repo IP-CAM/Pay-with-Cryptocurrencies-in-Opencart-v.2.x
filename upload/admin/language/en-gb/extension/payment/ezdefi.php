@@ -2,17 +2,6 @@
 // Heading
 $_['heading_title']		 = 'ezDeFi';
 
-// Text
-$_['text_edit']		   = 'Edit Stripe';
-$_['text_payment']		= 'Payment';
-$_['text_extension']		= 'Extension';
-$_['text_payments']		= 'Payments';
-$_['text_success']		= 'Success: You have modified Stripe Payment Module!';
-$_['text_ezdefi']			= '<img src="view/image/payment/ezdefi.png" alt="ezdefi" title="ezdefi" style="border: 1px solid #EEEEEE;" />';
-$_['text_next']			= 'Next';
-$_['text_live']			= 'Live (Production)';
-$_['text_test']			= 'Test (Sandbox)';
-
 
 // Entry
 $_['entry_enable_extension'] = 'Enable ezdefi';
@@ -37,8 +26,11 @@ $_['text_discount'] = 'Discount';
 $_['text_payment_lifetime'] = 'Payment lifetime';
 $_['text_wallet_address'] = 'Wallet address';
 $_['text_safe_block_distant'] = 'Safe block distant';
+$_['text_decimal'] = 'Decimal';
 $_['text_edit'] = 'Edit';
 $_['text_delete'] = 'Delete';
+$_['text_ezdefi']			= '<img src="view/image/payment/ezdefi.png" alt="ezdefi" title="ezdefi" style="border: 1px solid #EEEEEE;" />';
+$_['text_success'] = 'Success';
 
 
 // Error

@@ -1,0 +1,73 @@
+.ezdefi-tab-box {
+    display: flex;
+    margin-bottom: 5px;
+}
+.ezdefi-btn-tab {
+    color: #007bff;
+    flex:50%;
+    text-align: center;
+    background: #fff;
+    padding: 10px;
+    border-bottom: 1px solid #888;
+}
+
+.ezdefi-btn-tab:hover {
+    color: #00509b;
+    border-top: 1px solid #aaa;
+    border-left: 1px solid #aaa;
+    border-right: 1px solid #aaa;
+    border-radius: 4px 4px 0 0;
+}
+
+.ezdefi-admin-content-box {
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-template-rows: auto auto auto;
+}
+
+.ezdefi-btn-config-tab {
+    grid-column: 1/2;
+    grid-row: 1/2;
+}
+
+.ezdefi-btn-exception-tab {
+    grid-column: 2/3;
+    grid-row: 1/2
+
+}
+.config-content-tab {
+    grid-column: 1/3;
+    grid-row: 2/3;
+}
+
+.exception-content-tab {
+    grid-column: 1/3;
+    grid-row: 3/4;
+}
+
+#ezdefi-config-tab:checked ~ .ezdefi-btn-config-tab, #ezdefi-exception-tab:checked ~ .ezdefi-btn-exception-tab {
+    color: #333;
+    border: 1px solid #888;
+    border-radius: 4px 4px 0 0;
+    border-bottom-color: transparent;
+}
+
+#ezdefi-config-tab:checked ~ .config-content-tab, #ezdefi-exception-tab:checked ~ .exception-content-tab {
+    display: block;
+}
+
+.config-content-tab, .exception-content-tab {
+    display: none;
+}
+
+.ezdefi-search-box {
+    width: 100%;
+    text-align: center;
+}
+
+.extention-search-input {
+    width: 50%;
+    padding: 3px;
+    border-color: lightskyblue;
+    border-radius: 5px;
+}
