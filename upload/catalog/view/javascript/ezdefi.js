@@ -8,6 +8,7 @@ $(function () {
         paymentContent: '.ezdefi-payment__content',
         deeplink: '.ezdefi-payment__deeplink',
         qrCodeImg: '.ezdefi-payment__qr-code',
+        timeoutNotify: '.timeout-notification',
         countDownTime: '.ezdefi-payment__countdown-lifeTime',
         originValue: '.ezdefi-payment__origin-value',
         currencyValue: '.ezdefi-payment__currency-value',
@@ -22,11 +23,14 @@ $(function () {
     };
 
     var global = {};
+    global.countDownInterval = {};
 
     $('[data-toggle="popover"]').popover();
 
     $(selectors.btnCharge).click(function () {
-        clearInterval(global.countDownInterval);
+        for(let i in global.countDownInterval) {
+            clearInterval(global.countDownInterval[i]);
+        }
         $(selectors.chargeCoinBox).css('display', 'block');
         $(selectors.paymentContent).css('display', 'none');
         $(selectors.qrCodeImg).prop('src', '');
@@ -47,13 +51,12 @@ $(function () {
         }
     });
 
-    $('.btn-choose-payment-type').click(function () {
-        var paymentType = $(this).data('suffixes');
+    $('.ezdefi-show-payment-radio').change(function () {
+        var paymentType = $(".ezdefi-show-payment-radio:checked").data('suffixes');
         var gotPayment = $('#check-created-payment'+paymentType).is(':checked');
         $('.ezdefi-show-payment').prop('checked',false);
         $('#ezdefi-show-payment'+paymentType).prop('checked', true);
         if(!gotPayment) {
-            console.log(1111);
             var url = $("#url-create-payment"+paymentType).val();
             var coinId = $('#selected-coin-id').val();
             var discount = $('#selected-coin-discount').val();
@@ -110,11 +113,15 @@ $(function () {
     });
 
     var renderPayment = function (suffixes, data, discount ) {
+        showModalSuccess();
         var paymentId = data._id;
+        var originValue = $("#origin-value").val();
 
         $(selectors.paymentIdInput+suffixes).val(paymentId);
+        enablePaymentTimeout(suffixes, false);
         countDownTime(paymentId, data.expiredTime, suffixes);
 
+        $(selectors.originValue + suffixes).html(originValue * (100 - discount)/100);
         $(selectors.deeplink+suffixes).attr('href', data.deepLink);
         $(selectors.currencyValue+suffixes).html(parseInt(data.value) * Math.pow(10, -data.decimal) + data.currency);
         $("#check-created-payment"+suffixes).prop('checked', true);
@@ -155,11 +162,12 @@ $(function () {
     };
 
     var countDownTime = function (paymentId, expiredTime, suffixes) {
-        global.countDownInterval = setInterval(function () {
+        global.countDownInterval[suffixes] = setInterval(function () {
             var currentPaymentId = $(selectors.paymentIdInput+suffixes).val();
             if(currentPaymentId !== paymentId) {
-                clearInterval(global.countDownInterval);
+                clearInterval(global.countDownInterval[suffixes]);
             } else {
+                enablePaymentTimeout(suffixes, false);
                 var timestampCountdown = new Date(expiredTime) - new Date();
                 var secondToCountdown = Math.floor(timestampCountdown/1000);
                 if(secondToCountdown >= 0) {
@@ -174,10 +182,30 @@ $(function () {
                     }
                 } else {
                     $(selectors.countDownLabel + suffixes).html('0:0');
-                    clearInterval(global.countDownInterval);
+                    enablePaymentTimeout(suffixes, true);
+                    clearInterval(global.countDownInterval[suffixes]);
                 }
             }
         }, 1000);
     };
+
+    var enablePaymentTimeout = function(suffixes, enable) {
+        $(selectors.qrCodeImg+suffixes).css('filter', enable ? 'blur(5px)' : 'none');
+        $(selectors.timeoutNotify+suffixes).css('display', enable ? 'block' : 'none');
+    };
+
+    $(".select-coin-checkbox").change(function () {
+        var inputId = $(".select-coin-checkbox:checked").attr('id');
+        $("label.ezdefi-charge-coin-item").css('border', '1px solid #d8d8d8');
+        $("label.ezdefi-charge-coin-item[for='"+inputId+"']").css('border', '2px solid lightskyblue')
+    });
+
+    var showModalSuccess = function () {
+        $("#modal-notify-create-payment-success").modal('toggle');
+        setTimeout(function () {
+            $("#modal-notify-create-payment-success").modal('toggle');
+        },2500)
+    };
+    
     checkOrderComplete();
 });

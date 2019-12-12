@@ -13,7 +13,6 @@ $( function() {
         orderStatusInput: "#order-status-input",
         enableSimplePayInput: "#enable-simple-pay",
         enableEscrowPayInput: "#enable-escrow-pay",
-        decimalInput: "#decimal-input",
         variationInput: "#variation-input",
         decimalBox: ".decimal-input-box",
         variationBox: ".variation-input-box",
@@ -26,6 +25,7 @@ $( function() {
         coinWalletAddressInput: '.coin-config__wallet-address',
         coinSafeBlockDistantInput: '.coin-config__safe-block-distant',
         coinDecimalInput: '.coin-config__decimal',
+        cancelSelectCoin: '.cancel-select-coin'
     };
 
     var oc_ezdefi_admin = function() {
@@ -36,7 +36,20 @@ $( function() {
         this.showSimplePayConfig();
         this.initSortable();
         this.initValidate();
+        this.initAllowInputFloat();
     };
+
+    oc_ezdefi_admin.prototype.initAllowInputFloat = function() {
+        $('.validate-float').keypress(function(eve) {
+            if ((eve.which != 46 || $(this).val().indexOf('.') != -1) && (eve.which < 48 || eve.which > 57) || (eve.which == 46 && $(this).caret().start == 0) ) {
+                eve.preventDefault();
+            }
+            $('.validate-float').keyup(function(eve) {
+                if($(this).val().indexOf('.') == 0) {    $(this).val($(this).val().substring(1));
+                }
+            });
+        });
+    }
 
     oc_ezdefi_admin.prototype.initValidate = function() {
         $.validator.addMethod("integer", function(value, element) {
@@ -51,7 +64,7 @@ $( function() {
             }
         });
 
-        this.validateAllInput(selectors.gatewayApiUrlInput, {required: true});
+        this.validateAllInput(selectors.gatewayApiUrlInput, {url:true, required: true});
         this.validateAllInput(selectors.apiKeyInput, {required: true});
         this.validateAllInput(selectors.orderStatusInput, {required: true});
         this.validateAllInput(selectors.coinDiscountInput, {max: 100, integer: true});
@@ -61,34 +74,32 @@ $( function() {
         this.validateAllInput(selectors.coinSymbolInput, {required: true});
         this.validateAllInput(selectors.coinPaymentLifetimeInput, {integer: true});
         this.validateAllInput(selectors.coinSafeBlockDistantInput, {integer: true});
-        this.validateAllInput(selectors.coinSafeBlockDistantInput, {integer: true});
-        this.validateAllInput(selectors.variationInput, {float: true, required: () => $(selectors.enableSimplePayInput).is(':checked')});
-        this.validateAllInput(selectors.decimalInput, {integer: true, max:14, required: () => $(selectors.enableSimplePayInput).is(':checked')});
+        this.validateAllInput(selectors.variationInput, {max: 100, float: true, required: () => $(selectors.enableSimplePayInput).is(':checked')});
+        this.validateAllInput(selectors.coinDecimalInput, {integer: true, max:14, required: () => $(selectors.enableSimplePayInput).is(':checked')});
         this.validateAllInput(selectors.enableSimplePayInput, {required: () => !$(selectors.enableEscrowPayInput).is(':checked'), messages: {required: 'choose at least one payment method'}});
         this.validateAllInput(selectors.enableEscrowPayInput, {required: () => !$(selectors.enableSimplePayInput).is(':checked'), messages: {required: 'choose at least one payment method'}});
-
-        this.validateWalletAddress();
+        this.validateAllInput(selectors.coinWalletAddressInput, {required: true});
     };
 
-    oc_ezdefi_admin.prototype.validateWalletAddress = function() {
-        $(selectors.coinWalletAddressInput).each(function () {
-            var inputName = $(this).attr('name');
-            $(`input[name="${inputName}"]`).rules('add', {
-                required: true,
-                remote: {
-                    url: $(selectors.formConfig).data('url_validate_wallet'),
-                    data: {
-                        address: function () {
-                            return $(`input[name="${inputName}"]`).val();
-                        },
-                    },
-                },
-                messages: {
-                    remote: "This wallet address is invalid"
-                }
-            });
-        });
-    };
+    // oc_ezdefi_admin.prototype.validateWalletAddress = function() {
+    //     $(selectors.coinWalletAddressInput).each(function () {
+    //         var inputName = $(this).attr('name');
+    //         $(`input[name="${inputName}"]`).rules('add', {
+    //             required: true,
+    //             remote: {
+    //                 url: $(selectors.formConfig).data('url_validate_wallet'),
+    //                 data: {
+    //                     address: function () {
+    //                         return $(`input[name="${inputName}"]`).val();
+    //                     },
+    //                 },
+    //             },
+    //             messages: {
+    //                 remote: "This wallet address is invalid"
+    //             }
+    //         });
+    //     });
+    // };
 
     oc_ezdefi_admin.prototype.validateAllInput = function(selector, rules) {
         $(selector).each(function () {
@@ -107,9 +118,11 @@ $( function() {
         if($(selectors.enableSimplePayInput).is(':checked')) {
             $(selectors.decimalBox).css('display','block');
             $(selectors.variationBox).css('display','block');
+            $(".coin-decimal").css('display','table-cell');
         } else {
             $(selectors.decimalBox).css('display','none');
             $(selectors.variationBox).css('display','none');
+            $(".coin-decimal").css('display','none');
         }
     };
 
@@ -124,6 +137,7 @@ $( function() {
             success: function (response) {
                 var data = JSON.parse(response).data;
                 if(data.status === 'success') {
+                    alert(data.message);
                     $('#modal-delete-'+coinId).modal('toggle');
                     $('#config-row-' + coinId).remove();
                     $("#modal-edit-"+coinId).remove();
@@ -143,6 +157,7 @@ $( function() {
         var paymentLifetime = $('#edit-payment-lifetime-' + coinId).val();
         var walletAddress = $('#edit-wallet-address-' + coinId).val();
         var safeBlockDistant = $('#edit-safe-block-distant-' + coinId).val();
+        var decimal = $('#edit-decimal-' + coinId).val();
 
         $.ajax({
             url: url,
@@ -152,16 +167,19 @@ $( function() {
                 discount: discount,
                 payment_lifetime: paymentLifetime,
                 wallet_address: walletAddress,
-                safe_block_distant: safeBlockDistant
+                safe_block_distant: safeBlockDistant,
+                decimal: decimal
             },
             success: function (response) {
                 var data = JSON.parse(response).data;
                 if(data.status === 'success') {
+                    alert(data.message);
                     discount = discount === '' ? 0 : discount;
                     $('#config-row-'+coinId).find('.coin-discount').html(discount +'%');
-                    $('#config-row-'+coinId).find('.coin-payment-lifetime').html(paymentLifetime ? 0 :paymentLifetime);
+                    $('#config-row-'+coinId).find('.coin-payment-lifetime').html(paymentLifetime ? paymentLifetime : 0);
                     $('#config-row-'+coinId).find('.coin-wallet-address').html(walletAddress);
-                    $('#config-row-'+coinId).find('.coin-safe-block-distant').html(safeBlockDistant ? 0 : safeBlockDistant);
+                    $('#config-row-'+coinId).find('.coin-safe-block-distant').html(safeBlockDistant ? safeBlockDistant : 0);
+                    $('#config-row-'+coinId).find('.coin-decimal').html(decimal ? decimal : 0);
                     $('#modal-edit-' + coinId).modal('toggle');
                 } else {
                     alert(data.message);
@@ -169,10 +187,12 @@ $( function() {
                     var oldPaymentLifeTime = $('#config-row-'+coinId).find('.coin-payment-lifetime').html();
                     var oldWalletAddress = $('#config-row-'+coinId).find('.coin-wallet-address').html();
                     var oldSafeBlockDistant = $('#config-row-'+coinId).find('.coin-safe-block-distant').html();
+                    var oldDecimal = $('#config-row-'+coinId).find('.coin-decimal').html();
                     $('#edit-discount-' + coinId).val(oldDiscount);
                     $('#edit-payment-lifetime-' + coinId).val(oldPaymentLifeTime);
                     $('#edit-wallet-address-' + coinId).val(oldWalletAddress);
                     $('#edit-safe-block-distant-' + coinId).val(oldSafeBlockDistant);
+                    $('#edit-decimal-' + coinId).val(oldDecimal);
                 }
             }
         });
@@ -182,17 +202,17 @@ $( function() {
         var url = $(selectors.btnAdd).data('list_coin_url');
         var container = `<tr class="${this.formatSelectorToClassName(selectors.cloneRowCoinConfig)}">
                 <td class="sortable-handle">
-                    
                 </td>
                 <td>
                     <select class="form-control ${this.formatSelectorToClassName(selectors.selectCoinConfig)}" style="width: 200px" data-list_coin_url="${url}">
                         <option value=""></option>
-                    </select>
+                    </select><br>
+                    <a class="cancel-select-coin ezdefi-btn" >cancel</a>
                 </td>
                 <td></td>
                 <td></td>
                 <td>
-                    <div class="col-sm-10"><input type="text" class="form-control"></div>
+                    <input type="text" class="form-control">
                 </td>
                 <td><input type="text" class="form-control"></td>
                 <td><input type="text" class="form-control"></td>
@@ -201,7 +221,14 @@ $( function() {
         $(selectors.coinConfigTable).append(container);
 
         this.initSelectCoinConfig();
+        this.initCancelSelectCoin();
         $(selectors.selectCoinConfig).on('select2:select', this.selectCoinListener.bind(this));
+    };
+
+    oc_ezdefi_admin.prototype.initCancelSelectCoin = function() {
+        $(selectors.cancelSelectCoin).click(function () {
+            $(this).parent().parent().remove();
+        });
     };
 
     oc_ezdefi_admin.prototype.initSelectCoinConfig = function() {
@@ -253,10 +280,14 @@ $( function() {
                     <input type="hidden" class="${this.formatSelectorToClassName(selectors.coinIdInput)}" name="${data._id}[coin_id]" value="${data._id}">
                 </td>
                 <td>
-                    <img src="${data.logo}" alt="">
+                    <img src="${data.logo}" alt="" class="coin-config__logo">
                     <input type="hidden" value="${data.logo}" name="${data._id}[coin_logo]">
                 </td>
-                <td>${data.symbol} <input type="hidden" class="${this.formatSelectorToClassName(selectors.coinSymbolInput)}" value="${data.symbol}" name="${data._id}[coin_symbol]"></td>
+                <td> 
+                    <input type="hidden" class="${this.formatSelectorToClassName(selectors.coinSymbolInput)}" value="${data.symbol}" name="${data._id}[coin_symbol]">
+                    ${data.symbol} <br>
+                    <a class="cancel-select-coin ezdefi-btn">Cancel</a>
+                </td>
                 <td>${data.name} <input type="hidden" class="${this.formatSelectorToClassName(selectors.coinNameInput)}" value="${data.name}" name="${data._id}[coin_name]"> </td>
                 <td>
                     <div class="row">
@@ -267,12 +298,13 @@ $( function() {
                 <td><input type="text" class="form-control ${this.formatSelectorToClassName(selectors.coinPaymentLifetimeInput)}" name="${data._id}[coin_payment_life_time]"></td>
                 <td><input type="text" class="form-control ${this.formatSelectorToClassName(selectors.coinWalletAddressInput)}" name="${data._id}[coin_wallet_address]"></td>
                 <td><input type="text" class="form-control ${this.formatSelectorToClassName(selectors.coinSafeBlockDistantInput)}" name="${data._id}[coin_safe_block_distant]"></td>
-                <td><input type="text" class="form-control ${this.formatSelectorToClassName(selectors.coinDecimalInput)}" value="${data.suggestedDecimal}"></td>
-            </tr>`
+                <td><input type="text" class="form-control ${this.formatSelectorToClassName(selectors.coinDecimalInput)}" name="${data._id}[coin_decimal]" value="${data.suggestedDecimal}"></td>
+            </tr>`;
             $(selectors.coinConfigTable).append(container);
             $(selectors.cloneRowCoinConfig).remove();
 
             this.initValidate();
+            this.initCancelSelectCoin();
             this.updateCoinConfigOrder();
         }
     };
@@ -318,128 +350,4 @@ $( function() {
     };
 
     new oc_ezdefi_admin();
-
-
-    var oc_ezdefi_exception = function () {
-        this.loadException();
-        $("#btn-delete-exception").click(this.deleteException).bind(this);
-        $("#btn-confirm-paid-exception").click();
-    };
-
-    oc_ezdefi_exception.prototype.loadException = function () {
-        var that = this;
-        var container = $("#exception-content-box");
-        var url = $("#url-get-exception").val();
-        var totalNumber = $("#total-exception").val();
-        container.pagination({
-            dataSource: url,
-            locator: 'items',
-            totalNumber: totalNumber,
-            pageSize: 10,
-            showPageNumbers: true,
-            showPrevious: true,
-            showNext: true,
-            showNavigator: true,
-            showFirstOnEllipsisShow: true,
-            showLastOnEllipsisShow: true,
-            ajax: {
-                beforeSend: function() {
-                    container.prev().html('Loading data from server ...');
-                }
-            },
-            callback: function(response, pagination) {
-                var exceptionRecords = that.convertExceptionResponse(response);
-                var dataHtml = `<table class="table">
-                        <thead>
-                        <tr>
-                            <th>STT</th>
-                            <th>Currency</th>
-                            <th>Amount</th>
-                            <th>Order</th>
-                        </tr>
-                        </thead>
-                        <tbody>`;
-                let stt = 1;
-                $.each(exceptionRecords, function (exceptionKey, groupException) {
-                    let currency = groupException.currency;
-                    let amountId = groupException.amount_id;
-                    let orderItem = "<div>";
-                    $.each(groupException.orders, function (key, exceptionData) {
-                        orderItem += `<div id="exception-order-${exceptionData[0]}">
-                            <div>
-                                <p>order_id: ${exceptionData[1]} </p>
-                                <p>email: ${exceptionData[2]} </p>
-                                <p>expiration: ${exceptionData[3]} </p>
-                                <p>paid: ${exceptionData[4] === '1' ? 'yes' : 'no'} </p>
-                                <p>Pay by ezdefi wallet: ${exceptionData[6] === '1' ? 'no' : 'yes'} </p>
-                            </div>
-                            <div>
-                                <button class="btn btn-primary btn-confirm-paid" data-toggle="modal" data-target="#confirm-paid-order-exception" data-exception-id="${exceptionData[0]}">confirm paid</button>
-                                <button class="btn btn-danger btn-delete-exception" data-toggle="modal" data-target="#delete-order-exception" data-exception-id="${exceptionData[0]}">delete</button>
-                            </div>
-                        </div>`;
-                    });
-                    orderItem += "</div>";
-                    dataHtml += `<tr>
-                                <td>${stt}</td>
-                                <td>${currency}</td>
-                                <td>${amountId}</td>
-                                <td>${orderItem}</td>
-                            </tr>`;
-                    stt++;
-                });
-                dataHtml += `</tbody>
-                    </table>`;
-
-                container.prev().html(dataHtml);
-                that.addConfirmPaidListener();
-                that.addDeleteExceptionListener();
-            }
-        });
-    };
-
-    oc_ezdefi_exception.prototype.addConfirmPaidListener = function (data) {
-        $(".btn-confirm-paid").click(function () {
-            let exceptionId = $(this).data('exception-id');
-            $("#exception-confirm-id").val(exceptionId);
-        });
-    };
-
-    oc_ezdefi_exception.prototype.addDeleteExceptionListener = function (data) {
-        $(".btn-delete-exception").click(function () {
-            let exceptionId = $(this).data('exception-id');
-            $("#exception-delete-id").val(exceptionId);
-        });
-    };
-
-    oc_ezdefi_exception.prototype.convertExceptionResponse = function (data) {
-        for (let i in data) {
-            let orders = data[i].group_order.split(',');
-            for(let i in orders) {
-                orders[i] = orders[i].split('--');
-            }
-            data[i].orders = orders;
-        }
-        return data;
-    };
-
-    oc_ezdefi_exception.prototype.deleteException = function () {
-        let url = $("#url-delete-exception").val();
-        let exceptionId = $("#exception-delete-id").val();
-        console.log(url,exceptionId);
-        $.ajax({
-            url: url,
-            method: "POST",
-            data: { exception_id: exceptionId },
-            success: function (response) {
-                $("#exception-order-"+exceptionId).remove();
-                $('#delete-order-exception').modal('toggle');
-            }
-        });
-    };
-
-
-
-    new oc_ezdefi_exception();
-
 });

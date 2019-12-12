@@ -1,24 +1,27 @@
 <?php
 
 class ModelExtensionPaymentEzdefi extends Model {
-    const TIME_REMOVE_AMOUNT_ID = 3;
-    const TIME_REMOVE_EXCEPTION = 7;
+    CONST TIME_REMOVE_AMOUNT_ID = 3;
+    CONST TIME_REMOVE_EXCEPTION = 7;
+    CONST ORDER_STATUS_PENDING = 0;
+    CONST NUMBER_OF_ORDERS_IN_PAGE = 10;
 
     public function install() {
         $this->db->query("
 			CREATE TABLE IF NOT EXISTS `" . DB_PREFIX . "ezdefi_coin` (
-			  `coin_id` varchar(255),
-			  `order` int(11) NOT NULL,
-              `logo` varchar(255),
-		      `symbol` varchar(255),
-			  `name` varchar(255) NOT NULL,
-			  `discount` int(11),
-		      `payment_lifetime` int(11),
-		      `wallet_address` varchar(255) NOT NULL,
-		      `safe_block_distant` int(11),
-		      `decimal` int(11) DEFAULT 8,
-			  `created` DATETIME NOT NULL,
-			  `modified` DATETIME NOT NULL,
+			  `coin_id`             int auto_increment,
+			  `ezdefi_coin_id`      varchar(255),
+			  `order`               int(11) NOT NULL,
+              `logo`                varchar(255),
+		      `symbol`              varchar(255),
+			  `name`                varchar(255) NOT NULL,
+			  `discount`            int(4),
+		      `payment_lifetime`    int(11),
+		      `wallet_address`      varchar(255) NOT NULL,
+		      `safe_block_distant`  int(11),
+		      `decimal`             int(11) DEFAULT 8,
+			  `created`             DATETIME NOT NULL,
+			  `modified`            DATETIME NOT NULL,
 			  PRIMARY KEY (`coin_id`)
 			) ENGINE=InnoDB DEFAULT COLLATE=utf8_general_ci;
 			
@@ -37,9 +40,10 @@ class ModelExtensionPaymentEzdefi extends Model {
             CREATE TABLE IF NOT EXISTS `" . DB_PREFIX . "ezdefi_exception` (
                 `exception_id` int auto_increment,
 			    `order_id` int(11) NOT NULL,
-                `amount_id` varchar(255),
-                `currency` varchar(255)
-		        `status` varchar(255),
+                `amount_id` decimal(25,14),
+                `currency` varchar(255),
+		        `paid` int(4),
+		        `has_amount` tinyint(1),
 			    PRIMARY KEY (`exception_id`)
 			) ENGINE=InnoDB DEFAULT COLLATE=utf8_general_ci;
              
@@ -48,6 +52,12 @@ class ModelExtensionPaymentEzdefi extends Model {
             STARTS DATE(NOW())
             DO
             DELETE FROM `" . DB_PREFIX . "ezdefi_tag_amount` WHERE DATEDIFF( NOW( ) ,  expiration ) >= 86400;
+            
+            CREATE EVENT `ezdefi_remove_exception_event`
+            ON SCHEDULE EVERY ".self::TIME_REMOVE_EXCEPTION." DAY
+            STARTS DATE(NOW())
+            DO
+            DELETE FROM `" . DB_PREFIX . "ezdefi_exception` WHERE DATEDIFF( NOW( ) ,  expiration ) >= 86400;
             SET GLOBAL event_scheduler='ON';
         ");
     }
@@ -58,36 +68,32 @@ class ModelExtensionPaymentEzdefi extends Model {
     }
 
     public function updateCoins($data) {
-        foreach($data as $key => $coinRecord) {
-            if(isset($coinRecord['coin_wallet_address'])) {
-                $this->db->query("INSERT INTO `" . DB_PREFIX . "ezdefi_coin` SET `ezdefi_coin_id` = '" . $this->db->escape($coinRecord['coin_id']) .
-                    "', `order` = '" . (int)$coinRecord['coin_order'] .
-                    "', `logo` = '" . $this->db->escape($coinRecord['coin_logo']) .
-                    "', `symbol` = '" . $this->db->escape($coinRecord['coin_symbol']) .
-                    "', `name` = '" . $this->db->escape($coinRecord['coin_name']) .
-                    "', `discount` = '" .(int)$coinRecord['coin_discount'] .
-                    "', `payment_lifetime` = '" . (int)$coinRecord['coin_payment_life_time'].
-                    "', `wallet_address` = '" . $this->db->escape($coinRecord['coin_wallet_address']) .
-                    "', `safe_block_distant` = '" . (int)$coinRecord['coin_safe_block_distant'] .
+        foreach($data as $key => $coin_record) {
+            if(isset($coin_record['coin_wallet_address'])) {
+                $this->db->query("INSERT INTO `" . DB_PREFIX . "ezdefi_coin` SET `ezdefi_coin_id` = '" . $this->db->escape($coin_record['coin_id']) .
+                    "', `order` = '" . (int)$coin_record['coin_order'] .
+                    "', `logo` = '" . $this->db->escape($coin_record['coin_logo']) .
+                    "', `symbol` = '" . $this->db->escape($coin_record['coin_symbol']) .
+                    "', `name` = '" . $this->db->escape($coin_record['coin_name']) .
+                    "', `discount` = '" .(int)$coin_record['coin_discount'] .
+                    "', `payment_lifetime` = '" . (int)$coin_record['coin_payment_life_time'].
+                    "', `wallet_address` = '" . $this->db->escape($coin_record['coin_wallet_address']) .
+                    "', `safe_block_distant` = '" . (int)$coin_record['coin_safe_block_distant'] .
+                    "', `decimal` = '" . (int)$coin_record['coin_decimal'] .
                     "', `created` = now(), `modified` = now()");
             } else {
-                $this->db->query("UPDATE `" . DB_PREFIX . "ezdefi_coin` SET `order` = " . (int)$coinRecord['coin_order'] . ", `modified` = now()" ." WHERE `ezdefi_coin_id` ='". $this->db->escape($coinRecord['coin_id'])."'");
+                $this->db->query("UPDATE `" . DB_PREFIX . "ezdefi_coin` SET `order` = " . (int)$coin_record['coin_order'] . ", `modified` = now()" ." WHERE `ezdefi_coin_id` ='". $this->db->escape($coin_record['coin_id'])."'");
             }
         }
     }
 
     public function updateCoinConfig($dataUpdate) {
-        $coinId = $dataUpdate['coin_id'];
-        $discount = $dataUpdate['discount'];
-        $paymentLifetime = $dataUpdate['payment_lifetime'];
-        $walletAddress = $dataUpdate['wallet_address'];
-        $safeBlockDistant = $dataUpdate['safe_block_distant'];
-
-         return $this->db->query("UPDATE `" . DB_PREFIX . "ezdefi_coin` SET `discount` = '" . (int)$discount .
-            "', `payment_lifetime` = '". (int)$paymentLifetime.
-            "', `wallet_address` = '". $this->db->escape($walletAddress).
-            "', `safe_block_distant` = '". (int)$safeBlockDistant.
-            "', `modified` = now()" ." WHERE `ezdefi_coin_id` ='". $this->db->escape($coinId)."'");
+         return $this->db->query("UPDATE `" . DB_PREFIX . "ezdefi_coin` SET `discount` = '" . (int)$dataUpdate['discount'] .
+            "', `payment_lifetime` = '". (int)$dataUpdate['payment_lifetime'].
+            "', `wallet_address` = '". $this->db->escape($dataUpdate['wallet_address']).
+            "', `safe_block_distant` = '". (int)$dataUpdate['safe_block_distant'].
+            "', `decimal` = '". (int)$dataUpdate['decimal'].
+            "', `modified` = now()" ." WHERE `ezdefi_coin_id` ='". $this->db->escape($dataUpdate['coin_id'])."'");
     }
 
     public function checkUniqueCoinConfig($coinIds) {
@@ -100,7 +106,6 @@ class ModelExtensionPaymentEzdefi extends Model {
                 $sql .= " OR `ezdefi_coin_id` = '$coinId'";
             }
         }
-
         $query = $this->db->query($sql);
         if ($query->num_rows) {
             return ['unique_coins' => true];
@@ -126,21 +131,21 @@ class ModelExtensionPaymentEzdefi extends Model {
 
     public function getAllCoinAvailable($apiUrl, $keyword) {
         $url = $apiUrl . "/token/list?keyword=$keyword";
-        $listCoinSupport = $this->sendCurl($url, "GET");
+        $list_coin_support = $this->sendCurl($url, "GET");
 
-        if($listCoinSupport) {
-            return $listCoinSupport;
+        if($list_coin_support) {
+            return $list_coin_support;
         } else {
             return json_encode(['status' => 'failure', 'message' => 'Something error when get coins']);
         }
     }
 
     public function checkWalletAddress($apiUrl, $api_key, $address) {
-        $listWallet = $this->sendCurl($apiUrl . '/user/list_wallet', "GET", $api_key);
-        if ($listWallet) {
-            $WalletsData = json_decode($listWallet)->data;
-            foreach ($WalletsData as $key => $WalletData) {
-                if($WalletData->address === $address) {
+        $list_wallet = $this->sendCurl($apiUrl . '/user/list_wallet', "GET", $api_key);
+        if ($list_wallet) {
+            $Wallets_data = json_decode($list_wallet)->data;
+            foreach ($WalletsData as $key => $Wallet_data) {
+                if($Wallet_data->address === $address) {
                     echo "true";
                     return;
                 }
@@ -153,31 +158,62 @@ class ModelExtensionPaymentEzdefi extends Model {
     }
 
     //-------------------------------------------------Exception------------------------------------------------------
-    public function getTotalException() {
-        $query = $this->db->query("SELECT count(id) as total_exception FROM `".DB_PREFIX."ezdefi_exception` group by amount_id, currency");
-        return $query->row['total_exception'];
-    }
+    public function getTotalException($keyword, $currency) {
+        $sql = "select count(*) as total_exceptions
+            from `".DB_PREFIX."ezdefi_exception` `exception`
+                left join `".DB_PREFIX."order` `order` on exception.order_id = order.order_id
+            where (order.email like '%".$keyword."%'
+                OR exception.order_id like '%".$keyword."%'
+                OR exception.amount_id like '%".$keyword."%')";
+        if($currency) {
+            $sql .= " AND exception.currency = '".strtoupper($currency)."'";
+        }
+        $sql .= " group by exception.amount_id, exception.currency
+        having max(exception.paid) > 0";
+        $query = $this->db->query($sql);
 
-    public function getExceptions($page, $limit) {
-        $start = ($page-1) * $limit;
-        $exceptions = $this->db->query("select amount_id, currency, GROUP_CONCAT(oc_ezdefi_exception.id , '--', oc_order.order_id, '--', oc_order.email, '--', oc_ezdefi_exception.expiration, '--', oc_ezdefi_exception.paid, '--', oc_ezdefi_exception.has_amount ORDER BY paid DESC) group_order
-            from `".DB_PREFIX."ezdefi_exception`
-                left join `".DB_PREFIX."order` on oc_ezdefi_exception.order_id = oc_order.order_id
-            group by amount_id, currency
-            LIMIT ".$start.",".$limit);
-
-        return $exceptions->rows;
-    }
-
-    public function getExceptionById($exception_id) {
-        $query = $this->db->query("SELECT * FROM `".DB_PREFIX."ezdefi_exception` WHERE `id`=".$exception_id);
-        return $query->row;
+        return $query->num_rows;
     }
 
     public function deleteExceptionById($exception_id) {
         $this->db->query("DELETE FROM `".DB_PREFIX."ezdefi_exception` WHERE `id`=".$exception_id);
     }
 
+    public function deleteExceptionByOrderId($order_id) {
+        $this->db->query("DELETE FROM `".DB_PREFIX."ezdefi_exception` WHERE `order_id`=".$order_id);
+    }
+
+    public function searchExceptions($keyword, $currency, $page, $limit) {
+        $start = ($page-1) * $limit;
+        $sql = "select amount_id, currency, GROUP_CONCAT(exception.id , '--', order.order_id, '--', order.email, '--', exception.expiration, '--', exception.paid, '--', exception.has_amount ORDER BY paid DESC) group_order
+            from `".DB_PREFIX."ezdefi_exception` `exception`
+                left join `".DB_PREFIX."order` `order` on exception.order_id = order.order_id
+            where (order.email like '%".$keyword."%'
+                OR exception.order_id like '%".$keyword."%'
+                OR exception.amount_id like '%".$keyword."%')";
+        if($currency) {
+            $sql .= " AND exception.currency = '".strtoupper($currency)."'";
+        }
+        $sql .= " group by exception.amount_id, exception.currency
+            having max(exception.paid) > 0
+            LIMIT ".$start.",".$limit;
+
+        $query = $this->db->query($sql);
+        return $query->rows;
+    }
+
+    // ------------------------------order------------------------------------
+    public function searchOrderPending($keyword = '', $page) {
+        $start = self::NUMBER_OF_ORDERS_IN_PAGE * ($page-1);
+        $query = $this->db->query("SELECT email, order_id as id, date_added, total, currency_code, firstname, lastname 
+                                    FROM `".DB_PREFIX."order` 
+                                    WHERE (email like '%".$this->db->escape($keyword)."%'
+                                        OR order_id like '%".$this->db->escape($keyword)."%'
+                                        OR CONCAT(firstname, ' ', lastname) LIKE '%" . $this->db->escape($keyword) . "%')
+                                        AND order_status_id = ".self::ORDER_STATUS_PENDING."
+                                    LIMIT ".$start.",".self::NUMBER_OF_ORDERS_IN_PAGE);
+        return $query->rows;
+    }
 
     /**
      * @param $url

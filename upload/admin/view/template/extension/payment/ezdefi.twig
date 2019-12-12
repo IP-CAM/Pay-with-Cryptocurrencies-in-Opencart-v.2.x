@@ -2,7 +2,8 @@
 <div id="content">
     <input type="hidden" id="url-delete-exception" value="{{ url_delete_exception }}">
     <input type="hidden" id="url-add-order-history" value="{{ url_add_order_history }}">
-
+    <input type="hidden" id="url-delete-exception-by-order-id" value="{{ url_delete_exception_by_order_id }}">
+    <input type="hidden" id="url-get-order-pending" value="{{ url_get_order_pending }}">
     {# Ezdefi header #}
     <div class="page-header">
         <div class="container-fluid">
@@ -25,8 +26,8 @@
         {# Tab choose setting or show payment exception #}
         <input type="radio" id="ezdefi-config-tab" name="btn-radio-choose-tab" class="hidden" checked>
         <input type="radio" id="ezdefi-exception-tab" name="btn-radio-choose-tab" class="hidden">
-        <label class="ezdefi-btn-tab ezdefi-btn-config-tab" for="ezdefi-config-tab"> coin config </label>
-        <label class="ezdefi-btn-tab ezdefi-btn-exception-tab" for="ezdefi-exception-tab"> payment exception </label>
+        <label class="ezdefi-btn-tab ezdefi-btn-config-tab" for="ezdefi-config-tab"> {{ tab_config }} </label>
+        <label class="ezdefi-btn-tab ezdefi-btn-exception-tab" for="ezdefi-exception-tab"> {{ tab_exception }} </label>
         {# End tab choose setting or show payment exception #}
 
         <div class="panel panel-default config-content-tab">
@@ -37,52 +38,39 @@
                 </div>
                 <div class="panel-body">
                     <div class="form-group">
-                        <label class="control-label col-md-3" for="enable-ezdefi">{{ entry_enable_extension }}</label>
-                        <div class="col-sm-9">
-                            <input type="checkbox" id="enable-ezdefi" class="form-control" name="payment_ezdefi_status" {{ payment_ezdefi_status ? 'checked': ''}}>
+                        <label class="control-label col-sm-3" for="">{{ entry_enable_extension }}</label>
+                        <div class="col-lg-9">
+                            <label class="control-label" for="enable-ezdefi"><input type="checkbox" class="margin-right-10" id="enable-ezdefi" name="payment_ezdefi_status" {{ payment_ezdefi_status ? 'checked': ''}}> {{ text_enable_ezdefi }}</label>
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="control-label col-sm-3" for="gateway-api-url"> {{ entry_gateway_api_url }} </label>
-                        <div class="col-md-9">
+                        <div class="col-sm-9">
                             <input type="text" id="gateway-api-url-input" class="form-control" name="payment_ezdefi_gateway_api_url" value="{{ payment_ezdefi_gateway_api_url }}">
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label class="control-label col-sm-3" for="gateway-api-url"> {{ entry_api_key }} </label>
-                        <div class="col-md-9">
+                        <div class="col-sm-9">
                             <input type="text" id="api-key-input" class="form-control col-md-9" name="payment_ezdefi_api_key" value="{{ payment_ezdefi_api_key }}">
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="control-label col-sm-3" for="order-status"> {{ entry_order_status }} </label>
-                        <div class="col-md-9">
-                            <input type="text" id="order-status-input" class="form-control col-md-9" name="payment_ezdefi_order_status" value="{{ payment_ezdefi_order_status }}">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="control-label col-sm-3" for="enable-escrow-pay"> Escrow pay </label>
-                        <div class="col-md-3`">
-                            <input type="checkbox" name="payment_ezdefi_enable_escrow_pay" id="enable-escrow-pay" {{ payment_ezdefi_enable_escrow_pay ? 'checked' : '' }}>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="control-label col-sm-3" for="enable-simple-pay"> Simple Pay </label>
-                        <div class="col-md-3`">
-                            <input type="checkbox" name="payment_ezdefi_enable_simple_pay" id="enable-simple-pay" {{ payment_ezdefi_enable_simple_pay ? 'checked' : '' }}>
-                        </div>
-                    </div>
-                    <div class="form-group decimal-input-box">
-                        <label class="control-label col-sm-3" for="decimal-input"> decimal </label>
-                        <div class="col-md-9">
-                            <input type="text" class="form-control" name="payment_ezdefi_decimal" id="decimal-input" value="{{ payment_ezdefi_decimal }}">
+                        <label class="control-label col-sm-3"> {{ entry_payment_method }} </label>
+                        <div class="col-sm-9 payment-method-box">
+                            <label class="control-label  align-left" for="enable-simple-pay"><input type="checkbox" class="margin-right-10" name="payment_ezdefi_enable_simple_pay" id="enable-simple-pay" {{ payment_ezdefi_enable_simple_pay ? 'checked' : '' }}> {{ entry_pay_with_any_crypto_wallet }} </label>
+                            <p class=""><i>{{ text_simple_method_description }}</i></p>
+                            <label class="control-label align-left" for="enable-escrow-pay"><input type="checkbox" class="margin-right-10" name="payment_ezdefi_enable_escrow_pay" id="enable-escrow-pay" {{ payment_ezdefi_enable_escrow_pay ? 'checked' : '' }}> {{ entry_pay_with_ezdefi_wallet }} </label>
+                            <p class=""><i>{{ text_ezdefi_method_description }} </i></p>
                         </div>
                     </div>
                     <div class="form-group variation-input-box">
-                        <label class="control-label col-sm-3" for="variable-input"> variation </label>
-                        <div class="col-md-9">
-                            <input type="text" class="form-control" name="payment_ezdefi_variation" id="variation-input" value="{{ payment_ezdefi_variation }}">
+                        <label class="control-label col-sm-3" for="variable-input"> {{ entry_pay_variation }} </label>
+                        <div class="col-sm-9 variation-box">
+                            <input type="text" class="form-control validate-float" name="payment_ezdefi_variation" id="variation-input" value="{{ payment_ezdefi_variation }}" placeholder="{{ text_recommend_variation }}">
+                            <span class="padding-top-10 variation-percent">%</span>
+                            <i class="variation-description">Allowable amount variation</i>
                         </div>
                     </div>
                 </div>
@@ -101,31 +89,31 @@
                                 <th>{{ text_payment_lifetime }}</th>
                                 <th>{{ text_wallet_address }}</th>
                                 <th>{{ text_safe_block_distant }}</th>
-                                <th>{{ text_decimal }}</th>
+                                <th class="coin-decimal">{{ text_decimal }}</th>
                             </tr>
                         </thead>
                         <tbody id="coin-config__table">
                         {% for coin_config in coins_config %}
                             <tr id="config-row-{{ coin_config.ezdefi_coin_id }}">
-                                <td class="sortable-handle">
+                                <td class="sortable-handle padding-top-md">
                                     <i class="fa fa-arrows" aria-hidden="true"></i>
                                     <input type="hidden" class="coin-config__order" name="{{coin_config.ezdefi_coin_id}}[coin_order]" value="{{ coin_config.order }}">
                                     <input type="hidden" class="coin-config__id" name="{{coin_config.ezdefi_coin_id}}[coin_id]" value="{{coin_config.ezdefi_coin_id}}">
                                 </td>
                                 <td>
-                                    <img src="{{ coin_config.logo }}" alt="">
+                                    <img src="{{ coin_config.logo }}" alt="" class="coin-config__logo">
                                 </td>
                                 <td>
                                     <p>{{coin_config.symbol}}</p>
                                     <a class="btn-edit" data-toggle="modal" data-target="#modal-edit-{{ coin_config.ezdefi_coin_id }}">{{ text_edit }}</a> |
                                     <a class="btn-delete" data-toggle="modal" data-target="#modal-delete-{{ coin_config.ezdefi_coin_id }}">{{ text_delete }}</a>
                                 </td>
-                                <td>{{coin_config.name}}</td>
-                                <td class="coin-discount">{{ coin_config.discount }}%</td>
-                                <td class="coin-payment-lifetime">{{ coin_config.payment_lifetime }}</td>
-                                <td class="coin-wallet-address">{{ coin_config.wallet_address }}</td>
-                                <td class="coin-safe-block-distant">{{ coin_config.safe_block_distant }}</td>
-                                <td class="coin-safe-block-distant">{{ coin_config.decimal }}</td>
+                                <td class="padding-top-md">{{coin_config.name}}</td>
+                                <td class="coin-discount padding-top-md">{{ coin_config.discount }}%</td>
+                                <td class="coin-payment-lifetime padding-top-md">{{ coin_config.payment_lifetime }}</td>
+                                <td class="coin-wallet-address padding-top-md">{{ coin_config.wallet_address }}</td>
+                                <td class="coin-safe-block-distant padding-top-md">{{ coin_config.safe_block_distant }}</td>
+                                <td class="coin-decimal padding-top-md">{{ coin_config.decimal }}</td>
                             </tr>
                         {% endfor %}
                         </tbody>
@@ -162,7 +150,7 @@
                                         <label>Safe block distant</label>
                                         <input type="text" class="form-control coin-config__safe-block-distant" id="edit-safe-block-distant-{{ coin_config.ezdefi_coin_id }}" value="{{ coin_config.safe_block_distant }}" name="{{ coin_config.ezdefi_coin_id }}['edit_coin_safe_block_distant']">
                                     </div>
-                                    <div class="form-group">
+                                    <div class="form-group coin-decimal">
                                         <label>Decimal</label>
                                         <input type="text" class="form-control coin-config__decimal" id="edit-decimal-{{ coin_config.ezdefi_coin_id }}" value="{{ coin_config.decimal }}" name="{{ coin_config.ezdefi_coin_id }}['edit_coin_safe_block_distant']">
                                     </div>
@@ -204,15 +192,27 @@
 
         {# Payment exception #}
         <div class="panel panel-defaul exception-content-tab">
-            <input type="hidden" id="url-get-exception" value="{{ url_get_exception }}">
-            <input type="hidden" id="total-exception" value="{{ total_exception }}">
-
+            <input type="hidden" id="url-search-exceptions" value="{{ url_search_exceptions }}">
             <div class="panel-heading">
                 <h3 class="panel-title"><i class="fa fa-pencil"></i> {{tab_edit_general}} </h3>
             </div>
             <div class="panel-body">
+                <div class="exception-filter-currency-box">
+                    <div class="exception-filter-currency-item">
+                        <label for="filter-exception-by-currency-all" class="margin-top-5"> All coin </label>
+                        <input type="radio" name="filter-by-currency" value="" id="filter-exception-by-currency-all" checked>
+                    </div>
+                    {% for coin_config in coins_config %}
+                        <div class="exception-filter-currency-item">
+                            <label for="filter-exception-by-currency-{{ coin_config.symbol }}"><img src="{{ coin_config.logo }}" alt="" class="small-logo"> {{ coin_config.symbol }}</label>
+                            <input type="radio" name="filter-by-currency" value="{{ coin_config.symbol }}" id="filter-exception-by-currency-{{ coin_config.symbol }}">
+                        </div>
+                    {% endfor %}
+
+                </div>
+                <br>
                 <div class="ezdefi-search-box">
-                    <input type="text" class="extention-search-input">
+                    <input type="text" id="exception-search-input" placeholder="Search by order id, email or amount id">
                 </div>
                 <div class="data-container"></div>
                 <div id="exception-content-box">
@@ -229,7 +229,7 @@
                         </div>
                         <div class="modal-body">
                             <p>Do you want to delete this config</p>
-                            <input type="text" id="exception-delete-id">
+                            <input type="text" id="exception-id--delete">
                         </div>
                         <div class="modal-footer" style="text-align: center">
                             <button type="button" class="btn btn-danger" data-dismiss="modal">{{ button_close }}</button>
@@ -248,7 +248,8 @@
                         </div>
                         <div class="modal-body">
                             <p>Do you want to confirm this order</p>
-                            <input type="text" id="exception-confirm-id">
+                            <input type="text" id="exception-id--confirm">
+                            <input type="text" id="exception-order-id">
                         </div>
                         <div class="modal-footer" style="text-align: center">
                             <button type="button" class="btn btn-danger" data-dismiss="modal">{{ button_close }}</button>
@@ -259,7 +260,6 @@
             </div>
         </div>
         {# End payment exception #}
-
     </div>
 </div>
 {{ footer }}

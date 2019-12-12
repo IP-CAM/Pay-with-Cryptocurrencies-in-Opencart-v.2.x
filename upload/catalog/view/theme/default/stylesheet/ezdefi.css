@@ -2,23 +2,61 @@
     width: 100%;
 }
 .ezdefi-select-coin__list {
-    max-height: 300px;
+    max-height: 500px;
+    margin: 0 auto;
     overflow-x: auto;
-    border: 1px solid #aaa;
+    display: grid;
+    grid-template-columns: repeat(3, 175px);
+    grid-gap: 10px;
+    justify-content: center;
 }
 
-.ezdefi-select-coin__logo {
-    width: 50px;
+
+.ezdefi-charge-coin-item {
+    width: 100%;
+    height: 55px;
+    border: 1px solid #d8d8d8;
+    border-radius: 5px;
+    display: grid;
+    grid-template-columns: 30px auto auto;
+    grid-template-rows: auto auto;
+    grid-gap: 5px;
+    padding: 5px 5px 10px 5px;
 }
 
-.ezdefi-select-coin-box table>tbody>tr>td {
-    vertical-align: inherit;
+.ezdefi-select-coin-item__logo {
+    width: 30px;
+    grid-column: 1/ span 1;
+    grid-row: 1/ span 2;
 }
 
-.ezdefi-select-coin-box table>tbody>tr>td input {
-    -webkit-appearance:radio;
-    -moz-appearance:radio;
+.ezdefi-select-coin-item__price {
+    color: #8a8a8a;
+    grid-column: 2/ span 2;
+    grid-row: 1/ span 1;
 }
+
+.ezdefi-select-coin-item__symbol {
+    text-transform: uppercase;
+    font-weight: bold;
+    grid-column: 2/ span 1;
+    grid-row: 2/ span 1;
+}
+
+.ezdefi-select-coin-item__discount {
+    color: red;
+    grid-column: 3/ span 1;
+    grid-row: 2/ span 1;
+}
+
+/*.ezdefi-select-coin-box table>tbody>tr>td {*/
+/*    vertical-align: inherit;*/
+/*}*/
+
+/*.ezdefi-select-coin-box table>tbody>tr>td input {*/
+/*    -webkit-appearance:radio;*/
+/*    -moz-appearance:radio;*/
+/*}*/
 
 
 .ezapy-guide-link {
@@ -88,8 +126,8 @@
 }
 
 .btn-choose-payment-type {
-    margin-top: 20px;
-    padding: 10px;
+    margin-top: 10px;
+    padding: 10px 10px 0 10px;
     text-align: center;
     border-bottom: 1px solid #999;
     color: cornflowerblue;
@@ -145,6 +183,23 @@ div.escrow-pay-box, div.simple-pay-box {
     text-align: center;
 }
 
+.ezdefi-payment__deeplink {
+    display: block;
+    position: relative;
+}
+
+.timeout-notification {
+    display: none;
+    font-size: 14px;
+    font-weight: bold;
+    width: 100%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+}
+
 .ezdefi-payment__download-link {
     text-align: center;
 }
@@ -153,10 +208,26 @@ div.escrow-pay-box, div.simple-pay-box {
     display: block;
 }
 
+.link_use_ezdefi_wallet {
+    color: blue;
+    font-weight: 600;
+    text-decoration-line: underline;
+    cursor: pointer;
+}
+
 /* General */
 .margin-top-md {
     margin-top: 20px;
 }
 .wide-space {
     flex-grow: 1;
+}
+
+.text-red {
+    color: red;
+}
+
+.custom-modal {
+    top: 50%;
+    transform: translateY(-50%) !important;
 }
