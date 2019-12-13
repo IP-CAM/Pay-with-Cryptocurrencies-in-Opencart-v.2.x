@@ -131,8 +131,8 @@ class ControllerExtensionPaymentEzdefi extends Controller {
             $this->model_setting_setting->editSetting('payment_ezdefi', $data_setting);
 
             $this->session->data['success'] = $this->language->get('text_success');
-            $this->response->redirect($this->url->link('extension/payment/ezdefi', 'user_token=' . $this->session->data['user_token'], true));
         }
+        $this->response->redirect($this->url->link('extension/payment/ezdefi', 'user_token=' . $this->session->data['user_token'], true));
     }
 
     public function validate()

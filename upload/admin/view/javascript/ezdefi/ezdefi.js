@@ -25,7 +25,9 @@ $( function() {
         coinWalletAddressInput: '.coin-config__wallet-address',
         coinSafeBlockDistantInput: '.coin-config__safe-block-distant',
         coinDecimalInput: '.coin-config__decimal',
-        cancelSelectCoin: '.cancel-select-coin'
+        editCoinDecimalInput: '.edit-coin-config__decimal',
+        cancelSelectCoin: '.cancel-select-coin',
+        modalEditCoin: '.modal-edit-coin'
     };
 
     var oc_ezdefi_admin = function() {
@@ -33,6 +35,8 @@ $( function() {
         $(selectors.btnDelete).click(this.deleteCoinConfig);
         $(selectors.btnEdit).click(this.editCoinConfig);
         $(selectors.enableSimplePayInput).click(this.showSimplePayConfig);
+        $(selectors.editCoinDecimalInput).change(this.showWarningChangeDecimal);
+        $(selectors.modalEditCoin).on("hide.bs.modal", this.revertEditInput);
         this.showSimplePayConfig();
         this.initSortable();
         this.initValidate();
@@ -49,12 +53,16 @@ $( function() {
                 }
             });
         });
-    }
+    };
+
+    oc_ezdefi_admin.prototype.showWarningChangeDecimal = function() {
+        alert('Changing Decimal can cause to payment interruption');
+    };
 
     oc_ezdefi_admin.prototype.initValidate = function() {
         $.validator.addMethod("integer", function(value, element) {
-            return this.optional( element ) || Math.floor(value) == value && $.isNumeric(value);
-        }, "This field should be integer");
+            return this.optional( element ) || (Math.floor(value) == value && $.isNumeric(value) && value >= 0);
+        }, "This field should be positive integer");
         $.validator.addMethod("float", function(value, element) {
             return this.optional( element ) || value.match(/^-?\d*(\.\d+)?$/);
         }, "This field should be float");
@@ -75,7 +83,7 @@ $( function() {
         this.validateAllInput(selectors.coinPaymentLifetimeInput, {integer: true});
         this.validateAllInput(selectors.coinSafeBlockDistantInput, {integer: true});
         this.validateAllInput(selectors.variationInput, {max: 100, float: true, required: () => $(selectors.enableSimplePayInput).is(':checked')});
-        this.validateAllInput(selectors.coinDecimalInput, {integer: true, max:14, required: () => $(selectors.enableSimplePayInput).is(':checked')});
+        this.validateAllInput(selectors.coinDecimalInput, {integer: true, min:2, max:14, required: () => $(selectors.enableSimplePayInput).is(':checked')});
         this.validateAllInput(selectors.enableSimplePayInput, {required: () => !$(selectors.enableEscrowPayInput).is(':checked'), messages: {required: 'choose at least one payment method'}});
         this.validateAllInput(selectors.enableEscrowPayInput, {required: () => !$(selectors.enableSimplePayInput).is(':checked'), messages: {required: 'choose at least one payment method'}});
         this.validateAllInput(selectors.coinWalletAddressInput, {required: true});
@@ -196,6 +204,22 @@ $( function() {
                 }
             }
         });
+    };
+
+    oc_ezdefi_admin.prototype.revertEditInput = function(e, coinId =  null) {
+        if(coinId === null) {
+            coinId = $(this).data('coin-id');
+        }
+        var oldDiscount = $('#config-row-'+coinId).find('.coin-discount').html();
+        var oldPaymentLifeTime = $('#config-row-'+coinId).find('.coin-payment-lifetime').html();
+        var oldWalletAddress = $('#config-row-'+coinId).find('.coin-wallet-address').html();
+        var oldSafeBlockDistant = $('#config-row-'+coinId).find('.coin-safe-block-distant').html();
+        var oldDecimal = $('#config-row-'+coinId).find('.coin-decimal').html();
+        $('#edit-discount-' + coinId).val(oldDiscount);
+        $('#edit-payment-lifetime-' + coinId).val(oldPaymentLifeTime);
+        $('#edit-wallet-address-' + coinId).val(oldWalletAddress);
+        $('#edit-safe-block-distant-' + coinId).val(oldSafeBlockDistant);
+        $('#edit-decimal-' + coinId).val(oldDecimal);
     };
 
     oc_ezdefi_admin.prototype.addCoinConfigListener = function() {

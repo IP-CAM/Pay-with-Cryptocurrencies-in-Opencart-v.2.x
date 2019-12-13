@@ -12,7 +12,7 @@
 }
 
 
-.ezdefi-charge-coin-item {
+.ezdefi-change-coin-item {
     width: 100%;
     height: 55px;
     border: 1px solid #d8d8d8;
@@ -79,7 +79,7 @@
     background: darkgray;
 }
 
-.ezdefi-charge-coin-box {
+.ezdefi-change-coin-box {
     /*display: none;*/
 }
 
@@ -108,7 +108,7 @@
     flex-grow: 0;
 }
 
-.ezdefi-payment__btn-charge-coin {
+.ezdefi-payment__btn-change-coin {
     flex-grow: 0;
     margin-right: 20px;
     border: none;

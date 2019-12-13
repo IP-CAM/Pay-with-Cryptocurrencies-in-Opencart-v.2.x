@@ -34,6 +34,8 @@ $_['text_safe_block_distant'] = 'Block Confirmation';
 $_['text_decimal'] = 'Decimal';
 $_['text_edit'] = 'Edit';
 $_['text_delete'] = 'Delete';
+$_['text_delete_config'] = 'Delete config';
+$_['text_ask_delete_config'] = 'Delete config';
 $_['text_ezdefi']			= '<img src="view/image/payment/ezdefi.png" alt="ezdefi" title="ezdefi" style="border: 1px solid #EEEEEE;" />';
 $_['text_success'] = 'Success';
 $_['text_enable_ezdefi'] = 'Enable ezDeFi';

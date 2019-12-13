@@ -86,6 +86,7 @@ class ModelExtensionPaymentEzdefi extends Model {
         // create params
         $origin_value = $order_info['total'] - ($order_info['total'] * $coin_config['discount']/100);                       // get discount price for this order
         $exchange_rate = $this->sendCurl($api_url."/token/exchange/".$order_info['currency_code']."%3A".$coin_config['symbol'], 'GET');
+
         $amount = $origin_value * json_decode($exchange_rate)->data;
         $expiration = date('Y-m-d h:i:sa',strtotime(date('Y-m-d h:i:sa')) + $coin_config['payment_lifetime']);
         $amount_id = $this->createAmountId($coin_config['symbol'], $amount, $expiration, $coin_config['decimal']);
@@ -137,9 +138,9 @@ class ModelExtensionPaymentEzdefi extends Model {
             if($payment_status == "PENDING") {
                 return ['status' => "PENDING", 'code' => self::PENDING];
             } elseif ($payment_status == "DONE") {
-                return ['status' => "DONE", 'code' => self::DONE, 'currency' => $response_data->currency, 'value' => $value];
+                return ['status' => "DONE", 'code' => self::DONE, 'currency' => $response_data->currency, 'value' => $value, 'explorer_url' => $response_data->explorer->tx . $response_data->transactionHash];
             } elseif ($payment_status == 'EXPIRED_DONE') {
-                return ['status' => 'EXPIRED_DONE', 'currency' => $response_data->currency, 'value' => $value];
+                return ['status' => 'EXPIRED_DONE', 'currency' => $response_data->currency, 'value' => $value, 'explorer_url' => $response_data->explorer->tx . $response_data->transactionHash];
             }
         } else {
             return ['status' => "failure"];
@@ -152,8 +153,8 @@ class ModelExtensionPaymentEzdefi extends Model {
         ('".$order_id."', '".$currency."', '".$amount_id."', '".$expiration."', '".$has_amount."', '".$paid."')");
     }
 
-    public function setPaidForException($order_id, $currency, $amount_id, $paid = 0) {
-        $this->db->query("UPDATE `". DB_PREFIX . "ezdefi_exception` SET `paid`=".$paid." WHERE `currency` ='".$currency."' AND `order_id`='".$order_id."' AND `amount_id`='".$amount_id."'");
+    public function setPaidForException($order_id, $currency, $amount_id, $paid = 0,$explorer_url = null) {
+        $this->db->query("UPDATE `". DB_PREFIX . "ezdefi_exception` SET `paid`=".$paid.", `explorer_url`='".$this->db->escape($explorer_url)."' WHERE `currency` ='".$currency."' AND `order_id`='".$order_id."' AND `amount_id`='".$amount_id."'");
     }
 
     // --------------------------------------------------------End exception model-----------------------------------------------------------

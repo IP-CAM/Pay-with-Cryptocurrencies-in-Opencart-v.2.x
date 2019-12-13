@@ -23,8 +23,8 @@ class ModelExtensionPaymentEzdefi extends Model {
 			  `created`             DATETIME NOT NULL,
 			  `modified`            DATETIME NOT NULL,
 			  PRIMARY KEY (`coin_id`)
-			) ENGINE=InnoDB DEFAULT COLLATE=utf8_general_ci;
-			
+			) ENGINE=InnoDB DEFAULT COLLATE=utf8_general_ci;");
+        $this->db->query("
 			CREATE TABLE IF NOT EXISTS `" . DB_PREFIX . "ezdefi_tag_amount` (
                 `id`         int auto_increment,
                 `temp`       INT not null,
@@ -35,8 +35,8 @@ class ModelExtensionPaymentEzdefi extends Model {
                 primary key (id),
                 constraint tag_amount
                     unique (tag_amount, currency)
-            ) ENGINE=InnoDB DEFAULT COLLATE=utf8_general_ci;
-            
+            ) ENGINE=InnoDB DEFAULT COLLATE=utf8_general_ci;");
+        $this->db->query("
             CREATE TABLE IF NOT EXISTS `" . DB_PREFIX . "ezdefi_exception` (
                 `exception_id` int auto_increment,
 			    `order_id` int(11) NOT NULL,
@@ -45,21 +45,22 @@ class ModelExtensionPaymentEzdefi extends Model {
 		        `paid` int(4),
 		        `has_amount` tinyint(1),
 			    PRIMARY KEY (`exception_id`)
-			) ENGINE=InnoDB DEFAULT COLLATE=utf8_general_ci;
-             
+			) ENGINE=InnoDB DEFAULT COLLATE=utf8_general_ci;");
+
+        $this->db->query("
             CREATE EVENT `ezdefi_remove_amount_id_event`
             ON SCHEDULE EVERY ".self::TIME_REMOVE_AMOUNT_ID." DAY
             STARTS DATE(NOW())
             DO
-            DELETE FROM `" . DB_PREFIX . "ezdefi_tag_amount` WHERE DATEDIFF( NOW( ) ,  expiration ) >= 86400;
-            
+            DELETE FROM `" . DB_PREFIX . "ezdefi_tag_amount` WHERE DATEDIFF( NOW( ) ,  expiration ) >= 86400;");
+
+        $this->db->query("
             CREATE EVENT `ezdefi_remove_exception_event`
             ON SCHEDULE EVERY ".self::TIME_REMOVE_EXCEPTION." DAY
             STARTS DATE(NOW())
             DO
-            DELETE FROM `" . DB_PREFIX . "ezdefi_exception` WHERE DATEDIFF( NOW( ) ,  expiration ) >= 86400;
-            SET GLOBAL event_scheduler='ON';
-        ");
+            DELETE FROM `" . DB_PREFIX . "ezdefi_exception` WHERE DATEDIFF( NOW( ) ,  expiration ) >= 86400;");
+        $this->db->query("SET GLOBAL event_scheduler='ON';");
     }
 
     public function uninstall() {
@@ -144,7 +145,7 @@ class ModelExtensionPaymentEzdefi extends Model {
         $list_wallet = $this->sendCurl($apiUrl . '/user/list_wallet', "GET", $api_key);
         if ($list_wallet) {
             $Wallets_data = json_decode($list_wallet)->data;
-            foreach ($WalletsData as $key => $Wallet_data) {
+            foreach ($Wallets_data as $key => $Wallet_data) {
                 if($Wallet_data->address === $address) {
                     echo "true";
                     return;
@@ -185,7 +186,7 @@ class ModelExtensionPaymentEzdefi extends Model {
 
     public function searchExceptions($keyword, $currency, $page, $limit) {
         $start = ($page-1) * $limit;
-        $sql = "select amount_id, currency, GROUP_CONCAT(exception.id , '--', order.order_id, '--', order.email, '--', exception.expiration, '--', exception.paid, '--', exception.has_amount ORDER BY paid DESC) group_order
+        $sql = "select amount_id, currency, GROUP_CONCAT(exception.id , '--', IFNULL(order.order_id,'null'), '--', IFNULL(order.email,'null'), '--', ifnull(exception.expiration,'null'), '--', exception.paid, '--', exception.has_amount, '--', IFNULL(exception.explorer_url, 'null') ORDER BY paid DESC) group_order
             from `".DB_PREFIX."ezdefi_exception` `exception`
                 left join `".DB_PREFIX."order` `order` on exception.order_id = order.order_id
             where (order.email like '%".$keyword."%'
@@ -195,8 +196,8 @@ class ModelExtensionPaymentEzdefi extends Model {
             $sql .= " AND exception.currency = '".strtoupper($currency)."'";
         }
         $sql .= " group by exception.amount_id, exception.currency
-            having max(exception.paid) > 0
-            LIMIT ".$start.",".$limit;
+                    HAVING max(exception.paid) > 0
+                    LIMIT ".$start.','.$limit;
 
         $query = $this->db->query($sql);
         return $query->rows;
