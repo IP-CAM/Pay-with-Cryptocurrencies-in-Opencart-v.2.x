@@ -107,6 +107,20 @@
     padding-top: 10px;
 }
 
+.warning-edit-decimal {
+    color: red;
+    font-weight: bold;
+    display: none;
+}
+
+.select-coin__logo {
+    width: 30px;
+}
+
+.select-coin__name {
+    padding-left: 15px;
+}
+
 /*exception*/
 .exception-loading-icon {
     display: none;
@@ -214,4 +228,8 @@
 
 .align-left {
     text-align: left !important;
+}
+
+.padding-none {
+    padding: 0;
 }

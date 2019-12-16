@@ -45,6 +45,9 @@ $_['text_recommend_variation'] = '0.01';
 $_['edit_success'] = 'Edit success';
 $_['delete_success'] = 'Delete success';
 
+//warning
+$_['warning_change_decimal'] = 'Changing Decimal can cause to payment interruption';
+
 // Error
 $_['error_permission']	= 'Warning: You do not have permission to modify Stripe Payment!';
 $_['error_gateway_api_url'] = 'Gateway api url is required';

@@ -106,6 +106,7 @@
 .ezdefi-payment__coin-name {
     padding-left: 15px;
     flex-grow: 0;
+    font-size: 16px;
 }
 
 .ezdefi-payment__btn-change-coin {
@@ -118,7 +119,7 @@
 
 .ezdefi-payment__content {
     display: grid;
-    grid-template-columns: auto auto;
+    grid-template-columns: 1fr 1fr;
 }
 
 .ezdefi-payment__content > div{
@@ -131,7 +132,13 @@
     text-align: center;
     border-bottom: 1px solid #999;
     color: cornflowerblue;
+    font-size: 18px;
 }
+
+.label-choose-payment {
+    border-bottom: 1px solid #999;
+}
+
 .btn-choose-payment-type:hover {
     background: #eee;
     color: #888;
@@ -181,6 +188,10 @@ div.escrow-pay-box, div.simple-pay-box {
     margin: 0 auto;
     display: block;
     text-align: center;
+}
+
+.create-payment-loading {
+    display: none;
 }
 
 .ezdefi-payment__deeplink {

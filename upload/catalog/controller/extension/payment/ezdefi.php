@@ -42,7 +42,7 @@ class ControllerExtensionPaymentEzdefi extends Controller {
             if ($payment_info) {
                 return $this->response->setOutput($payment_info);
             } else {
-                return $this->response->setOutput(['data' => ['status'=> 'failure', 'message'=>$this->language->get('error_cant_create_payment')]]);
+                return $this->response->setOutput(json_encode(['data' => ['status'=> 'failure', 'message'=>$this->language->get('error_cant_create_payment_with_amount')]]));
             }
         } else {
             return $this->response->setOutput(['data' => ['status'=> 'failure', 'message'=>$this->language->get('error_enable_simple_pay')]]);
@@ -52,7 +52,6 @@ class ControllerExtensionPaymentEzdefi extends Controller {
     public function createEscrowPayment() {
         $this->load->model('setting/setting');
         $enable_escrow_pay = $this->config->get('payment_ezdefi_enable_escrow_pay');
-//        $callback = 'http://fb4a3875.ngrok.io/opencart/upload/index.php?route=extension/payment/ezdefi/callbackConfirmOrder';
         $callback = $this->url->link('extension/payment/ezdefi/callbackConfirmOrder', '', true);
         $coin_id = $this->request->get['coin_id'];
         if ($enable_escrow_pay) {
@@ -69,27 +68,29 @@ class ControllerExtensionPaymentEzdefi extends Controller {
     }
 
     public function callbackConfirmOrder() {
-        if($this->request->get['paymentid'])
-        $uoid_info_arr = explode("-",$this->request->get['uoid']);
-        $order_id = $uoid_info_arr[0];
-        $has_amount_id = $uoid_info_arr[1];
-
-        $this->load->model('setting/setting');
-        $api_url = $this->config->get('payment_ezdefi_gateway_api_url');
-        $api_key = $this->config->get('payment_ezdefi_api_key');
-
         $this->load->model('extension/payment/ezdefi');
-        $payment = $this->model_extension_payment_ezdefi->checkPaymentComplete($api_url, $api_key, $this->request->get['paymentid']);
 
-        if($payment['status'] == 'DONE') {
-            $this->load->model('checkout/order');
-            $message = 'Payment ID: '. $this->request->get['paymentid'] .', Status: '.$payment['status'].' Has amountId:'. ($has_amount_id ? 'true' : 'false');
-            $this->model_extension_payment_ezdefi->setPaidForException($order_id, $payment['currency'], $payment['value'], self::PAID_IN_TIME, $payment['explorer_url']);
-            $this->model_checkout_order->addOrderHistory($order_id, $payment['code'],  $message, false);
+        if (isset($this->request->get['paymentid'])) {
+            $payment = $this->model_extension_payment_ezdefi->checkPaymentComplete($this->request->get['paymentid']);
+            $uoid = $payment['uoid'];
+            $order_id = explode( '-', $uoid)[0];
+            $has_amount_id = explode( '-', $uoid)[1];
+            if($payment['status'] == 'DONE') {
+                $this->load->model('checkout/order');
+                $message = 'Payment ID: '. $this->request->get['paymentid'] .', Status: '.$payment['status'].' Has amountId:'. ($has_amount_id ? 'true' : 'false');
+                $this->model_extension_payment_ezdefi->setPaidForException($order_id, $payment['currency'], $payment['value'], self::PAID_IN_TIME, $payment['explorer_url']);
+                $this->model_checkout_order->addOrderHistory($order_id, $payment['code'],  $message, false);
+            }
+            if($payment['status'] == 'EXPIRED_DONE') {
+                $this->model_extension_payment_ezdefi->setPaidForException($order_id, $payment['currency'], $payment['value'], self::PAID_OUT_TIME, $payment['explorer_url']);
+            }
+        } elseif (isset($this->request->get['explorerUrl']) && isset($this->request->get['id'])) {
+            $transaction_id =  $this->request->get['id'];
+            $explorer_url = $this->request->get['explorerUrl'];
+
+            $this->model_extension_payment_ezdefi->checkTransaction($transaction_id, $explorer_url);
         }
-        if($payment['status'] == 'EXPIRED_DONE') {
-            $this->model_extension_payment_ezdefi->setPaidForException($order_id, $payment['currency'], $payment['value'], self::PAID_OUT_TIME, $payment['explorer_url']);
-        }
+
         return;
     }
 
@@ -111,6 +112,7 @@ class ControllerExtensionPaymentEzdefi extends Controller {
                 ]
             ];
         }
+
         return $this->response->setOutput(json_encode($response));
     }
 

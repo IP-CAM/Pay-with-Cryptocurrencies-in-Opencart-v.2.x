@@ -105,6 +105,7 @@ $(function () {
                 var data = JSON.parse(response).data;
                 if(data.status === 'failure') {
                     alert(data.message);
+                    renderPayment(suffixes,{},discount);
                 } else {
                     renderPayment(suffixes,data,discount);
                 }
@@ -113,7 +114,6 @@ $(function () {
     });
 
     var renderPayment = function (suffixes, data, discount ) {
-        showModalSuccess();
         var paymentId = data._id;
         var originValue = $("#origin-value").val();
 
@@ -125,8 +125,8 @@ $(function () {
         $(selectors.deeplink+suffixes).attr('href', data.deepLink);
         $(selectors.currencyValue+suffixes).html(parseInt(data.value) * Math.pow(10, -data.decimal) + data.currency);
         $("#check-created-payment"+suffixes).prop('checked', true);
-        $(selectors.logoCoinSelected).prop('src', data.token.logo);
-        $(selectors.nameCoinSelected).html(  data.token.symbol.toUpperCase() + '/' + data.token.name);
+        $(selectors.logoCoinSelected).prop('src', data.token ? data.token.logo : '');
+        $(selectors.nameCoinSelected).html(  data.token ? data.token.symbol.toUpperCase() + '/' + data.token.name : '');
         $(selectors.tooltipShowDiscount).attr('data-content', 'Discount: ' + discount + '%');
         $(selectors.selectCoinBox).css('display', 'none');
         $(selectors.changeCoinBox).css('display', 'none');
@@ -158,7 +158,7 @@ $(function () {
                     }
                 }
             });
-        }, 500);
+        }, 1000);
     };
 
     var countDownTime = function (paymentId, expiredTime, suffixes) {
@@ -200,12 +200,5 @@ $(function () {
         $("label.ezdefi-change-coin-item[for='"+inputId+"']").css('border', '2px solid lightskyblue')
     });
 
-    var showModalSuccess = function () {
-        $("#modal-notify-create-payment-success").modal('toggle');
-        setTimeout(function () {
-            $("#modal-notify-create-payment-success").modal('toggle');
-        },2500)
-    };
-    
     checkOrderComplete();
 });
