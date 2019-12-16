@@ -12,7 +12,7 @@
 	<div class="ezdefi-select-coin-box">
 		<div class="ezdefi-select-coin__list">
 			{% for coin_config in coins_config %}
-				<label for="select-coin-{{ coin_config.ezdefi_coin_id }}" class="ezdefi-charge-coin-item">
+				<label for="select-coin-{{ coin_config.ezdefi_coin_id }}" class="ezdefi-change-coin-item">
 					<img src="{{ coin_config.logo }}" alt="" class="ezdefi-select-coin-item__logo">
 					<span class="ezdefi-select-coin-item__price"> {{ coin_config.price }} </span>
 					<span class="ezdefi-select-coin-item__symbol">{{coin_config.symbol}}</span>
@@ -20,25 +20,6 @@
 					<input type="radio" name="coin-selected-to-order" class="hidden select-coin-checkbox" id="select-coin-{{ coin_config.ezdefi_coin_id }}" value="{{ coin_config.ezdefi_coin_id }}" data-discount="{{ coin_config.discount }}">
 				</label>
 			{% endfor %}
-
-{#			<table class="table">#}
-{#				{% for coin_config in coins_config %}#}
-{#					<tr>#}
-{#						<td>#}
-{#							<input type="radio" name="coin-selected-to-order" value="{{ coin_config.ezdefi_coin_id }}" data-discount="{{ coin_config.discount }}">#}
-{#						</td>#}
-{#						<td>#}
-{#							<img src="{{ coin_config.logo }}" alt="" class="ezdefi-select-coin__logo">#}
-{#						</td>#}
-{#						<td style="text-transform: uppercase">{{coin_config.symbol}}</td>#}
-{#						<td class="text-red"> Discount {{ coin_config.discount }}%</td>#}
-{#						<td>#}
-{#							<a href="#" data-toggle="tooltip" title="Description"><i class="fa fa-info" aria-hidden="true"></i></a>#}
-{#							<a data-toggle="tooltip" title="Description"><i class="fa fa-info" aria-hidden="true"></i></a>#}
-{#						</td>#}
-{#					</tr>#}
-{#				{% endfor %}#}
-{#			</table>#}
 		</div>
 		<a href="#" class="ezapy-guide-link">{{ text_guide }}</a>
         {% if enable_simple_pay %}
@@ -54,12 +35,12 @@
 			<img src="https://s2.coinmarketcap.com/static/img/coins/64x64/3957.png" alt="" class="ezdefi-payment__coin-logo tooltip-show-discount" data-toggle="popover" title="Discount" data-placement="top" data-content="Discount:" data-trigger="hover">
 			<span class="ezdefi-payment__coin-name tooltip-show-discount" data-toggle="popover" title="Discount" data-placement="top" data-content="Discount:" data-trigger="hover"></span>
 			<span class="wide-space"></span>
-			<button class="ezdefi-payment__btn-charge-coin">{{ text_charge }}</button>
+			<button class="ezdefi-payment__btn-change-coin">{{ text_change }}</button>
 		</div>
-		<div class="ezdefi-charge-coin-box margin-top-md">
+		<div class="ezdefi-change-coin-box margin-top-md">
 			<div class="ezdefi-select-coin__list">
 				{% for coin_config in coins_config %}
-					<label for="select-coin-{{ coin_config.ezdefi_coin_id }}" class="ezdefi-charge-coin-item">
+					<label for="select-coin-{{ coin_config.ezdefi_coin_id }}" class="ezdefi-change-coin-item">
 						<img src="{{ coin_config.logo }}" alt="" class="ezdefi-select-coin-item__logo">
 						<span class="ezdefi-select-coin-item__price"> {{ coin_config.price }} </span>
 						<span class="ezdefi-select-coin-item__symbol">{{coin_config.symbol}}</span>
@@ -67,23 +48,6 @@
 						<input type="radio" name="coin-selected-to-order" class="hidden select-coin-checkbox" id="select-coin-{{ coin_config.ezdefi_coin_id }}" value="{{ coin_config.ezdefi_coin_id }}" data-discount="{{ coin_config.discount }}">
 					</label>
 				{% endfor %}
-{#				<table class="table">#}
-{#					{% for coin_config in coins_config %}#}
-{#						<tr>#}
-{#							<td>#}
-{#								<input type="radio" name="coin-selected-to-order" value="{{ coin_config.ezdefi_coin_id }}" data-discount="{{ coin_config.discount }}">#}
-{#							</td>#}
-{#							<td>#}
-{#								<img src="{{ coin_config.logo }}" alt="" class="ezdefi-select-coin__logo">#}
-{#							</td>#}
-{#							<td style="text-transform: uppercase">{{coin_config.symbol}}</td>#}
-{#							<td class="text-red"> -{{ coin_config.discount }}%</td>#}
-{#							<td>#}
-{#								<a data-toggle="tooltip" title="Description"><i class="fa fa-info" aria-hidden="true"></i></a>#}
-{#							</td>#}
-{#						</tr>#}
-{#					{% endfor %}#}
-{#				</table>#}
 			</div>
             {% if enable_simple_pay %}
                 <button class="ezdefi-btn-create-payment" data-url_create_payment="{{ url_create_simple_payment }}" disabled> {{ button_next }} </button>
@@ -93,10 +57,16 @@
 		</div>
 		<div class="ezdefi-payment__content">
             {% if enable_simple_pay and not enable_escrow_pay %}
-                <input type="radio" id="ezdefi-show-payment--simple" name="show-payment" checked>
+                <input type="radio" class="ezdefi-show-payment-radio" id="ezdefi-show-payment--simple" name="show-payment" checked data-suffixes="--simple" checked>
+                <label for="ezdefi-show-payment--simple" class="ezdefi-tab btn-show-payment--simple btn-choose-payment-type" data-suffixes="--simple"> {{ text_pay_with_any_wallet }} </label>
+                <label class="label-choose-payment"></label>
+                <input type="checkbox" class="hidden" id="check-created-payment--simple">
             {% endif %}
             {% if enable_escrow_pay and not enable_simple_pay %}
-                <input type="radio" id="ezdefi-show-payment--escrow" name="show-payment" checked>
+                <input type="radio" class="ezdefi-show-payment-radio" id="ezdefi-show-payment--escrow" name="show-payment" data-suffixes="--escrow" checked>
+                <label for="ezdefi-show-payment--escrow" class="ezdefi-tab btn-show-payment--escrow btn-choose-payment-type" data-suffixes="--escrow">{{ text_pay_with_ezdefi_wallet }}</label>
+				<label class="label-choose-payment"></label>
+				<input type="checkbox" class="hidden" id="check-created-payment--escrow">
             {% endif %}
             {% if enable_simple_pay and enable_escrow_pay %}
                 <input type="radio" class="ezdefi-show-payment-radio" id="ezdefi-show-payment--simple" name="show-payment" checked data-suffixes="--simple">
@@ -149,22 +119,6 @@
                     </div>
                 </div>
             {% endif %}
-			<div id="modal-notify-create-payment-success" class="modal fade" role="dialog">
-				<div class="modal-dialog custom-modal">
-					<div class="modal-content">
-						<div class="modal-header">
-							<button type="button" class="close" data-dismiss="modal">&times;</button>
-							<h4 class="modal-title">Notification</h4>
-						</div>
-						<div class="modal-body">
-							<p>{{ text_create_payment_success }}</p>
-						</div>
-						<div class="modal-footer">
-							<button type="button" class="btn btn-default" data-dismiss="modal">{{ button_close }}</button>
-						</div>
-					</div>
-				</div>
-			</div>
 		</div>
 	</div>
 </div>

@@ -34,6 +34,8 @@ $_['text_safe_block_distant'] = 'Block Confirmation';
 $_['text_decimal'] = 'Decimal';
 $_['text_edit'] = 'Edit';
 $_['text_delete'] = 'Delete';
+$_['text_delete_config'] = 'Delete config';
+$_['text_ask_delete_config'] = 'Delete config';
 $_['text_ezdefi']			= '<img src="view/image/payment/ezdefi.png" alt="ezdefi" title="ezdefi" style="border: 1px solid #EEEEEE;" />';
 $_['text_success'] = 'Success';
 $_['text_enable_ezdefi'] = 'Enable ezDeFi';
@@ -42,6 +44,9 @@ $_['text_simple_method_description'] = 'This method will adjust payment amount o
 $_['text_recommend_variation'] = '0.01';
 $_['edit_success'] = 'Edit success';
 $_['delete_success'] = 'Delete success';
+
+//warning
+$_['warning_change_decimal'] = 'Changing Decimal can cause to payment interruption';
 
 // Error
 $_['error_permission']	= 'Warning: You do not have permission to modify Stripe Payment!';

@@ -24,7 +24,6 @@ input.error {
 
 label.error {
     color: red;
-    padding-top: 10px;
 }
 
 label.valid {

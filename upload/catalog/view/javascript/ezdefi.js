@@ -3,7 +3,7 @@ $(function () {
         btnGetQrCode: '.ezdefi-btn-create-payment',
         coinSelectedToPaymentInput: 'input[name="coin-selected-to-order"]',
         selectCoinBox: '.ezdefi-select-coin-box',
-        chargeCoinBox: '.ezdefi-charge-coin-box',
+        changeCoinBox: '.ezdefi-change-coin-box',
         paymentbox: '.ezdefi-payment-box',
         paymentContent: '.ezdefi-payment__content',
         deeplink: '.ezdefi-payment__deeplink',
@@ -17,7 +17,7 @@ $(function () {
         urlCheckOrderCompleteInput: '#url-check-order-complete',
         orderIdInput: '#order-id',
         paymentIdInput: '#payment-id',
-        btnCharge: '.ezdefi-payment__btn-charge-coin',
+        btnChange: '.ezdefi-payment__btn-change-coin',
         tooltipShowDiscount: '.tooltip-show-discount',
         countDownLabel: '.ezdefi-countdown-lifetime'
     };
@@ -27,16 +27,16 @@ $(function () {
 
     $('[data-toggle="popover"]').popover();
 
-    $(selectors.btnCharge).click(function () {
+    $(selectors.btnChange).click(function () {
         for(let i in global.countDownInterval) {
             clearInterval(global.countDownInterval[i]);
         }
-        $(selectors.chargeCoinBox).css('display', 'block');
+        $(selectors.changeCoinBox).css('display', 'block');
         $(selectors.paymentContent).css('display', 'none');
         $(selectors.qrCodeImg).prop('src', '');
         $(selectors.deeplink).attr('href', '');
         $(selectors.currencyValue).html('');
-        $(selectors.btnCharge).css('display','none');
+        $(selectors.btnChange).css('display','none');
         $(selectors.coinSelectedToPaymentInput).each(function () {
             $(this).prop("checked", false);
         });
@@ -105,6 +105,7 @@ $(function () {
                 var data = JSON.parse(response).data;
                 if(data.status === 'failure') {
                     alert(data.message);
+                    renderPayment(suffixes,{},discount);
                 } else {
                     renderPayment(suffixes,data,discount);
                 }
@@ -113,7 +114,6 @@ $(function () {
     });
 
     var renderPayment = function (suffixes, data, discount ) {
-        showModalSuccess();
         var paymentId = data._id;
         var originValue = $("#origin-value").val();
 
@@ -125,12 +125,12 @@ $(function () {
         $(selectors.deeplink+suffixes).attr('href', data.deepLink);
         $(selectors.currencyValue+suffixes).html(parseInt(data.value) * Math.pow(10, -data.decimal) + data.currency);
         $("#check-created-payment"+suffixes).prop('checked', true);
-        $(selectors.logoCoinSelected).prop('src', data.token.logo);
-        $(selectors.nameCoinSelected).html(  data.token.symbol.toUpperCase() + '/' + data.token.name);
+        $(selectors.logoCoinSelected).prop('src', data.token ? data.token.logo : '');
+        $(selectors.nameCoinSelected).html(  data.token ? data.token.symbol.toUpperCase() + '/' + data.token.name : '');
         $(selectors.tooltipShowDiscount).attr('data-content', 'Discount: ' + discount + '%');
         $(selectors.selectCoinBox).css('display', 'none');
-        $(selectors.chargeCoinBox).css('display', 'none');
-        $(selectors.btnCharge).css('display','block');
+        $(selectors.changeCoinBox).css('display', 'none');
+        $(selectors.btnChange).css('display','block');
         $(selectors.paymentbox).css('display','block');
         $(selectors.paymentContent).css('display','grid');
         $(selectors.qrCodeImg+suffixes).prop('src', data.qr);
@@ -158,7 +158,7 @@ $(function () {
                     }
                 }
             });
-        }, 500);
+        }, 1000);
     };
 
     var countDownTime = function (paymentId, expiredTime, suffixes) {
@@ -196,16 +196,9 @@ $(function () {
 
     $(".select-coin-checkbox").change(function () {
         var inputId = $(".select-coin-checkbox:checked").attr('id');
-        $("label.ezdefi-charge-coin-item").css('border', '1px solid #d8d8d8');
-        $("label.ezdefi-charge-coin-item[for='"+inputId+"']").css('border', '2px solid lightskyblue')
+        $("label.ezdefi-change-coin-item").css('border', '1px solid #d8d8d8');
+        $("label.ezdefi-change-coin-item[for='"+inputId+"']").css('border', '2px solid lightskyblue')
     });
 
-    var showModalSuccess = function () {
-        $("#modal-notify-create-payment-success").modal('toggle');
-        setTimeout(function () {
-            $("#modal-notify-create-payment-success").modal('toggle');
-        },2500)
-    };
-    
     checkOrderComplete();
 });

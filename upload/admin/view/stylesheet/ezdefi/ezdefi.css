@@ -75,6 +75,19 @@
     grid-template-rows: repeat(4, auto);
 }
 
+.payment-method-label {
+    display: grid;
+    grid-template-columns: 20px repeat(2, 250px);
+}
+
+.payment-method-label>input {
+    grid-column: 1/span 1;
+}
+.payment-method-label>p {
+    grid-column: 2/span 1;
+    grid-row: 1/span 1;
+}
+
 .variation-box {
     display: grid;
     grid-template-columns: 70px 20px auto;
@@ -90,8 +103,42 @@
     grid-column: 1/-1;
     grid-row: 2/-1;
 }
+.variation-box >label.error {
+    padding-top: 10px;
+}
+
+.warning-edit-decimal {
+    color: red;
+    font-weight: bold;
+    display: none;
+}
+
+.select-coin__logo {
+    width: 30px;
+}
+
+.select-coin__name {
+    padding-left: 15px;
+}
 
 /*exception*/
+.exception-loading-icon {
+    display: none;
+    margin-right: 5px;
+
+}
+
+.exception-order-info__data {
+    /*display: inline-block;*/
+    /*word-wrap: break-word;*/
+}
+
+.exception-order-info__explorer-url {
+    display: inline-block;
+    word-wrap: break-word;
+    max-width: 300px;
+}
+
 .ezdefi-search-box {
     width: 100%;
     text-align: center;
@@ -132,7 +179,7 @@
     justify-content: space-around;
 }
 .exception-order-info {
-    width: 400px;
+    width: 500px;
 }
 .exception-order-button-box {
     display: flex;
@@ -181,4 +228,8 @@
 
 .align-left {
     text-align: left !important;
+}
+
+.padding-none {
+    padding: 0;
 }

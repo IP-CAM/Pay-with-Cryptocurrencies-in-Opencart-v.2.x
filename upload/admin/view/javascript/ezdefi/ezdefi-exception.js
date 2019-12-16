@@ -1,16 +1,22 @@
 $(function () {
     const text = {
-        orderHistoryComment: "confirm from exception",
-        assignOrderComment: "Assign order from exception"
+        orderHistoryComment: "confirm from ezDeFi exception management",
+        assignOrderComment: "Assign order from ezDeFi exception management",
+        revertOrderComment: "Revert order from ezDeFi exception management"
     };
+    const ORDER_STATUS = {
+        PENDING: 0,
+        PROCESSING: 2,
+    };
+
     var global = {};
 
     var oc_ezdefi_exception = function () {
         this.numberOfOrderInPage = 10;
-
         this.loadException();
         $("#btn-delete-exception").click(this.deleteException.bind(this));
         $("#btn-confirm-paid-exception").click(this.confirmPaidException.bind(this));
+        $("#btn-revert-order").click(this.revertOrder.bind(this));
         $("#exception-search-input").keyup(this.searchException.bind(this));
         $("input[name='filter-by-currency']").change(this.searchException.bind(this));
     };
@@ -60,36 +66,52 @@ $(function () {
                     let amountId = groupException.amount_id;
                     let orderItem = "<div>";
                     $.each(groupException.orders, function (key, exceptionData) {
-                        if(exceptionData[4] === '0') {
-                            var paymentStatus = 'Have not paid';
-                        } else if(exceptionData[4] === '1') {
-                            var paymentStatus = 'Paid on time';
+                        var exceptionId = exceptionData[0];
+                        var orderId = exceptionData[1];
+                        var email = exceptionData[2];
+                        var expiration = exceptionData[3];
+                        var paidStatus = exceptionData[4];
+                        var hasAmount = exceptionData[5];
+                        var explorerUrl = exceptionData[6];
+
+                        console.log(orderId === "null" && explorerUrl !== "null", orderId, explorerUrl);
+                        if(orderId === "null" && explorerUrl !== "null") {
+                            amountId += `<p><a class="exception-order-info__explorer-url" href="${explorerUrl}" target="_blank">${explorerUrl}</a></p>`
                         } else {
-                            var paymentStatus = 'Paid on expiration';
-                        }
-                        orderItem += `<div id="exception-${exceptionData[0]}" class="order-${exceptionData[1]} exception-order-box ${key%2 ? 'background-grey' : ''}">
+                            if(paidStatus === '0') {
+                                var paymentStatus = 'Have not paid';
+                            } else if(paidStatus === '1') {
+                                var paymentStatus = 'Paid on time';
+                            } else {
+                                var paymentStatus = 'Paid on expiration';
+                            }
+                            orderItem += `<div id="exception-${exceptionId}" class="order-${orderId} exception-order-box ${key%2 ? 'background-grey' : ''}">
                             <div class="exception-order-info">
-                                <p><span class="exception-order-label-1">order_id:</span> ${exceptionData[1]} </p>
-                                <p><span class="exception-order-label-1">email:</span> ${exceptionData[2]} </p>
-                                <p><span class="exception-order-label-1">expiration:</span> ${exceptionData[3]} </p>
-                                <p><span class="exception-order-label-1">paid:</span> ${paymentStatus} </p>
-                                <p><span class="exception-order-label-1">Pay by ezdefi wallet:</span> ${exceptionData[5] === '1' ? 'yes' : 'no'} </p>
+                                <p><span class="exception-order-label-1">order_id:</span> <span class="exception-order-info__data"> ${orderId} </span></p>
+                                <p><span class="exception-order-label-1">email:</span> <span class="exception-order-info__data">${email} </span></p>
+                                <p><span class="exception-order-label-1">expiration:</span> <span class="exception-order-info__data"> ${expiration} </span></p>
+                                <p><span class="exception-order-label-1">paid:</span> <span class="exception-order-info__data">${paymentStatus} </span></p>
+                                <p><span class="exception-order-label-1">Pay by ezdefi wallet:</span> ${hasAmount === '1' ? 'yes' : 'no'} </p>
+                                <p class="${explorerUrl == 'null' ? 'hidden':''}"><span class="exception-order-label-1">Explorer url:</span><a class="exception-order-info__explorer-url" href="${explorerUrl}" target="_blank">${explorerUrl}</a></p>
                             </div>
-                            <div class="exception-order-button-box">
-                                <button class="btn btn-primary ${exceptionData[4] !== '1' ? 'btn-confirm-paid': 'hidden'}" data-toggle="modal" data-target="#confirm-paid-order-exception" data-exception-id="${exceptionData[0]}" data-order-id="${exceptionData[1]}">confirm paid</button>
-                                <button class="btn btn-danger btn-delete-exception" data-toggle="modal" data-target="#delete-order-exception" data-exception-id="${exceptionData[0]}">delete</button>
-                            </div>
-                        </div>`;
+                            <div class="exception-order-button-box">`;
+                            orderItem += paidStatus == 1 ? `<button class="btn btn-primary btn-revert-order" data-toggle="modal" data-target="#modal-revert-order-exception" data-exception-id="${exceptionId}" data-order-id="${orderId}">Revert</button>` : '';
+                            orderItem += paidStatus != 1 ? `<button class="btn btn-danger btn-delete-exception" data-toggle="modal" data-target="#delete-order-exception" data-exception-id="${exceptionId}">delete</button>
+                                                            <button class="btn btn-primary btn-confirm-paid" data-toggle="modal" data-target="#confirm-paid-order-exception" data-exception-id="${exceptionId}" data-order-id="${orderId}">confirm paid</button>` : ''
+                            orderItem +=`
+                                    </div>
+                                </div>`;
+                        }
                     });
                     orderItem += `<div class="exception-order-box">
-                                    <div class="exception-order-info">
-                                         <select class="form-control all_order_pending" style="width: 300px" data-list_coin_url="${urlGetAllOrderPending}" id="exception-select-order-${tmp}" data-tmp="${tmp}"></select>
-                                     </div>
-                                    <div class="exception-order-button-box"> 
-                                        <button class="btn btn-info btn-assign-order" id="btn-assign-order-${tmp}" data-toggle="modal" data-target="#confirm-paid-order-exception" data-order-id="" style="opacity: 0">Assign</button>
+                                        <div class="exception-order-info">
+                                             <select class="form-control all_order_pending" style="width: 300px" data-list_coin_url="${urlGetAllOrderPending}" id="exception-select-order-${tmp}" data-tmp="${tmp}"></select>
+                                        </div>
+                                        <div class="exception-order-button-box">
+                                            <button class="btn btn-info btn-assign-order" id="btn-assign-order-${tmp}" data-toggle="modal" data-target="#confirm-paid-order-exception" data-order-id="" style="opacity: 0">Assign</button>
+                                        </div>
                                     </div>
-                                </div>
-                            </div>`;
+                                </div>`;
                     dataHtml += `<tr>
                                 <td>${tmp}</td>
                                 <td>${currency}</td>
@@ -104,6 +126,7 @@ $(function () {
                 that.addConfirmPaidListener();
                 that.addDeleteExceptionListener();
                 that.addAssignOrderListener();
+                that.addRevertOrderListener();
                 that.initSelectCoinConfig();
             }
         });
@@ -114,7 +137,8 @@ $(function () {
             let exceptionId = $(this).data('exception-id');
             let orderId = $(this).data('order-id');
             $("#exception-id--confirm").val(exceptionId);
-            $("#exception-order-id").val(orderId);
+            $("#exception-order-id--confirm").val(orderId);
+            $(".exception-loading-icon__confirm-paid").css('display', 'none');
         });
     };
 
@@ -122,14 +146,26 @@ $(function () {
         $(".btn-delete-exception").click(function () {
             let exceptionId = $(this).data('exception-id');
             $("#exception-id--delete").val(exceptionId);
+            $(".exception-loading-icon__delete").css('display', 'none');
+        });
+    };
+
+    oc_ezdefi_exception.prototype.addRevertOrderListener = function() {
+        $(".btn-revert-order").click(function () {
+            let exceptionId = $(this).data('exception-id');
+            let orderId = $(this).data('order-id');
+            $("#exception-id--revert").val(exceptionId);
+            $("#exception-order-id--revert").val(orderId);
+            $(".exception-loading-icon__revert").css('display', 'none');
         });
     };
 
     oc_ezdefi_exception.prototype.addAssignOrderListener = function() {
         $(".btn-assign-order").click(function () {
             let orderId = $(this).data('order-id');
-            $("#exception-order-id").val(orderId);
+            $("#exception-order-id-confirm").val(orderId);
             $("#exception-id--confirm").val('');
+            $(".exception-loading-icon__confirm-paid").css('display', 'none');
         })
     };
 
@@ -144,32 +180,44 @@ $(function () {
         return data;
     };
 
-    oc_ezdefi_exception.prototype.deleteException = function () {
+    oc_ezdefi_exception.prototype.deleteException = function (e, exceptionId = null) {
+        if(exceptionId == null) {
+            exceptionId = $("#exception-id--delete").val();
+        }
+
         let url = $("#url-delete-exception").val();
-        let exceptionId = $("#exception-id--delete").val();
         $.ajax({
             url: url,
             method: "POST",
             data: { exception_id: exceptionId },
+            beforeSend: function() {
+                $(".exception-loading-icon__delete").css('display', 'inline-block');
+            },
             success: function (response) {
-                $("#exception-"+exceptionId).remove();
-                $('#delete-order-exception').modal('toggle');
-
+                $("#exception-"+exceptionId).hide(500, function () {
+                    $("#exception-"+exceptionId).remove();
+                });
+                if($('#delete-order-exception').hasClass('in')) {
+                    $('#delete-order-exception').modal('toggle');
+                }
             }
         });
     };
 
     oc_ezdefi_exception.prototype.confirmPaidException = function () {
         let urlAddOrderHistory = $("#url-add-order-history").val();
-        let orderId = $("#exception-order-id").val();
+        let orderId = $("#exception-order-id--confirm").val();
         let exceptionId = $('#exception-id--confirm').val();
         var that = this;
         $.ajax({
             url: urlAddOrderHistory + '&store_id=0&order_id='+orderId,
             method: "POST",
             data: {
-                order_status_id: 2,
+                order_status_id: ORDER_STATUS.PROCESSING,
                 comment: exceptionId ? text.orderHistoryComment : text.assignOrderComment
+            },
+            beforeSend:function() {
+                $(".exception-loading-icon__confirm-paid").css('display', 'inline-block');
             },
             success: function (response) {
                 that.deleteExceptionByOrderId(orderId);
@@ -180,14 +228,42 @@ $(function () {
         });
     };
 
+    oc_ezdefi_exception.prototype.revertOrder = function() {
+        let urlAddOrderHistory = $("#url-add-order-history").val();
+        let orderId = $("#exception-order-id--revert").val();
+        let exceptionId = $('#exception-id--revert').val();
+        var that = this;
+        $.ajax({
+            url: urlAddOrderHistory + '&store_id=0&order_id='+orderId,
+            method: "POST",
+            data: {
+                order_status_id: ORDER_STATUS.PENDING,
+                comment: text.revertOrderComment
+            },
+            beforeSend: function() {
+                $(".exception-loading-icon__revert").css('display', 'inline-block');
+            },
+            success: function (response) {
+                that.deleteException(null, exceptionId);
+                $("modal-revert-order-exception").modal('toggle');
+            },
+            error: function () {
+                that.deleteException(null, exceptionId);
+                $("modal-revert-order-exception").modal('toggle');
+            }
+        });
+    };
+
     oc_ezdefi_exception.prototype.deleteExceptionByOrderId = function (orderId) {
         let urlDeleteExceptionByOrderId = $("#url-delete-exception-by-order-id").val();
         $.ajax({
-            url: urlDeleteExceptionByOrderId + '&order_id=451&store_id=0',
+            url: urlDeleteExceptionByOrderId,
             method: "POST",
             data: { order_id: orderId},
             success: function (response) {
-                $(".order-"+orderId).remove();
+                $(".order-"+orderId).hide(500, function () {
+                    $(".order-"+orderId).remove();
+                });
                 $('#confirm-paid-order-exception').modal('toggle');
             }
         });
@@ -233,7 +309,6 @@ $(function () {
     };
 
     oc_ezdefi_exception.prototype.formatRepoSelection = function (repo) {
-        console.log(repo)
         return repo.total ? 'Order: ' + repo.id : 'Choose order to assign';
     }
 
