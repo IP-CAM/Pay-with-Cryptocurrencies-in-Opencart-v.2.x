@@ -39,11 +39,12 @@ class ModelExtensionPaymentEzdefi extends Model {
         $this->db->query("
             CREATE TABLE IF NOT EXISTS `" . DB_PREFIX . "ezdefi_exception` (
                 `exception_id` int auto_increment,
-			    `order_id` int(11) NOT NULL,
-                `amount_id` decimal(25,14),
-                `currency` varchar(255),
-		        `paid` int(4),
-		        `has_amount` tinyint(1),
+			    `order_id` int(11),
+                `amount_id` decimal(25,14) not null,
+                `currency` varchar(255) not null,
+		        `paid` int(4) default 0,
+		        `has_amount` tinyint(1) not null,
+		        `explorer_url` varchar(255) default null,
 			    PRIMARY KEY (`exception_id`)
 			) ENGINE=InnoDB DEFAULT COLLATE=utf8_general_ci;");
 
