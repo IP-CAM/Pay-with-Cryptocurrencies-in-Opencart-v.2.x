@@ -23,7 +23,7 @@
 				</label>
 			{% endfor %}
 		</div>
-		<a href="#" class="ezapy-guide-link">{{ text_guide }}1111</a>
+		<a href="#" class="ezapy-guide-link">{{ text_guide }}</a>
         {% if enable_simple_pay %}
 		    <button class="ezdefi-btn-create-payment" data-url_create_payment="{{ url_create_simple_payment }}" disabled> Tiếp theo </button>
         {% else %}
@@ -116,8 +116,8 @@
 						</p>
 					</a>
                     <div class="ezdefi-payment__download-link">
-                        <a href="{{ link_download_app_ios }}">{{ text_download_app_ios }}</a>
-                        <a href="{{ link_download_app_android }}">{{ text_download_app_android }}</a>
+                        <a href="{{ link_download_app_ios }}"><span><i class="fa fa-apple ezdefi-icon-apple"></i></span> {{ text_download_app_ios }}</a>
+                        <a href="{{ link_download_app_android }}"><span><i class="fa fa-android ezdefi-icon-android"></i></span> {{ text_download_app_android }}</a>
                     </div>
                 </div>
             {% endif %}
