@@ -1,5 +1,7 @@
 <link rel="stylesheet" type="text/css" href="{{ store_url }}catalog/view/theme/default/stylesheet/ezdefi.css">
+<script src="{{ store_url }}catalog/view/javascript/bignumber.min.js"></script>
 <script src="{{ store_url }}catalog/view/javascript/ezdefi.js"></script>
+
 <div class="payment-form-wrapper">
 	<input type="hidden" id="origin-value" value="{{ origin_value }}">
 	<input type="hidden" id="url-check-order-complete" value="{{ url_check_order_complete }}">
@@ -21,7 +23,7 @@
 				</label>
 			{% endfor %}
 		</div>
-		<a href="#" class="ezapy-guide-link">{{ text_guide }}</a>
+		<a href="#" class="ezapy-guide-link">{{ text_guide }}1111</a>
         {% if enable_simple_pay %}
 		    <button class="ezdefi-btn-create-payment" data-url_create_payment="{{ url_create_simple_payment }}" disabled> Tiếp theo </button>
         {% else %}

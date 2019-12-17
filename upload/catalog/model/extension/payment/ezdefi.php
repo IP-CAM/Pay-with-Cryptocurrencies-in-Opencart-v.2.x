@@ -4,7 +4,7 @@ class ModelExtensionPaymentEzdefi extends Model {
     const DONE = 2;
     const HAS_AMOUNT = 1;
     const NO_AMOUNT = 0;
-
+    const MAX_AMOUNT_DECIMAL = 14;
 
 	public function getMethod($address, $total) {
 		$this->load->language('extension/payment/ezdefi');
@@ -100,9 +100,8 @@ class ModelExtensionPaymentEzdefi extends Model {
                             FROM `".DB_PREFIX."ezdefi_amount` t1
                             LEFT JOIN `".DB_PREFIX."ezdefi_amount` t2 ON t1.temp + 1 = t2.temp and t1.amount = t2.amount
                             WHERE t2.temp IS NULL
-                                AND t1.amount = " .$amount."
-                        ON DUPLICATE KEY UPDATE `expiration`='".$expiration."';");
-        $amount_id = $this->db->query("select tag_amount from `".DB_PREFIX."ezdefi_amount` where `currency` = '" .$currency."' AND `amount`=".$amount." ORDER BY id DESC LIMIT 1;");
+                                AND t1.amount = ROUND(" .$amount.", ".self::MAX_AMOUNT_DECIMAL.");");
+        $amount_id = $this->db->query("select tag_amount from `".DB_PREFIX."ezdefi_amount` where `currency` = '" .$currency."' AND `amount`=ROUND(" .$amount.", ".self::MAX_AMOUNT_DECIMAL.") ORDER BY id DESC LIMIT 1;");
         $this->db->query("COMMIT;");
         $variationValue = abs($amount_id->row['tag_amount'] - $amount);
 
