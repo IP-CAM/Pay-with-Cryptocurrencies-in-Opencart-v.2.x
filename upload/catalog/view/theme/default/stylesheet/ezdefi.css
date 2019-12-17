@@ -203,6 +203,9 @@ div.escrow-pay-box, div.simple-pay-box {
 
 .ezdefi-payment__deeplink {
     display: block;
+}
+
+.qrcode-box {
     position: relative;
 }
 
@@ -211,11 +214,24 @@ div.escrow-pay-box, div.simple-pay-box {
     font-size: 14px;
     font-weight: bold;
     width: 100%;
+    height: 100%;
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     color: white;
+}
+
+.reload-payment {
+    cursor: pointer;
+}
+
+.timeout-notification >p {
+    position: absolute;
+    width: 100%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 .ezdefi-payment__download-link {
@@ -224,6 +240,12 @@ div.escrow-pay-box, div.simple-pay-box {
 
 .ezdefi-payment__download-link>a {
     display: block;
+}
+
+.ezdefi-copy-icon {
+    font-size: 20px;
+    color: lightskyblue;
+    padding-left: 10px;
 }
 
 .link_use_ezdefi_wallet {
