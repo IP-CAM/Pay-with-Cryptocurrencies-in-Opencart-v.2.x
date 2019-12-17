@@ -80,6 +80,12 @@
             {% endif %}
             {% if enable_simple_pay %}
                 <div class="payment-box simple-pay-box">
+					<div class="alert alert-danger alert-copy alert-copy-address hidden">
+						<strong>Danger!</strong> This alert box could indicate a dangerous or potentially negative action.
+					</div>
+					<div class="alert alert-danger alert-copy alert-copy-amount hidden">
+						<strong>Danger!</strong> This alert box could indicate a dangerous or potentially negative action.
+					</div>
                     <div class="ezdefi-payment__value">
                         <span class="ezdefi-payment__origin-value--simple">{{ origin_value }}</span> <span> {{ origin_currency }}</span>
                         <span class="ezdefi-payment__icon-convert"><i class="fa fa-retweet" aria-hidden="true"></i></span>
@@ -89,12 +95,20 @@
                         <input type="hidden" id="payment-id--simple">
                         {{ ezdefi_countdown_lifetime_simple }}
                     </div>
-					<a href="" target="_blank" class="ezdefi-payment__deeplink ezdefi-payment__deeplink--simple">
-						<img src="" alt="" class="ezdefi-payment__qr-code--simple">
-						<p class="timeout-notification timeout-notification--simple">{{ payment_time_out }}</p>
-					</a>
-                    <p><b>Address:</b> <span class="ezdefi-payment__wallet-address--simple"></span></p>
-                    <p><b>Amount:</b> <span class="ezdefi-payment__amount--simple"></span></p>
+					<div class="qrcode-box">
+						<a href="" target="_blank" class="ezdefi-payment__deeplink ezdefi-payment__deeplink--simple">
+							<img src="" alt="" class="ezdefi-payment__qr-code--simple">
+						</a>
+						<div class="timeout-notification timeout-notification--simple reload-payment" data-suffixes="--simple">
+							<p>{{ payment_time_out }}</p>
+						</div>
+					</div>
+                    <p><b>Address:</b> <span class="ezdefi-payment__wallet-address--simple"></span>
+						<span class="btn-copy-address"><i class="fa fa-copy ezdefi-copy-icon"></i></span>
+					</p>
+                    <p><b>Amount:</b> <span class="ezdefi-payment__amount--simple"></span>
+						<span class="btn-copy-amount"><i class="fa fa-copy ezdefi-copy-icon"></i></span>
+					</p>
                     <p class="margin-top-md text-red">{{ text_notify_pay_exact_amount }} <label for="ezdefi-show-payment--escrow" class="link_use_ezdefi_wallet"><i>{{ text_ezdefi_wallet }}</i></label></p>
                 </div>
             {% endif %}
@@ -109,12 +123,14 @@
                         <input type="hidden" id="payment-id--escrow">
                         {{ ezdefi_countdown_lifetime_escrow }}
                     </div>
-					<a href="" class="ezdefi-payment__deeplink ezdefi-payment__deeplink--escrow" target="_blank">
-						<img src="" alt="" class="ezdefi-payment__qr-code ezdefi-payment__qr-code--escrow">
-						<p class="timeout-notification timeout-notification--escrow">
-							{{ payment_time_out }}
-						</p>
-					</a>
+					<div class="qrcode-box">
+						<a href="" class="ezdefi-payment__deeplink" target="_blank">
+							<img src="" alt="" class="ezdefi-payment__qr-code ezdefi-payment__qr-code--escrow">
+						</a>
+						<div class="timeout-notification timeout-notification--escrow reload-payment" data-suffixes="--escrow">
+							<p>{{ payment_time_out }}</p>
+						</div>
+					</div>
                     <div class="ezdefi-payment__download-link">
                         <a href="{{ link_download_app_ios }}"><span><i class="fa fa-apple ezdefi-icon-apple"></i></span> {{ text_download_app_ios }}</a>
                         <a href="{{ link_download_app_android }}"><span><i class="fa fa-android ezdefi-icon-android"></i></span> {{ text_download_app_android }}</a>

@@ -19,10 +19,14 @@ $(function () {
         paymentIdInput: '#payment-id',
         btnChange: '.ezdefi-payment__btn-change-coin',
         tooltipShowDiscount: '.tooltip-show-discount',
-        countDownLabel: '.ezdefi-countdown-lifetime'
+        countDownLabel: '.ezdefi-countdown-lifetime',
+        btnReloadPayment: '.reload-payment'
     };
 
-    var global = {};
+    var global = {
+        reloadingSimple : 0,
+        reloadingEscrow: 0
+    };
     global.countDownInterval = {};
 
     $('[data-toggle="popover"]').popover();
@@ -61,19 +65,6 @@ $(function () {
             var coinId = $('#selected-coin-id').val();
             var discount = $('#selected-coin-discount').val();
             createPayment(url, coinId, paymentType, discount);
-            // $.ajax({
-            //     url: url,
-            //     method: "GET",
-            //     data: { coin_id: coinId },
-            //     success: function (response) {
-            //         var data = JSON.parse(response).data;
-            //         if(data.status === 'failure') {
-            //             alert(data.message);
-            //         } else {
-            //             renderPayment(paymentType, data, discount);
-            //         }
-            //     }
-            // })
         }
     });
 
@@ -99,6 +90,47 @@ $(function () {
         createPayment(url, coinId, suffixes, discount);
     });
 
+    $(selectors.btnReloadPayment).click(function () {
+        let suffixes = $(this).data('suffixes');
+
+        if((suffixes === "--simple" && global.reloadingSimple === 0) || (suffixes === "--escrow" && global.reloadingEscrow === 0)) {
+            if(suffixes === "--simple") global.reloadingSimple = 1;
+            else if(suffixes === "--escrow") global.reloadingEscrow = 1;
+            var url = $("#url-create-payment" + suffixes).val();
+            var coinId = $(selectors.coinSelectedToPaymentInput+':checked').val();
+            var discount = $(selectors.coinSelectedToPaymentInput+':checked').data('discount');
+            createPayment(url, coinId, suffixes, discount);
+        }
+    });
+
+    $(".select-coin-checkbox").change(function () {
+        var inputId = $(".select-coin-checkbox:checked").attr('id');
+        $("label.ezdefi-change-coin-item").css('border', '1px solid #d8d8d8');
+        $("label.ezdefi-change-coin-item[for='"+inputId+"']").css('border', '2px solid lightskyblue')
+    });
+
+    $(".btn-copy-address").click(function () {
+        copytext(".ezdefi-payment__wallet-address--simple");
+        $(".alert-copy").hide();
+        $(".alert-copy-address").show();
+    });
+
+    $(".btn-copy-amount").click(function () {
+        copytext(".ezdefi-payment__amount--simple");
+        $(".alert-copy").hide();
+        $(".alert-copy-amount").show();
+    });
+
+    var copytext = function (elementToCopy) {
+        let text = $(elementToCopy).html();
+        let tmpElem = document.createElement("input");
+        document.body.appendChild(tmpElem);
+        tmpElem.value = text;
+        tmpElem.select();
+        document.execCommand("copy");
+        document.body.removeChild(tmpElem);
+    };
+    
     var createPayment = function (url, coinId, suffixes, discount) {
         $.ajax({
             url: url,
@@ -117,9 +149,11 @@ $(function () {
                 }
             }
         })
-    }
+    };
 
     var renderPayment = function (suffixes, data, discount ) {
+        global.reloadingSimple = 0;
+        global.reloadingEscrow = 0;
         let paymentId = data._id;
         let originValue = $("#origin-value").val();
 
@@ -206,11 +240,6 @@ $(function () {
         $(selectors.timeoutNotify+suffixes).css('display', enable ? 'block' : 'none');
     };
 
-    $(".select-coin-checkbox").change(function () {
-        var inputId = $(".select-coin-checkbox:checked").attr('id');
-        $("label.ezdefi-change-coin-item").css('border', '1px solid #d8d8d8');
-        $("label.ezdefi-change-coin-item[for='"+inputId+"']").css('border', '2px solid lightskyblue')
-    });
 
     checkOrderComplete();
 });

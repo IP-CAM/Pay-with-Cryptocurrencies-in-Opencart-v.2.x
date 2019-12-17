@@ -45,7 +45,7 @@ class ControllerExtensionPaymentEzdefi extends Controller {
                 return $this->response->setOutput(json_encode(['data' => ['status'=> 'failure', 'message'=>$this->language->get('error_cant_create_payment_with_amount')]]));
             }
         } else {
-            return $this->response->setOutput(['data' => ['status'=> 'failure', 'message'=>$this->language->get('error_enable_simple_pay')]]);
+            return $this->response->setOutput(json_encode(['data' => ['status'=> 'failure', 'message'=>$this->language->get('error_enable_simple_pay')]]));
         }
     }
 
@@ -60,10 +60,10 @@ class ControllerExtensionPaymentEzdefi extends Controller {
             if ($payment_info) {
                 return $this->response->setOutput($payment_info);
             } else {
-                return $this->response->setOutput(['data' => ['status'=> 'failure', 'message'=>$this->language->get('error_cant_create_payment')]]);
+                return $this->response->setOutput(json_encode(['data' => ['status'=> 'failure', 'message'=>$this->language->get('error_cant_create_payment')]]));
             }
         } else {
-            return $this->response->setOutput(['data' => ['status'=> 'failure', 'message'=>$this->language->get('error_enable_escrow_pay')]]);
+            return $this->response->setOutput(json_encode(['data' => ['status'=> 'failure', 'message'=>$this->language->get('error_enable_escrow_pay')]]));
         }
     }
 
