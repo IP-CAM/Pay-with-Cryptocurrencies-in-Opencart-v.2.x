@@ -114,16 +114,22 @@ $(function () {
     });
 
     var renderPayment = function (suffixes, data, discount ) {
-        var paymentId = data._id;
-        var originValue = $("#origin-value").val();
+        let paymentId = data._id;
+        let originValue = $("#origin-value").val();
 
         $(selectors.paymentIdInput+suffixes).val(paymentId);
         enablePaymentTimeout(suffixes, false);
         countDownTime(paymentId, data.expiredTime, suffixes);
-
-        $(selectors.originValue + suffixes).html(originValue * (100 - discount)/100);
         $(selectors.deeplink+suffixes).attr('href', data.deepLink);
-        $(selectors.currencyValue+suffixes).html(parseInt(data.value) * Math.pow(10, -data.decimal) + data.currency);
+
+        let originValueWithDiscount = new BigNumber(originValue).multipliedBy(new BigNumber((100 - discount)/100));
+        $(selectors.originValue + suffixes).html(originValueWithDiscount.toFormat());
+
+        let decimalBN = new BigNumber(Math.pow(10, data.decimal));
+        let valueBN = new BigNumber(data.value);
+        let currencyValue = valueBN.div(decimalBN).toFormat();            // big number
+        $(selectors.currencyValue+suffixes).html(currencyValue + data.currency);
+
         $("#check-created-payment"+suffixes).prop('checked', true);
         $(selectors.logoCoinSelected).prop('src', data.token ? data.token.logo : '');
         $(selectors.nameCoinSelected).html(  data.token ? data.token.symbol.toUpperCase() + '/' + data.token.name : '');

@@ -50,14 +50,14 @@ class ModelExtensionPaymentEzdefi extends Model {
 			) ENGINE=InnoDB DEFAULT COLLATE=utf8_general_ci;");
 
         $this->db->query("
-            CREATE EVENT `ezdefi_remove_amount_id_event`
+            CREATE EVENT IF NOT EXISTS `ezdefi_remove_amount_id_event`
             ON SCHEDULE EVERY ".self::TIME_REMOVE_AMOUNT_ID." DAY
             STARTS DATE(NOW())
             DO
             DELETE FROM `" . DB_PREFIX . "ezdefi_tag_amount` WHERE DATEDIFF( NOW( ) ,  expiration ) >= 86400;");
 
         $this->db->query("
-            CREATE EVENT `ezdefi_remove_exception_event`
+            CREATE EVENT  IF NOT EXISTS `ezdefi_remove_exception_event`
             ON SCHEDULE EVERY ".self::TIME_REMOVE_EXCEPTION." DAY
             STARTS DATE(NOW())
             DO
