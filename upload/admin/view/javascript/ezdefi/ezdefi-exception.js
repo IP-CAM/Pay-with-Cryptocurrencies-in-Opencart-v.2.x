@@ -12,13 +12,29 @@ $(function () {
     var global = {};
 
     var oc_ezdefi_exception = function () {
-        this.numberOfOrderInPage = 10;
         this.loadException();
         $("#btn-delete-exception").click(this.deleteException.bind(this));
         $("#btn-confirm-paid-exception").click(this.confirmPaidException.bind(this));
         $("#btn-revert-order").click(this.revertOrder.bind(this));
         $("#exception-search-input").keyup(this.searchException.bind(this));
         $("input[name='filter-by-currency']").change(this.searchException.bind(this));
+        $(".tab-radio-input").change(this.selectTabListener);
+        this.detectTabToShow();
+    };
+
+    oc_ezdefi_exception.prototype.selectTabListener = function() {
+        let tab = $(this).data('tab');
+        localStorage.setItem('tab', tab);
+    };
+
+    oc_ezdefi_exception.prototype.detectTabToShow = function () {
+        let tab = localStorage.getItem('tab') !== null ? localStorage.getItem('tab') : 'config';
+
+        $("input[name='btn-radio-choose-tab']").each(function (e, b) {
+            if($(this).data('tab') == tab) {
+                $(this).prop('checked',true);
+            }
+        });
     };
 
     oc_ezdefi_exception.prototype.loadException = function (keyword = '') {
@@ -49,6 +65,7 @@ $(function () {
                 }
             },
             callback: function(response, pagination) {
+                console.log(response, pagination);
                 var exceptionRecords = that.convertExceptionResponse(response);
                 var dataHtml = `<table class="table">
                         <thead>
@@ -60,7 +77,7 @@ $(function () {
                         </tr>
                         </thead>
                         <tbody>`;
-                let tmp = 1;
+                let tmp = (pagination.pageNumber - 1) * pagination.pageSize + 1;
                 $.each(exceptionRecords, function (exceptionKey, groupException) {
                     let currency = groupException.currency;
                     let amountId = groupException.amount_id;
@@ -74,9 +91,8 @@ $(function () {
                         var hasAmount = exceptionData[5];
                         var explorerUrl = exceptionData[6];
 
-                        console.log(orderId === "null" && explorerUrl !== "null", orderId, explorerUrl);
                         if(orderId === "null" && explorerUrl !== "null") {
-                            amountId += `<p><a class="exception-order-info__explorer-url" href="${explorerUrl}" target="_blank">${explorerUrl}</a></p>`
+                            amountId += `<p><a class="exception-order-info__explorer-url" href="${explorerUrl}" target="_blank">View Transaction Detail</a></p>`
                         } else {
                             if(paidStatus === '0') {
                                 var paymentStatus = 'Have not paid';
@@ -92,7 +108,7 @@ $(function () {
                                 <p><span class="exception-order-label-1">expiration:</span> <span class="exception-order-info__data"> ${expiration} </span></p>
                                 <p><span class="exception-order-label-1">paid:</span> <span class="exception-order-info__data">${paymentStatus} </span></p>
                                 <p><span class="exception-order-label-1">Pay by ezdefi wallet:</span> ${hasAmount === '1' ? 'yes' : 'no'} </p>
-                                <p class="${explorerUrl == 'null' ? 'hidden':''}"><span class="exception-order-label-1">Explorer url:</span><a class="exception-order-info__explorer-url" href="${explorerUrl}" target="_blank">${explorerUrl}</a></p>
+                                <p class="${explorerUrl == '' ? 'hidden':''}"><span class="exception-order-label-1">Explorer url:</span><a class="exception-order-info__explorer-url" href="${explorerUrl}" target="_blank">View Transaction Detail</a></p>
                             </div>
                             <div class="exception-order-button-box">`;
                             orderItem += paidStatus == 1 ? `<button class="btn btn-primary btn-revert-order" data-toggle="modal" data-target="#modal-revert-order-exception" data-exception-id="${exceptionId}" data-order-id="${orderId}">Revert</button>` : '';

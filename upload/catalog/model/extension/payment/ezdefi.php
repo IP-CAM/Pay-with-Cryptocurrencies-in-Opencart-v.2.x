@@ -147,8 +147,9 @@ class ModelExtensionPaymentEzdefi extends Model {
         ('".$order_id."', '".$currency."', '".$amount_id."', '".$expiration."', '".$has_amount."', '".$paid."', '".$explorer_url."')");
     }
 
-    public function setPaidForException($order_id, $currency, $amount_id, $paid = 0,$explorer_url = null) {
-        $this->db->query("UPDATE `". DB_PREFIX . "ezdefi_exception` SET `paid`=".$paid.", `explorer_url`='".$this->db->escape($explorer_url)."' WHERE `currency` ='".$currency."' AND `order_id`='".$order_id."' AND `amount_id`='".$amount_id."'");
+    public function setPaidForException($order_id, $currency, $amount_id, $has_amount, $paid = 0,$explorer_url = null) {
+        $this->db->query("UPDATE `". DB_PREFIX . "ezdefi_exception` SET `paid`=".$paid.", `explorer_url`='".$this->db->escape($explorer_url)."' 
+            WHERE `currency` ='".$currency."' AND `order_id`='".$order_id."' AND `amount_id`='".$amount_id."', AND `has_amount`='".$has_amount."'");
     }
 
     public function checkTransaction($transaction_id, $explorer_url) {

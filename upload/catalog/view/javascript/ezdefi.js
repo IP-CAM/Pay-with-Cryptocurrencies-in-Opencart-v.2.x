@@ -141,7 +141,7 @@ $(function () {
         $(selectors.paymentContent).css('display','grid');
         $(selectors.qrCodeImg+suffixes).prop('src', data.qr);
         $('.ezdefi-payment__wallet-address'+suffixes).html(data.to);
-        $('.ezdefi-payment__amount'+suffixes).html(parseInt(data.value) * Math.pow(10, -data.decimal) + data.currency);
+        $('.ezdefi-payment__amount'+suffixes).html(currencyValue + data.currency);
     };
 
     var checkOrderComplete = function () {

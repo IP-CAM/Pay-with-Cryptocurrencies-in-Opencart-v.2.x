@@ -44,6 +44,7 @@ $_['text_simple_method_description'] = 'This method will adjust payment amount o
 $_['text_recommend_variation'] = '0.01';
 $_['edit_success'] = 'Edit success';
 $_['delete_success'] = 'Delete success';
+$_['text_view_transaction'] = 'View Transaction Detail';
 
 //warning
 $_['warning_change_decimal'] = 'Changing Decimal can cause to payment interruption';

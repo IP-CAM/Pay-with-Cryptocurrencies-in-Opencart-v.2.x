@@ -24,8 +24,8 @@
 
     <div class="container-fluid ezdefi-admin-content-box">
         {# Tab choose setting or show payment exception #}
-        <input type="radio" id="ezdefi-config-tab" name="btn-radio-choose-tab" class="hidden" checked>
-        <input type="radio" id="ezdefi-exception-tab" name="btn-radio-choose-tab" class="hidden">
+        <input type="radio" id="ezdefi-config-tab" name="btn-radio-choose-tab" class="hidden tab-radio-input" checked data-tab="config">
+        <input type="radio" id="ezdefi-exception-tab" name="btn-radio-choose-tab" class="hidden tab-radio-input" data-tab="exception">
         <label class="ezdefi-btn-tab ezdefi-btn-config-tab" for="ezdefi-config-tab"> {{ tab_config }} </label>
         <label class="ezdefi-btn-tab ezdefi-btn-exception-tab" for="ezdefi-exception-tab"> {{ tab_exception }} </label>
         {# End tab choose setting or show payment exception #}
