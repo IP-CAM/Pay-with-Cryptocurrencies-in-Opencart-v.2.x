@@ -60,19 +60,20 @@ $(function () {
             var url = $("#url-create-payment"+paymentType).val();
             var coinId = $('#selected-coin-id').val();
             var discount = $('#selected-coin-discount').val();
-            $.ajax({
-                url: url,
-                method: "GET",
-                data: { coin_id: coinId },
-                success: function (response) {
-                    var data = JSON.parse(response).data;
-                    if(data.status === 'failure') {
-                        alert(data.message);
-                    } else {
-                        renderPayment(paymentType, data, discount);
-                    }
-                }
-            })
+            createPayment(url, coinId, paymentType, discount);
+            // $.ajax({
+            //     url: url,
+            //     method: "GET",
+            //     data: { coin_id: coinId },
+            //     success: function (response) {
+            //         var data = JSON.parse(response).data;
+            //         if(data.status === 'failure') {
+            //             alert(data.message);
+            //         } else {
+            //             renderPayment(paymentType, data, discount);
+            //         }
+            //     }
+            // })
         }
     });
 
@@ -94,6 +95,11 @@ $(function () {
         var discount = $(selectors.coinSelectedToPaymentInput+':checked').data('discount');
         $('#selected-coin-id').val(coinId);
         $('#selected-coin-discount').val(discount);
+
+        createPayment(url, coinId, suffixes, discount);
+    });
+
+    var createPayment = function (url, coinId, suffixes, discount) {
         $.ajax({
             url: url,
             method: "GET",
@@ -111,7 +117,7 @@ $(function () {
                 }
             }
         })
-    });
+    }
 
     var renderPayment = function (suffixes, data, discount ) {
         let paymentId = data._id;

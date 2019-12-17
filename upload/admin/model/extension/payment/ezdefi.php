@@ -197,7 +197,7 @@ class ModelExtensionPaymentEzdefi extends Model {
         if($currency) {
             $sql .= " AND exception.currency = '".strtoupper($currency)."'";
         }
-        $sql .= " group by exception.amount_id, exception.currency
+        $sql .= " group by exception.amount_id, exception.currency, exception.unknown_tx_explorer_url
                     LIMIT ".$start.','.$limit;
 
         $query = $this->db->query($sql);
