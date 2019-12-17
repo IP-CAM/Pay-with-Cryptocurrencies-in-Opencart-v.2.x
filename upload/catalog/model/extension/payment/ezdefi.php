@@ -104,7 +104,6 @@ class ModelExtensionPaymentEzdefi extends Model {
                         ON DUPLICATE KEY UPDATE `expiration`='".$expiration."';");
         $amount_id = $this->db->query("select tag_amount from `".DB_PREFIX."ezdefi_amount` where `currency` = '" .$currency."' AND `amount`=".$amount." ORDER BY id DESC LIMIT 1;");
         $this->db->query("COMMIT;");
-
         $variationValue = abs($amount_id->row['tag_amount'] - $amount);
 
         if ($variationValue > ($amount * (float)$variation) / 100 ) {

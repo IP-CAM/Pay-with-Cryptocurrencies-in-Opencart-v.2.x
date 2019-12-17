@@ -25,7 +25,7 @@ class ModelExtensionPaymentEzdefi extends Model {
 			  PRIMARY KEY (`coin_id`)
 			) ENGINE=InnoDB DEFAULT COLLATE=utf8_general_ci;");
         $this->db->query("
-			CREATE TABLE IF NOT EXISTS `" . DB_PREFIX . "ezdefi_tag_amount` (
+			CREATE TABLE IF NOT EXISTS `" . DB_PREFIX . "ezdefi_amount` (
                 `id`         int auto_increment,
                 `temp`       INT not null,
                 `amount`     DECIMAL(15, 4) not null,
@@ -38,14 +38,15 @@ class ModelExtensionPaymentEzdefi extends Model {
             ) ENGINE=InnoDB DEFAULT COLLATE=utf8_general_ci;");
         $this->db->query("
             CREATE TABLE IF NOT EXISTS `" . DB_PREFIX . "ezdefi_exception` (
-                `exception_id` int auto_increment,
+                `id` int auto_increment,
 			    `order_id` int(11),
                 `amount_id` decimal(25,14) not null,
                 `currency` varchar(255) not null,
 		        `paid` int(4) default 0,
 		        `has_amount` tinyint(1) not null,
+		        `expiration` TIMESTAMP,
 		        `explorer_url` varchar(255) default null,
-			    PRIMARY KEY (`exception_id`)
+			    PRIMARY KEY (`id`)
 			) ENGINE=InnoDB DEFAULT COLLATE=utf8_general_ci;");
 
         $this->db->query("
@@ -66,7 +67,8 @@ class ModelExtensionPaymentEzdefi extends Model {
 
     public function uninstall() {
         $this->db->query("DROP TABLE IF EXISTS `" . DB_PREFIX . "ezdefi_coin`;");
-        $this->db->query("DROP TABLE IF EXISTS `" . DB_PREFIX . "ezdefi_amount_id_log`;");
+        $this->db->query("DROP TABLE IF EXISTS `" . DB_PREFIX . "ezdefi_amount`;");
+        $this->db->query("DROP TABLE IF EXISTS `" . DB_PREFIX . "ezdefi_exception`;");
     }
 
     public function updateCoins($data) {
@@ -170,8 +172,7 @@ class ModelExtensionPaymentEzdefi extends Model {
         if($currency) {
             $sql .= " AND exception.currency = '".strtoupper($currency)."'";
         }
-        $sql .= " group by exception.amount_id, exception.currency
-        having max(exception.paid) > 0";
+        $sql .= " group by exception.amount_id, exception.currency";
         $query = $this->db->query($sql);
 
         return $query->num_rows;
@@ -197,7 +198,6 @@ class ModelExtensionPaymentEzdefi extends Model {
             $sql .= " AND exception.currency = '".strtoupper($currency)."'";
         }
         $sql .= " group by exception.amount_id, exception.currency
-                    HAVING max(exception.paid) > 0
                     LIMIT ".$start.','.$limit;
 
         $query = $this->db->query($sql);
