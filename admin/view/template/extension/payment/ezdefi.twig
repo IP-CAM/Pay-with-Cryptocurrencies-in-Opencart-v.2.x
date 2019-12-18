@@ -254,8 +254,8 @@
                         </div>
                         <div class="modal-body">
                             <p>Do you want to confirm this order</p>
-                            <input type="hidden" id="exception-id--confirm">
-                            <input type="hidden" id="exception-order-id--confirm">
+                            <input type="text" id="exception-id--confirm">
+                            <input type="text" id="exception-order-id--confirm">
                         </div>
                         <div class="modal-footer" style="text-align: center">
                             <button type="button" class="btn btn-danger" data-dismiss="modal">{{ button_close }}</button>
@@ -291,4 +291,30 @@
         {# End payment exception #}
     </div>
 </div>
+<script>
+    var language = {
+        ordinal: '{{ text_ordinal }}',
+        currency: '{{ text_currency }}',
+        amount: '{{ text_amount }}',
+        order: '{{ text_order }}',
+        viewTransactionDetail: '{{ text_view_transaction_detail }}',
+        orderId: '{{ text_order_id }}',
+        email: '{{ text_email }}',
+        price: '{{ text_price }}',
+        createAt: '{{ text_create_at }}',
+        customer: '{{ text_customer }}',
+        expiration: '{{ text_expiration}}',
+        paid: '{{ text_paid }}',
+        payByEzdefi: '{{ text_pay_by_ezdefi }}',
+        textNo: '{{ text_no }}',
+        textYes: '{{ text_yes }}',
+        haveNotPaid: '{{ text_have_not_paid }}',
+        paidOnTime: '{{ text_paid_on_time }}',
+        paidOnExpiration: '{{ text_paid_on_expiration }}',
+        delete: '{{ text_delete }}',
+        confirmPaid: '{{ text_confirm_paid }}',
+        revert: '{{ text_revert }}',
+        assign: '{{ text_assign }}',
+    }
+</script>
 {{ footer }}
