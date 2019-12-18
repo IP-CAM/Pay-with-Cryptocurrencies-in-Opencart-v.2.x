@@ -112,13 +112,17 @@ $(function () {
     $(".btn-copy-address").click(function () {
         copytext(".ezdefi-payment__wallet-address--simple");
         $(".alert-copy").hide();
-        $(".alert-copy-address").show();
+        $(".alert-copy-address").show(function () {
+            $(".alert-copy-address").delay(1000).hide("slow")
+        });
     });
 
     $(".btn-copy-amount").click(function () {
         copytext(".ezdefi-payment__amount--simple");
         $(".alert-copy").hide();
-        $(".alert-copy-amount").show();
+        $(".alert-copy-amount").show(function () {
+            $(".alert-copy-amount").delay(1000).hide("slow")
+        });
     });
 
     var copytext = function (elementToCopy) {
@@ -181,7 +185,8 @@ $(function () {
         $(selectors.paymentContent).css('display','grid');
         $(selectors.qrCodeImg+suffixes).prop('src', data.qr);
         $('.ezdefi-payment__wallet-address'+suffixes).html(data.to);
-        $('.ezdefi-payment__amount'+suffixes).html(currencyValue + data.currency);
+        $('.ezdefi-payment__amount'+suffixes).html(currencyValue);
+        $('.ezdefi-payment__currency'+suffixes).html(data.currency);
     };
 
     var checkOrderComplete = function () {

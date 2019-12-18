@@ -91,7 +91,6 @@ $(function () {
                         var hasAmount = exceptionData[5];
                         var explorerUrl = exceptionData[6];
                         var unknowTxExplorerUrl = exceptionData[7];
-                        console.log(exceptionData);
 
                         if(orderId === "null" && explorerUrl !== "null") {
                             amountId += `<p><a class="exception-order-info__explorer-url" href="${unknowTxExplorerUrl}" target="_blank">View Transaction Detail</a></p>`
@@ -109,7 +108,7 @@ $(function () {
                                 <p><span class="exception-order-label-1">email:</span> <span class="exception-order-info__data">${email} </span></p>
                                 <p><span class="exception-order-label-1">expiration:</span> <span class="exception-order-info__data"> ${expiration} </span></p>
                                 <p><span class="exception-order-label-1">paid:</span> <span class="exception-order-info__data">${paymentStatus} </span></p>
-                                <p><span class="exception-order-label-1">Pay by ezdefi wallet:</span> ${hasAmount === '1' ? 'yes' : 'no'} </p>
+                                <p><span class="exception-order-label-1">Pay by ezdefi wallet:</span> ${hasAmount === '1' ? 'no' : 'yes'} </p>
                                 <p class="${explorerUrl == '' ? 'hidden':''}"><span class="exception-order-label-1">Explorer url:</span><a class="exception-order-info__explorer-url" href="${explorerUrl}" target="_blank">View Transaction Detail</a></p>
                             </div>
                             <div class="exception-order-button-box">`;
