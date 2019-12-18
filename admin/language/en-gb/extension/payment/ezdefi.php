@@ -46,6 +46,29 @@ $_['edit_success'] = 'Edit success';
 $_['delete_success'] = 'Delete success';
 $_['text_view_transaction'] = 'View Transaction Detail';
 
+$_['text_ordinal']  = 'STT';
+$_['text_currency']  = 'Currency';
+$_['text_amount'] = 'Amount';
+$_['text_order'] = 'Order';
+$_['text_view_transaction_detail'] = 'View Transaction Detail';
+$_['text_order_id'] = 'Order id';
+$_['text_email'] = 'Email';
+$_['text_price'] = 'Price';
+$_['text_create_at'] = 'Create at';
+$_['text_customer'] = 'Customer';
+$_['text_expiration'] = 'Expiration';
+$_['text_paid'] = 'Paid';
+$_['text_pay_by_ezdefi'] = 'Pay by ezdefi wallet';
+$_['text_no'] = 'No';
+$_['text_yes'] = 'Yes';
+$_['text_have_not_paid'] = 'Have not paid';
+$_['text_paid_on_time'] = 'Paid on time';
+$_['text_paid_on_expiration'] = 'Paid on expiration';
+$_['text_delete'] = 'Delete';
+$_['text_confirm_paid'] = 'Confirm Paid';
+$_['text_revert'] = 'Revert';
+$_['text_assign'] = 'Assign';
+
 //warning
 $_['warning_change_decimal'] = 'Changing Decimal can cause to payment interruption';
 
