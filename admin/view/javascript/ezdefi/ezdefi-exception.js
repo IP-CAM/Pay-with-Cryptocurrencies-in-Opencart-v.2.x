@@ -201,6 +201,7 @@ $(function () {
         if(exceptionId == null) {
             exceptionId = $("#exception-id--delete").val();
         }
+        $("#btn-delete-exception").prop('disabled', true);
 
         let url = $("#url-delete-exception").val();
         $.ajax({
@@ -217,11 +218,16 @@ $(function () {
                 if($('#delete-order-exception').hasClass('in')) {
                     $('#delete-order-exception').modal('toggle');
                 }
+                $("#btn-delete-exception").prop('disabled', false);
+            },
+            error: function () {
+                $("#btn-delete-exception").prop('disabled', false);
             }
         });
     };
 
     oc_ezdefi_exception.prototype.confirmPaidException = function () {
+        $("#btn-confirm-paid-exception").prop('disabled', true);
         let urlAddOrderHistory = $("#url-add-order-history").val();
         let orderId = $("#exception-order-id--confirm").val();
         let exceptionId = $('#exception-id--confirm').val();
@@ -238,14 +244,17 @@ $(function () {
             },
             success: function (response) {
                 that.deleteExceptionByOrderId(orderId);
+                $("#btn-confirm-paid-exception").prop('disabled', false);
             },
             error: function () {
                 that.deleteExceptionByOrderId(orderId);
+                $("#btn-confirm-paid-exception").prop('disabled', false);
             }
         });
     };
 
     oc_ezdefi_exception.prototype.revertOrder = function() {
+        $("#btn-revert-order").prop('disabled', true);
         let urlAddOrderHistory = $("#url-add-order-history").val();
         let orderId = $("#exception-order-id--revert").val();
         let exceptionId = $('#exception-id--revert').val();
@@ -263,10 +272,12 @@ $(function () {
             success: function (response) {
                 that.deleteException(null, exceptionId);
                 $("modal-revert-order-exception").modal('toggle');
+                $("#btn-revert-order").prop('disabled', false);
             },
             error: function () {
                 that.deleteException(null, exceptionId);
                 $("modal-revert-order-exception").modal('toggle');
+                $("#btn-revert-order").prop('disabled', false);
             }
         });
     };
