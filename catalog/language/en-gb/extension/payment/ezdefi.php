@@ -15,6 +15,9 @@ $_['text_pay_with_ezdefi_wallet'] = '<img src="catalog/view/theme/default/image/
 $_['text_notify_pay_exact_amount'] = 'You have to pay exact amount so that your order can be handle property. <br> If you have difficulty for sending exact amount try to use';
 $_['text_ezdefi_wallet'] = ' ezDeFi Wallet.';
 $_['text_create_payment_success'] = ' Create payment success';
+$_['text_success'] = 'Success!';
+$_['text_copy_address'] = 'Address was copied to the clipboard.';
+$_['text_copy_amount'] = 'Amount was copied to the clipboard.';
 
 
 //link

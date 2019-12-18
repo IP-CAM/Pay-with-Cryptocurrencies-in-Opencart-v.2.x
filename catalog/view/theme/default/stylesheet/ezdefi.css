@@ -222,6 +222,10 @@ div.escrow-pay-box, div.simple-pay-box {
     color: white;
 }
 
+.alert-copy, .alert-copy{
+    display: none;
+}
+
 .reload-payment {
     cursor: pointer;
 }
