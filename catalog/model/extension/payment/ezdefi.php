@@ -142,14 +142,14 @@ class ModelExtensionPaymentEzdefi extends Model {
     }
 
     // ----------------------------------------------------------Exception model------------------------------------------------------------
-    public function addException($order_id, $currency, $amount_id, $expiration, $has_amount, $paid = 0, $explorer_url = null) {
-        $this->db->query("INSERT INTO `". DB_PREFIX . "ezdefi_exception` (`order_id`, `currency`, `amount_id`, `expiration`, `has_amount`, `paid`, `explorer_url`) VALUES 
-        ('".$order_id."', '".$currency."', '".$amount_id."', '".$expiration."', '".$has_amount."', '".$paid."', '".$explorer_url."')");
+    public function addException($order_id, $currency, $amount_id, $expiration, $has_amount, $paid = 0, $explorer_url = null, $unknown_tx_explorer_url = null) {
+        $this->db->query("INSERT INTO `". DB_PREFIX . "ezdefi_exception` (`order_id`, `currency`, `amount_id`, `expiration`, `has_amount`, `paid`, `explorer_url`, `unknown_tx_explorer_url`) VALUES 
+        ('".$order_id."', '".$currency."', '".$amount_id."', '".$expiration."', '".$has_amount."', '".$paid."', '".$explorer_url."', '".$unknown_tx_explorer_url."')");
     }
 
-    public function setPaidForException($order_id, $currency, $amount_id, $has_amount, $paid = 0,$explorer_url = null) {
+    public function setPaidForException($order_id, $currency, $amount_id, $has_amount, $paid = 0, $explorer_url = null) {
         $this->db->query("UPDATE `". DB_PREFIX . "ezdefi_exception` SET `paid`=".$paid.", `explorer_url`='".$this->db->escape($explorer_url)."' 
-            WHERE `currency` ='".$currency."' AND `order_id`='".$order_id."' AND `amount_id`='".$amount_id."', AND `has_amount`='".$has_amount."'");
+            WHERE `currency` ='".$currency."' AND `order_id`='".$order_id."' AND `amount_id`='".$amount_id."' AND `has_amount`='".$has_amount."'");
     }
 
     public function checkTransaction($transaction_id, $explorer_url) {

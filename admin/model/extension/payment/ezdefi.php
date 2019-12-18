@@ -188,17 +188,18 @@ class ModelExtensionPaymentEzdefi extends Model {
 
     public function searchExceptions($keyword, $currency, $page, $limit) {
         $start = ($page-1) * $limit;
-        $sql = "select amount_id, currency, GROUP_CONCAT(exception.id , '--', IFNULL(order.order_id,'null'), '--', IFNULL(order.email,'null'), '--', ifnull(exception.expiration,'null'), '--', exception.paid, '--', exception.has_amount, '--', IFNULL(exception.explorer_url, 'null') ORDER BY paid DESC) group_order
-            from `".DB_PREFIX."ezdefi_exception` `exception`
-                left join `".DB_PREFIX."order` `order` on exception.order_id = order.order_id
-            where (order.email like '%".$keyword."%'
-                OR exception.order_id like '%".$keyword."%'
-                OR exception.amount_id like '%".$keyword."%')";
+        $sql = "select amount_id, currency, GROUP_CONCAT(exception.id , '--', IFNULL(order.order_id,'null'), '--', IFNULL(order.email,'null'), '--', ifnull(exception.expiration,'null'), '--', exception.paid, '--', exception.has_amount, '--', IFNULL(exception.explorer_url, 'null'), '--' , IFNULL(exception.unknown_tx_explorer_url, 'null')  ORDER BY paid DESC) group_order
+                from `".DB_PREFIX."ezdefi_exception` `exception`
+                    left join `".DB_PREFIX."order` `order` on exception.order_id = order.order_id
+                where (order.email like '%".$keyword."%'
+                    OR exception.order_id like '%".$keyword."%'
+                    OR exception.amount_id like '%".$keyword."%')";
         if($currency) {
             $sql .= " AND exception.currency = '".strtoupper($currency)."'";
         }
         $sql .= " group by exception.amount_id, exception.currency, exception.unknown_tx_explorer_url
-                    LIMIT ".$start.','.$limit;
+                ORDER BY exception.id DESC
+                LIMIT ".$start.','.$limit;
 
         $query = $this->db->query($sql);
         return $query->rows;
