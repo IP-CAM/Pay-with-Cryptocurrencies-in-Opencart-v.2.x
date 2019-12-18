@@ -154,6 +154,9 @@ $( function() {
 
     oc_ezdefi_admin.prototype.editCoinConfig = function() {
         if(!$(selectors.formConfig).valid()) return;
+        var thisElem = $(this);
+        $(this).prop('disabled', true);
+
 
         var url = $(this).data('url_edit');
         var coinId = $(this).data('coin_id');
@@ -198,6 +201,7 @@ $( function() {
                     $('#edit-safe-block-distant-' + coinId).val(oldSafeBlockDistant);
                     $('#edit-decimal-' + coinId).val(oldDecimal);
                 }
+                thisElem.prop('disabled', false);
             }
         });
     };
