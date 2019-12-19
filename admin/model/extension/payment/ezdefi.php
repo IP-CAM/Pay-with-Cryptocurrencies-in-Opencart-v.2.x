@@ -79,7 +79,7 @@ class ModelExtensionPaymentEzdefi extends Model {
                     "', `logo` = '" . $this->db->escape($coin_record['coin_logo']) .
                     "', `symbol` = '" . $this->db->escape($coin_record['coin_symbol']) .
                     "', `name` = '" . $this->db->escape($coin_record['coin_name']) .
-                    "', `discount` = '" .(int)$coin_record['coin_discount'] .
+                    "', `discount` = '" .(float)$coin_record['coin_discount'] .
                     "', `payment_lifetime` = '" . (int)$coin_record['coin_payment_life_time'].
                     "', `wallet_address` = '" . $this->db->escape($coin_record['coin_wallet_address']) .
                     "', `safe_block_distant` = '" . (int)$coin_record['coin_safe_block_distant'] .
@@ -92,7 +92,7 @@ class ModelExtensionPaymentEzdefi extends Model {
     }
 
     public function updateCoinConfig($dataUpdate) {
-         return $this->db->query("UPDATE `" . DB_PREFIX . "ezdefi_coin` SET `discount` = '" . (int)$dataUpdate['discount'] .
+         return $this->db->query("UPDATE `" . DB_PREFIX . "ezdefi_coin` SET `discount` = '" . (float)$dataUpdate['discount'] .
             "', `payment_lifetime` = '". (int)$dataUpdate['payment_lifetime'].
             "', `wallet_address` = '". $this->db->escape($dataUpdate['wallet_address']).
             "', `safe_block_distant` = '". (int)$dataUpdate['safe_block_distant'].

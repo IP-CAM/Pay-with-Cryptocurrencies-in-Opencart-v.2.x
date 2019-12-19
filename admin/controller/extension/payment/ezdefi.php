@@ -184,7 +184,7 @@ class ControllerExtensionPaymentEzdefi extends Controller {
                 if (isset($coin_data['coin_name']) && trim($coin_data['coin_name']) === '') {
                     $this->error['full_name'] = $this->language->get('error_full_name');
                 }
-                if (isset($coin_data['coin_discount']) && trim($coin_data['coin_discount']) !== '' && ($coin_data['coin_discount'] > 100 || $coin_data['coin_discount'] < 0 || !filter_var($coin_data['coin_discount'], FILTER_VALIDATE_INT) && filter_var($coin_data['coin_discount'], FILTER_VALIDATE_INT) !== 0)) {
+                if (isset($coin_data['coin_discount']) && trim($coin_data['coin_discount']) !== '' && ($coin_data['coin_discount'] > 100 || $coin_data['coin_discount'] < 0 )) {
                     $this->error['discount'] = $this->language->get('error_discount');
                 }
                 if (isset($coin_data['coin_payment_life_time']) && trim($coin_data['coin_payment_life_time']) !== '' && !filter_var($coin_data['coin_payment_life_time'], FILTER_VALIDATE_INT) && filter_var($coin_data['coin_payment_life_time'], FILTER_VALIDATE_INT) !== 0) {
