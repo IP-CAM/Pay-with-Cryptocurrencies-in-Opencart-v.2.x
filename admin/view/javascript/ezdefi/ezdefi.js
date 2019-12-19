@@ -40,7 +40,6 @@ $( function() {
         this.showSimplePayConfig();
         this.initSortable();
         this.initValidate();
-        this.initAllowInput();
     };
 
     oc_ezdefi_admin.prototype.initAllowInput = function() {
@@ -66,6 +65,7 @@ $( function() {
     };
 
     oc_ezdefi_admin.prototype.initValidate = function() {
+        this.initAllowInput();
         $.validator.addMethod("integer", function(value, element) {
             return this.optional( element ) || (Math.floor(value) == value && $.isNumeric(value) && value >= 0);
         }, "This field should be positive integer");
@@ -88,7 +88,7 @@ $( function() {
         this.validateAllInput(selectors.gatewayApiUrlInput, {url:true, required: true});
         this.validateAllInput(selectors.apiKeyInput, {required: true});
         this.validateAllInput(selectors.orderStatusInput, {required: true});
-        this.validateAllInput(selectors.coinDiscountInput, {max: 100, integer: true});
+        this.validateAllInput(selectors.coinDiscountInput, {max: 100, min:0, float: true});
         this.validateAllInput(selectors.coinNameInput, {required: true});
         this.validateAllInput(selectors.coinIdInput, {required: true});
         this.validateAllInput(selectors.coinOrderInput, {required: true});
@@ -142,7 +142,7 @@ $( function() {
                 var data = JSON.parse(response).data;
                 if(data.status === 'success') {
                     alert(data.message);
-                    $('#modal-delete-'+coinId).modal('toggle');
+                    $('#modal-delete-'+coinId).modal('hide');
                     $('#config-row-' + coinId).remove();
                     $("#modal-edit-"+coinId).remove();
                 } else {
@@ -182,12 +182,12 @@ $( function() {
                 if(data.status === 'success') {
                     alert(data.message);
                     discount = discount === '' ? 0 : discount;
-                    $('#config-row-'+coinId).find('.coin-discount').html(discount +'%');
+                    $('#config-row-'+coinId).find('.coin-discount').html(discount);
                     $('#config-row-'+coinId).find('.coin-payment-lifetime').html(paymentLifetime ? paymentLifetime : 0);
                     $('#config-row-'+coinId).find('.coin-wallet-address').html(walletAddress);
                     $('#config-row-'+coinId).find('.coin-safe-block-distant').html(safeBlockDistant ? safeBlockDistant : 0);
                     $('#config-row-'+coinId).find('.coin-decimal').html(decimal ? decimal : 0);
-                    $('#modal-edit-' + coinId).modal('toggle');
+                    $('#modal-edit-' + coinId).modal('hide')
                 } else {
                     alert(data.message);
                     var oldDiscount = $('#config-row-'+coinId).find('.coin-discount').html();
@@ -316,7 +316,7 @@ $( function() {
                 <td>${data.name} <input type="hidden" class="${this.formatSelectorToClassName(selectors.coinNameInput)}" value="${data.name}" name="${data._id}[coin_name]"> </td>
                 <td>
                     <div class="row">
-                        <div class="col-sm-10"><input type="number" class="form-control ${this.formatSelectorToClassName(selectors.coinDiscountInput)} only-positive-integer" name="${data._id}[coin_discount]"></div>
+                        <div class="col-sm-10"><input type="number" class="form-control ${this.formatSelectorToClassName(selectors.coinDiscountInput)} validate-float" name="${data._id}[coin_discount]"></div>
                         <div class="col-sm-2 text-left"></div>
                     </div>
                 </td>
