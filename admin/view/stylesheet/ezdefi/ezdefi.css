@@ -56,6 +56,16 @@
     display: block;
 }
 
+.search-exception-input {
+    border-radius: 5px;
+    padding: 4px;
+    border-color: #999;
+    padding-left: 8px;
+    padding-right: 20px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .config-content-tab, .exception-content-tab {
     display: none;
 }

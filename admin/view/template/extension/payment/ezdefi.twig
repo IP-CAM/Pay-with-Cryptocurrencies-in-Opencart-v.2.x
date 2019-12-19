@@ -4,6 +4,7 @@
     <input type="hidden" id="url-add-order-history" value="{{ url_add_order_history }}">
     <input type="hidden" id="url-delete-exception-by-order-id" value="{{ url_delete_exception_by_order_id }}">
     <input type="hidden" id="url-get-order-pending" value="{{ url_get_order_pending }}">
+    <input type="hidden" id="url-revert-order-exception" value="{{ url_revert_order_exception }}">
     {# Ezdefi header #}
     <div class="page-header">
         <div class="container-fluid">
@@ -197,6 +198,8 @@
         {# Payment exception #}
         <div class="panel panel-defaul exception-content-tab">
             <input type="hidden" id="url-search-exceptions" value="{{ url_search_exceptions }}">
+            <input type="hidden" id="current-page-exception" value="1">
+            <input type="hidden" id="total-number-exception" value="">
             <div class="panel-heading">
                 <h3 class="panel-title"><i class="fa fa-pencil"></i> {{tab_edit_general}} </h3>
             </div>
@@ -216,7 +219,9 @@
                 </div>
                 <br>
                 <div class="ezdefi-search-box">
-                    <input type="text" id="exception-search-input" placeholder="Search by order id, email or amount id">
+                    <input type="text" id="exception-search-by-amount" placeholder="Enter amount" class="search-exception-input">
+                    <input type="text" id="exception-search-by-order" placeholder="Enter order id" class="search-exception-input">
+                    <input type="text" id="exception-search-by-email" placeholder="Enter email" class="search-exception-input">
                 </div>
                 <div class="data-container"></div>
                 <div id="exception-content-box">
@@ -256,6 +261,7 @@
                             <p>Do you want to confirm this order</p>
                             <input type="text" id="exception-id--confirm">
                             <input type="text" id="exception-order-id--confirm">
+                            <input type="checkbox" id="confirm-dialog-assign">
                         </div>
                         <div class="modal-footer" style="text-align: center">
                             <button type="button" class="btn btn-danger" data-dismiss="modal">{{ button_close }}</button>

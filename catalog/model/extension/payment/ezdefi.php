@@ -5,6 +5,7 @@ class ModelExtensionPaymentEzdefi extends Model {
     const HAS_AMOUNT = 1;
     const NO_AMOUNT = 0;
     const MAX_AMOUNT_DECIMAL = 14;
+    const MIN_SECOND_REUSE = 10;
 
 	public function getMethod($address, $total) {
 		$this->load->language('extension/payment/ezdefi');
@@ -94,21 +95,33 @@ class ModelExtensionPaymentEzdefi extends Model {
     }
 
     public function createAmountId($currency, $amount, $expiration, $decimal, $variation) {
-        $this->db->query("START TRANSACTION;");
-        $this->db->query("INSERT INTO `".DB_PREFIX."ezdefi_amount` (`temp`, `amount`, `tag_amount`, `expiration`, `currency`)
+	    $oldAmount = $this->db->query("SELECT `tag_amount`, `id`
+                                            from `".DB_PREFIX."ezdefi_amount` 
+                                            where `currency`='".$currency."' 
+                                                AND `amount`='".$amount."' 
+                                                AND `expiration` < DATE_ADD(NOW(), INTERVAL ".self::MIN_SECOND_REUSE." SECOND) 
+                                            order by `tag_amount` 
+                                            LIMIT 1;");
+	    if ($oldAmount->row) {
+            $this->db->query("UPDATE `". DB_PREFIX . "ezdefi_amount` SET `expiration`='".$expiration."' WHERE `id`=".$oldAmount->row['id']);
+            return $oldAmount->row['tag_amount'];
+        } else {
+            $this->db->query("START TRANSACTION;");
+            $this->db->query("INSERT INTO `".DB_PREFIX."ezdefi_amount` (`temp`, `amount`, `tag_amount`, `expiration`, `currency`)
                             SELECT (case when(MIN(t1.temp + 1) is null) then 0 else MIN(t1.temp + 1) end) as `temp`, " .$amount." as `amount`, ".$amount." + (CASE WHEN(MIN(t1.temp + 1) is NULL) THEN 0 WHEN(MIN(t1.temp+1)%2 = 0) then MIN(t1.temp+1)/2 else -(MIN(t1.temp+1)+1)/2 end) * pow(10, -".$decimal.") as `tag_amount`,'".$expiration."' as `expiration`, '".$currency. "' as `currency`
                             FROM `".DB_PREFIX."ezdefi_amount` t1
                             LEFT JOIN `".DB_PREFIX."ezdefi_amount` t2 ON t1.temp + 1 = t2.temp and t1.amount = t2.amount
                             WHERE t2.temp IS NULL
                                 AND t1.amount = ROUND(" .$amount.", ".self::MAX_AMOUNT_DECIMAL.");");
-        $amount_id = $this->db->query("select tag_amount from `".DB_PREFIX."ezdefi_amount` where `currency` = '" .$currency."' AND `amount`=ROUND(" .$amount.", ".self::MAX_AMOUNT_DECIMAL.") ORDER BY id DESC LIMIT 1;");
-        $this->db->query("COMMIT;");
-        $variationValue = abs($amount_id->row['tag_amount'] - $amount);
+            $amount_id = $this->db->query("select tag_amount from `".DB_PREFIX."ezdefi_amount` where `currency` = '" .$currency."' AND `amount`=ROUND(" .$amount.", ".self::MAX_AMOUNT_DECIMAL.") ORDER BY id DESC LIMIT 1;");
+            $this->db->query("COMMIT;");
+            $variationValue = abs($amount_id->row['tag_amount'] - $amount);
 
-        if ($variationValue > ($amount * (float)$variation) / 100 ) {
-            return false;
+            if ($variationValue > ($amount * (float)$variation) / 100 ) {
+                return false;
+            }
+            return $amount_id->row['tag_amount'];
         }
-        return $amount_id->row['tag_amount'];
     }
 
     public function getCoinConfigByEzdefiCoinId($coin_id) {
