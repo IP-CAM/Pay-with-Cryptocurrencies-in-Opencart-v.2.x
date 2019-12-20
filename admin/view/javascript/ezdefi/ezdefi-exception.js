@@ -84,7 +84,6 @@ $(function () {
                     var hasAmount = exceptionRecord.has_amount;
                     var explorerUrl = exceptionRecord.explorer_url;
                     let orderItem = "<div>";
-                    console.log(orderId, exceptionId);
                     if(orderId == null) {
                         amountId += `<p><a class="exception-order-info__explorer-url" href="${explorerUrl}" target="_blank">${language.viewTransactionDetail}</a></p>`;
                     } else {
@@ -118,7 +117,7 @@ $(function () {
                                              <select class="form-control all_order_pending" style="width: 300px" data-list_coin_url="${urlGetAllOrderPending}" id="exception-select-order-${tmp}" data-tmp="${tmp}"></select>
                                         </div>
                                         <div class="exception-order-button-box">
-                                            <button class="btn btn-info btn-assign-order" id="btn-assign-order-${tmp}" data-toggle="modal" data-target="#confirm-paid-order-exception" data-exception-id="${exceptionId}" data-order-id="" style="opacity: 0">Assign</button>
+                                            <button class="btn btn-info btn-assign-order" id="btn-assign-order-${tmp}" data-toggle="modal" data-target="#confirm-paid-order-exception" data-exception-id="${exceptionId}" data-old-order-id="${orderId}" data-order-id="" style="opacity: 0">Assign</button>
                                         </div>
                                     </div>
                                 </div>`;
@@ -159,6 +158,7 @@ $(function () {
             let orderId = $(this).data('order-id');
             $("#exception-id--confirm").val(exceptionId);
             $("#exception-order-id--confirm").val(orderId);
+            $("#exception-old-order-id--confirm").val();
             $("#confirm-dialog-assign").prop('checked', false);
             $(".exception-loading-icon__confirm-paid").css('display', 'none');
         });
@@ -185,9 +185,11 @@ $(function () {
     oc_ezdefi_exception.prototype.addAssignOrderListener = function() {
         $(".btn-assign-order").click(function () {
             let orderId = $(this).data('order-id');
+            let oldOrderId = $(this).data('old-order-id');
             let exceptionId = $(this).data('exception-id');
             $("#exception-order-id--confirm").val(orderId);
             $("#exception-id--confirm").val(exceptionId);
+            $("#exception-old-order-id--confirm").val(oldOrderId);
             $("#confirm-dialog-assign").prop('checked', true);
             $(".exception-loading-icon__confirm-paid").css('display', 'none');
         })
@@ -266,23 +268,27 @@ $(function () {
             },
             success: function (response) {
                 let isAssign = $("#confirm-dialog-assign").prop('checked');
-                if(isAssign) {
+                let oldOrderId = $("#exception-old-order-id--confirm").val();
+                if(isAssign && oldOrderId) {
+                    that.deleteExceptionByOrderId(oldOrderId);
+                } else if( isAssign && !oldOrderId) {
                     that.deleteException(null, exceptionId);
                 } else {
                     that.deleteExceptionByOrderId(orderId);
                 }
-                // if (exceptionId) that.deleteException(null, exceptionId);
                 $("#confirm-paid-order-exception").modal('toggle');
                 $("#btn-confirm-paid-exception").prop('disabled', false);
             },
             error: function () {
                 let isAssign = $("#confirm-dialog-assign").prop('checked');
-                if(isAssign) {
+                let oldOrderId = $("#exception-old-order-id--confirm").val();
+                if(isAssign && oldOrderId) {
+                    that.deleteExceptionByOrderId(oldOrderId);
+                } else if( isAssign && !oldOrderId) {
                     that.deleteException(null, exceptionId);
                 } else {
                     that.deleteExceptionByOrderId(orderId);
                 }
-                // if (exceptionId) that.deleteException(null, exceptionId);
                 $("#confirm-paid-order-exception").modal('toggle');
                 $("#btn-confirm-paid-exception").prop('disabled', false);
             }
