@@ -60,7 +60,6 @@ $(function () {
                 }
             },
             callback: function(response, pagination) {
-                // var exceptionRecords = that.convertExceptionResponse(response);
                 $("#current-page-exception").val(pagination.pageNumber);
                 var dataHtml = `<table class="table">
                         <thead>

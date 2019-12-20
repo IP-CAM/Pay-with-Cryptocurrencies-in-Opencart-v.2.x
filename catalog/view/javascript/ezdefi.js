@@ -47,6 +47,10 @@ $(function () {
         $(selectors.btnGetQrCode).prop("disabled", true);
         $("#check-created-payment--simple").prop('checked', false);
         $("#check-created-payment--escrow").prop('checked', false);
+        $("label.ezdefi-change-coin-item").css({
+            border: '1px solid #d8d8d8',
+            background: 'inherit'
+        });
     });
 
     $(selectors.coinSelectedToPaymentInput).click(function () {
@@ -105,8 +109,14 @@ $(function () {
 
     $(".select-coin-checkbox").change(function () {
         var inputId = $(".select-coin-checkbox:checked").attr('id');
-        $("label.ezdefi-change-coin-item").css('border', '1px solid #d8d8d8');
-        $("label.ezdefi-change-coin-item[for='"+inputId+"']").css('border', '2px solid lightskyblue')
+        $("label.ezdefi-change-coin-item").css({
+            border: '1px solid #d8d8d8',
+            background: 'inherit'
+        });
+        $("label.ezdefi-change-coin-item[for='"+inputId+"']").css({
+            border: '2px solid #54bdff',
+            background: '#c0dcf9db'
+        });
     });
 
     $(".btn-copy-address").click(function () {

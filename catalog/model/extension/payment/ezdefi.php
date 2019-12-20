@@ -59,7 +59,7 @@ class ModelExtensionPaymentEzdefi extends Model {
         $price = $order_info['total'] - ($order_info['total'] * $coin_config['discount']/100);             // get discount price for this order
         $exchange_rate = $this->sendCurl("/token/exchange/".$order_info['currency_code']."%3A".$coin_config['symbol'], 'GET');
         $this->addException($order_info['order_id'], strtoupper($coin_config['symbol']), $price * json_decode($exchange_rate)->data, $coin_config['payment_lifetime'], self::NO_AMOUNT);
-        $params = "?uoid=".$order_info['order_id']."-0&to=".$coin_config['wallet_address']."&value=".$price."&currency=".$order_info['currency_code']."%3A".$coin_config['symbol']."&callback=".urlencode($callback);
+        $params = "?uoid=".$order_info['order_id']."-0&to=".$coin_config['wallet_address']."&value=".$price."&currency=".$order_info['currency_code']."%3A".$coin_config['symbol']."&safedist=".$coin_config['safe_block_distant']."&callback=".urlencode($callback);
         if($coin_config['payment_lifetime'] > 0) {
             $params .= "&duration=".$coin_config['payment_lifetime'];
         }
@@ -82,7 +82,7 @@ class ModelExtensionPaymentEzdefi extends Model {
         $amount_id = $this->createAmountId($coin_config['symbol'], $amount, $coin_config['payment_lifetime'], $coin_config['decimal'], $this->config->get('payment_ezdefi_variation'));
         if($amount_id) {
             $this->addException($order_info['order_id'], strtoupper($coin_config['symbol']), $amount_id, $coin_config['payment_lifetime'], self::HAS_AMOUNT);
-            $params = "?amountId=true&uoid=".$order_info['order_id']."-1&to=".$coin_config['wallet_address']."&value=".$amount_id."&currency=".$coin_config['symbol']."%3A".$coin_config['symbol']."&callback=".urlencode($callback);
+            $params = "?amountId=true&uoid=".$order_info['order_id']."-1&to=".$coin_config['wallet_address']."&value=".$amount_id."&currency=".$coin_config['symbol']."%3A".$coin_config['symbol']."&safedist=".$coin_config['safe_block_distant']."&callback=".urlencode($callback);
             if($coin_config['payment_lifetime'] > 0) {
                 $params .= "&duration=".$coin_config['payment_lifetime'];
             }
