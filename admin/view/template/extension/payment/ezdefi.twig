@@ -259,10 +259,10 @@
                         </div>
                         <div class="modal-body">
                             <p>{{ text_ask_confirm_order }}</p>
-                            <input type="text" id="exception-id--confirm">
-                            <input type="text" id="exception-order-id--confirm">
-                            <input type="checkbox" id="confirm-dialog-assign">
-                            <input type="text" id="exception-old-order-id--confirm">
+                            <input type="hidden" id="exception-id--confirm">
+                            <input type="hidden" id="exception-order-id--confirm">
+                            <input type="checkbox" id="confirm-dialog-assign" class="hidden">
+                            <input type="hidden" id="exception-old-order-id--confirm">
                         </div>
                         <div class="modal-footer" style="text-align: center">
                             <button type="button" class="btn btn-danger" data-dismiss="modal">{{ button_close }}</button>
