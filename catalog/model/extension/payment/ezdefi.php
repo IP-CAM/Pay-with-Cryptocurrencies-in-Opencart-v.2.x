@@ -97,7 +97,8 @@ class ModelExtensionPaymentEzdefi extends Model {
                                             from `".DB_PREFIX."ezdefi_amount` 
                                             where `currency`='".$currency."' 
                                                 AND `amount`='".$amount."' 
-                                                AND `expiration` < DATE_SUB(NOW(), INTERVAL ".self::MIN_SECOND_REUSE." SECOND) 
+                                                AND `expiration` < DATE_SUB(NOW(), INTERVAL ".self::MIN_SECOND_REUSE." SECOND)
+                                                AND ( `decimal` = ".(int)$decimal." OR `temp` = 0 )
                                             order by `temp` 
                                             LIMIT 1;");
 	    if ($oldAmount->row) {
@@ -105,8 +106,11 @@ class ModelExtensionPaymentEzdefi extends Model {
             return $oldAmount->row['tag_amount'];
         } else {
             $this->db->query("START TRANSACTION;");
-            $this->db->query("INSERT INTO `".DB_PREFIX."ezdefi_amount` (`temp`, `amount`, `tag_amount`, `expiration`, `currency`)
-                            SELECT (case when(MIN(t1.temp + 1) is null) then 0 else MIN(t1.temp + 1) end) as `temp`, " .$amount." as `amount`, ".$amount." + (CASE WHEN(MIN(t1.temp + 1) is NULL) THEN 0 WHEN(MIN(t1.temp+1)%2 = 0) then MIN(t1.temp+1)/2 else -(MIN(t1.temp+1)+1)/2 end) * pow(10, -".$decimal.") as `tag_amount`, DATE_ADD(NOW(), INTERVAL ".$expiration." SECOND) as `expiration`, '".$currency. "' as `currency`
+            $this->db->query("INSERT INTO `".DB_PREFIX."ezdefi_amount` (`temp`, `amount`, `tag_amount`, `expiration`, `currency`, `decimal`)
+                            SELECT (case when(MIN(t1.temp + 1) is null) then 0 else MIN(t1.temp + 1) end) as `temp`, " .$amount." as `amount`, 
+                                ".$amount." + (CASE WHEN(MIN(t1.temp + 1) is NULL) THEN 0 WHEN(MIN(t1.temp+1)%2 = 0) then MIN(t1.temp+1)/2 else -(MIN(t1.temp+1)+1)/2 end) * pow(10, -".$decimal.") as `tag_amount`, DATE_ADD(NOW(),
+                                 INTERVAL ".$expiration." SECOND) as `expiration`,
+                                  '".$currency. "' as `currency`, ".(int)$decimal." as `decimal`
                             FROM `".DB_PREFIX."ezdefi_amount` t1
                             LEFT JOIN `".DB_PREFIX."ezdefi_amount` t2 ON t1.temp + 1 = t2.temp and t1.amount = t2.amount
                             WHERE t2.temp IS NULL
