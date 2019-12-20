@@ -78,7 +78,11 @@ class ControllerExtensionPaymentEzdefi extends Controller {
             if($payment['status'] == 'DONE') {
                 $this->load->model('checkout/order');
                 $message = 'Payment ID: '. $this->request->get['paymentid'] .', Status: '.$payment['status'].' Has amountId:'. ($has_amount_id ? 'true' : 'false');
-                $this->model_extension_payment_ezdefi->setPaidForException($order_id, $payment['currency'], $payment['value'], self::PAID_IN_TIME, $has_amount_id, $payment['explorer_url']);
+                if ($has_amount_id == 1) {
+                    $this->model_extension_payment_ezdefi->setPaidForException($order_id, $payment['currency'], $payment['value'], self::PAID_IN_TIME, $has_amount_id, $payment['explorer_url']);
+                } else {
+                    $this->model_extension_payment_ezdefi->deleteExceptionByOrderId($order_id);
+                }
                 $this->model_checkout_order->addOrderHistory($order_id, $payment['code'],  $message, false);
             }
             if($payment['status'] == 'EXPIRED_DONE') {

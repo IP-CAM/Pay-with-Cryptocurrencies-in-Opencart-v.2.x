@@ -177,6 +177,10 @@ class ModelExtensionPaymentEzdefi extends Model {
         return;
 	}
 
+	public function deleteExceptionByOrderId($order_id) {
+        $this->db->query("DELETE FROM `".DB_PREFIX."ezdefi_exception` WHERE `order_id`=".$order_id);
+    }
+
     // --------------------------------------------------------End exception model-----------------------------------------------------------
     public function sendCurl($api, $method) {
         $this->load->model('setting/setting');
