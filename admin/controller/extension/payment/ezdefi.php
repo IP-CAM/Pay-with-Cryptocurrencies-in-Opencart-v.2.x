@@ -23,6 +23,7 @@ class ControllerExtensionPaymentEzdefi extends Controller {
         $data['url_delete_exception_by_order_id'] = $this->url->link('extension/payment/ezdefi/deleteExceptionByOrderId', 'user_token=' . $this->session->data['user_token'], true);
         $data['url_search_exceptions'] = $this->url->link('extension/payment/ezdefi/searchExceptions', 'user_token=' . $this->session->data['user_token'], true);
         $data['url_get_order_pending'] = $this->url->link('extension/payment/ezdefi/getAllOrderPending', 'user_token=' . $this->session->data['user_token'], true);
+        $data['url_revert_order_exception'] = $this->url->link('extension/payment/ezdefi/revertOrderException', 'user_token=' . $this->session->data['user_token'], true);
 
         if($this->config->has('payment_ezdefi_status')){
             $data['payment_ezdefi_status'] = $this->config->get('payment_ezdefi_status');
@@ -289,15 +290,25 @@ class ControllerExtensionPaymentEzdefi extends Controller {
 
     public function searchExceptions () {
         $this->load->model('extension/payment/ezdefi');
-        $keyword = isset($this->request->get['keyword']) ? $this->request->get['keyword'] : '';
         $currency = isset($this->request->get['currency']) ? $this->request->get['currency'] : '';
         $page = isset($this->request->get['pageNumber']) ? $this->request->get['pageNumber'] : 1;
+        $keyword_amount = isset($this->request->get['amount']) ? $this->request->get['amount'] : '';
+        $keyword_order_id = isset($this->request->get['order_id']) ? $this->request->get['order_id'] : '';
+        $keyword_email = isset($this->request->get['email']) ? $this->request->get['email'] : '';
 
-        $exceptions = $this->model_extension_payment_ezdefi->searchExceptions($keyword, $currency, $page, self::LIMIT_EXCEPTION_IN_PAGE);
-        $total_exceptions = $this->model_extension_payment_ezdefi->getTotalException($keyword, $currency);
+        $exceptions = $this->model_extension_payment_ezdefi->searchExceptions($keyword_amount, $keyword_order_id, $keyword_email, $currency, $page, self::LIMIT_EXCEPTION_IN_PAGE);
+        $total_exceptions = $this->model_extension_payment_ezdefi->getTotalException($keyword_amount, $keyword_order_id, $keyword_email, $currency);
         $result = ['exceptions' => $exceptions, 'total_exceptions' => $total_exceptions];
 
         return $this->response->setOutput(json_encode($result));
+    }
+
+    public function revertOrderException () {
+        $this->load->model('extension/payment/ezdefi');
+        $exception_id = isset($this->request->post['exception_id']) ? $this->request->post['exception_id'] : '';
+        $this->model_extension_payment_ezdefi->revertOrderException($exception_id);
+
+        return $this->response->setOutput(json_encode(['status'=> 'success']));
     }
 
     public function getAllOrderPending() {

@@ -12,11 +12,13 @@ $(function () {
     var global = {};
 
     var oc_ezdefi_exception = function () {
-        this.loadException();
+        this.searchException();
         $("#btn-delete-exception").click(this.deleteException.bind(this));
         $("#btn-confirm-paid-exception").click(this.confirmPaidException.bind(this));
         $("#btn-revert-order").click(this.revertOrder.bind(this));
-        $("#exception-search-input").keyup(this.searchException.bind(this));
+        $("#exception-search-by-amount").change(this.searchException.bind(this));
+        $("#exception-search-by-order").change(this.searchException.bind(this));
+        $("#exception-search-by-email").change(this.searchException.bind(this));
         $("input[name='filter-by-currency']").change(this.searchException.bind(this));
         $(".tab-radio-input").change(this.selectTabListener);
         this.detectTabToShow();
@@ -37,35 +39,29 @@ $(function () {
         });
     };
 
-    oc_ezdefi_exception.prototype.loadException = function (keyword = '') {
+    oc_ezdefi_exception.prototype.searchException = function (page = 1, totalNumber = null) {
         var that = this;
         var container = $("#exception-content-box");
+        var keywordAmount = $("#exception-search-by-amount").val();
+        var keywordOrder = $("#exception-search-by-order").val();
+        var keywordEmail = $("#exception-search-by-email").val();
         var urlGetException = $("#url-search-exceptions").val();
         var urlGetAllOrderPending = $("#url-get-order-pending").val();
         var currency = $("input[name='filter-by-currency']:checked").val() ? $("input[name='filter-by-currency']:checked").val() : '';
-        container.pagination({
-            dataSource: urlGetException + '&keyword=' +keyword + '&currency=' + currency,
+
+        var paginationObject = {
+            dataSource: urlGetException + '&amount=' +keywordAmount + '&order_id='+ keywordOrder + '&email=' + keywordEmail + '&currency=' + currency,
             locator: 'items.exceptions',
-            // totalNumber: totalNumber,
-            totalNumberLocator: function(response) {
-                // you can return totalNumber by analyzing response content
-                return response.total_exceptions;
-            },
+            pageNumber: page,
             pageSize: 10,
-            showPageNumbers: true,
-            showPrevious: true,
-            showNext: true,
-            showNavigator: true,
-            showFirstOnEllipsisShow: true,
-            showLastOnEllipsisShow: true,
             ajax: {
                 beforeSend: function() {
                     container.prev().html('Loading data from server ...');
                 }
             },
             callback: function(response, pagination) {
-                console.log(response, pagination);
-                var exceptionRecords = that.convertExceptionResponse(response);
+                // var exceptionRecords = that.convertExceptionResponse(response);
+                $("#current-page-exception").val(pagination.pageNumber);
                 var dataHtml = `<table class="table">
                         <thead>
                         <tr>
@@ -77,33 +73,29 @@ $(function () {
                         </thead>
                         <tbody>`;
                 let tmp = (pagination.pageNumber - 1) * pagination.pageSize + 1;
-                $.each(exceptionRecords, function (exceptionKey, groupException) {
-                    let currency = groupException.currency;
-                    let amountId = groupException.amount_id;
-                    let unknownTxExceptionId = '';
+                $.each(response, function (exceptionKey, exceptionRecord) {
+                    let currency = exceptionRecord.currency;
+                    let amountId = exceptionRecord.amount_id;
+                    var exceptionId = exceptionRecord.id;
+                    var orderId = exceptionRecord.order_id;
+                    var email = exceptionRecord.email;
+                    var expiration = exceptionRecord.expiration;
+                    var paidStatus = exceptionRecord.paid;
+                    var hasAmount = exceptionRecord.has_amount;
+                    var explorerUrl = exceptionRecord.explorer_url;
                     let orderItem = "<div>";
-                    $.each(groupException.orders, function (key, exceptionData) {
-                        var exceptionId = exceptionData[0];
-                        var orderId = exceptionData[1];
-                        var email = exceptionData[2];
-                        var expiration = exceptionData[3];
-                        var paidStatus = exceptionData[4];
-                        var hasAmount = exceptionData[5];
-                        var explorerUrl = exceptionData[6];
-                        var unknownTxExplorerUrl = exceptionData[7];
-
-                        if(orderId === "null" && explorerUrl !== "null") {
-                            amountId += `<p><a class="exception-order-info__explorer-url" href="${unknownTxExplorerUrl}" target="_blank">${language.viewTransactionDetail}</a></p>`
-                            unknownTxExceptionId =  exceptionId;
+                    console.log(orderId, exceptionId);
+                    if(orderId == null) {
+                        amountId += `<p><a class="exception-order-info__explorer-url" href="${explorerUrl}" target="_blank">${language.viewTransactionDetail}</a></p>`;
+                    } else {
+                        if(paidStatus === '0') {
+                            var paymentStatus = 'Have not paid';
+                        } else if(paidStatus === '1') {
+                            var paymentStatus = 'Paid on time';
                         } else {
-                            if(paidStatus === '0') {
-                                var paymentStatus = 'Have not paid';
-                            } else if(paidStatus === '1') {
-                                var paymentStatus = 'Paid on time';
-                            } else {
-                                var paymentStatus = 'Paid on expiration';
-                            }
-                            orderItem += `<div id="exception-${exceptionId}" class="order-${orderId} exception-order-box ${key%2 ? 'background-grey' : ''}">
+                            var paymentStatus = 'Paid on expiration';
+                        }
+                        orderItem += `<div id="exception-${exceptionId}" class="order-${orderId} exception-order-box">
                             <div class="exception-order-info">
                                 <p><span class="exception-order-label-1">${language.orderId}:</span> <span class="exception-order-info__data"> ${orderId} </span></p>
                                 <p><span class="exception-order-label-1">${language.email}:</span> <span class="exception-order-info__data">${email} </span></p>
@@ -113,21 +105,20 @@ $(function () {
                                 <p class="${explorerUrl == '' ? 'hidden':''}"><span class="exception-order-label-1">Explorer url:</span><a class="exception-order-info__explorer-url" href="${explorerUrl}" target="_blank">${language.viewTransactionDetail}</a></p>
                             </div>
                             <div class="exception-order-button-box">`;
-                            orderItem += paidStatus == 1 ? `<button class="btn btn-primary btn-revert-order" data-toggle="modal" data-target="#modal-revert-order-exception" data-exception-id="${exceptionId}" data-order-id="${orderId}">${language.revert}</button>
+                        orderItem += paidStatus == 1 ? `<button class="btn btn-primary btn-revert-order" data-toggle="modal" data-target="#modal-revert-order-exception" data-exception-id="${exceptionId}" data-order-id="${orderId}">${language.revert}</button>
                                                             <button class="btn btn-danger btn-delete-exception" data-toggle="modal" data-target="#delete-order-exception" data-exception-id="${exceptionId}">${language.delete}</button>` : '';
-                            orderItem += paidStatus != 1 ? `<button class="btn btn-danger btn-delete-exception" data-toggle="modal" data-target="#delete-order-exception" data-exception-id="${exceptionId}">${language.delete}</button>
+                        orderItem += paidStatus != 1 ? `<button class="btn btn-danger btn-delete-exception" data-toggle="modal" data-target="#delete-order-exception" data-exception-id="${exceptionId}">${language.delete}</button>
                                                             <button class="btn btn-primary btn-confirm-paid" data-toggle="modal" data-target="#confirm-paid-order-exception" data-exception-id="${exceptionId}" data-order-id="${orderId}">${language.confirmPaid}</button>` : ''
-                            orderItem +=`
+                        orderItem +=`
                                     </div>
                                 </div>`;
-                        }
-                    });
+                    }
                     orderItem += `<div class="exception-order-box">
                                         <div class="exception-order-info">
                                              <select class="form-control all_order_pending" style="width: 300px" data-list_coin_url="${urlGetAllOrderPending}" id="exception-select-order-${tmp}" data-tmp="${tmp}"></select>
                                         </div>
                                         <div class="exception-order-button-box">
-                                            <button class="btn btn-info btn-assign-order" id="btn-assign-order-${tmp}" data-toggle="modal" data-target="#confirm-paid-order-exception" data-exception-id="${unknownTxExceptionId}" data-order-id="" style="opacity: 0">Assign</button>
+                                            <button class="btn btn-info btn-assign-order" id="btn-assign-order-${tmp}" data-toggle="modal" data-target="#confirm-paid-order-exception" data-exception-id="${exceptionId}" data-order-id="" style="opacity: 0">Assign</button>
                                         </div>
                                     </div>
                                 </div>`;
@@ -148,7 +139,18 @@ $(function () {
                 that.addRevertOrderListener();
                 that.initSelectOrder();
             }
-        });
+        };
+        if (totalNumber) {
+            paginationObject.totalNumber = totalNumber;
+        } else {
+            paginationObject.totalNumberLocator = function(response) {
+                // you can return totalNumber by analyzing response content
+                $("#total-number-exception").val(response.total_exceptions);
+                return response.total_exceptions;
+            }
+        }
+
+        container.pagination(paginationObject);
     };
 
     oc_ezdefi_exception.prototype.addConfirmPaidListener = function (data) {
@@ -157,6 +159,7 @@ $(function () {
             let orderId = $(this).data('order-id');
             $("#exception-id--confirm").val(exceptionId);
             $("#exception-order-id--confirm").val(orderId);
+            $("#confirm-dialog-assign").prop('checked', false);
             $(".exception-loading-icon__confirm-paid").css('display', 'none');
         });
     };
@@ -185,6 +188,7 @@ $(function () {
             let exceptionId = $(this).data('exception-id');
             $("#exception-order-id--confirm").val(orderId);
             $("#exception-id--confirm").val(exceptionId);
+            $("#confirm-dialog-assign").prop('checked', true);
             $(".exception-loading-icon__confirm-paid").css('display', 'none');
         })
     };
@@ -201,6 +205,7 @@ $(function () {
     };
 
     oc_ezdefi_exception.prototype.deleteException = function (e, exceptionId = null) {
+        var that = this;
         if(exceptionId == null) {
             exceptionId = $("#exception-id--delete").val();
         }
@@ -214,21 +219,31 @@ $(function () {
                 $(".exception-loading-icon__delete").css('display', 'inline-block');
             },
             success: function (response) {
-                $("#exception-"+exceptionId).hide(500, function () {
-                    let contSiblings = $("#exception-"+exceptionId).siblings().length;
-                    if(contSiblings <= 1) {
-                        $("#exception-"+exceptionId).parent().parent().parent().remove();
-                    } else {
-                        $("#exception-"+exceptionId).remove();
-                    }
-                });
                 if ($('#delete-order-exception').hasClass('in')) {
                     $('#delete-order-exception').modal('toggle');
                 }
                 $("#btn-delete-exception").prop('disabled', false);
+                let page = $("#current-page-exception").val();
+                let totalNumber = $("#total-number-exception").val();
+                that.searchException(page, totalNumber);
             },
             error: function () {
                 $("#btn-delete-exception").prop('disabled', false);
+            }
+        });
+    };
+
+    oc_ezdefi_exception.prototype.deleteExceptionByOrderId = function (orderId) {
+        var that = this;
+        let urlDeleteExceptionByOrderId = $("#url-delete-exception-by-order-id").val();
+        $.ajax({
+            url: urlDeleteExceptionByOrderId,
+            method: "POST",
+            data: { order_id: orderId},
+            success: function (response) {
+                let page = $("#current-page-exception").val();
+                let totalNumber = $("#total-number-exception").val();
+                that.searchException(page, totalNumber);
             }
         });
     };
@@ -250,14 +265,24 @@ $(function () {
                 $(".exception-loading-icon__confirm-paid").css('display', 'inline-block');
             },
             success: function (response) {
-                // that.deleteExceptionByOrderId(orderId);
-                if (exceptionId) that.deleteException(null, exceptionId);
+                let isAssign = $("#confirm-dialog-assign").prop('checked');
+                if(isAssign) {
+                    that.deleteException(null, exceptionId);
+                } else {
+                    that.deleteExceptionByOrderId(orderId);
+                }
+                // if (exceptionId) that.deleteException(null, exceptionId);
                 $("#confirm-paid-order-exception").modal('toggle');
                 $("#btn-confirm-paid-exception").prop('disabled', false);
             },
             error: function () {
-                // that.deleteExceptionByOrderId(orderId);
-                if (exceptionId) that.deleteException(null, exceptionId);
+                let isAssign = $("#confirm-dialog-assign").prop('checked');
+                if(isAssign) {
+                    that.deleteException(null, exceptionId);
+                } else {
+                    that.deleteExceptionByOrderId(orderId);
+                }
+                // if (exceptionId) that.deleteException(null, exceptionId);
                 $("#confirm-paid-order-exception").modal('toggle');
                 $("#btn-confirm-paid-exception").prop('disabled', false);
             }
@@ -281,7 +306,7 @@ $(function () {
                 $(".exception-loading-icon__revert").css('display', 'inline-block');
             },
             success: function (response) {
-                that.deleteException(null, exceptionId);
+                that.revertException(exceptionId);
                 $("#modal-revert-order-exception").modal('toggle');
                 $("#btn-revert-order").prop('disabled', false);
             },
@@ -293,10 +318,24 @@ $(function () {
         });
     };
 
-    oc_ezdefi_exception.prototype.searchException = function () {
-        var keyword = $("#exception-search-input").val();
-        this.loadException(keyword);
+    oc_ezdefi_exception.prototype.revertException = function(exceptionId) {
+        var that = this;
+        var url = $("#url-revert-order-exception").val();
+        $.ajax({
+            url: url,
+            method: "POST",
+            data: {
+                exception_id: exceptionId,
+            },
+            success: function (response) {
+                let page = $("#current-page-exception").val();
+                let totalNumber = $("#total-number-exception").val();
+                that.searchException(page, totalNumber);
+            },
+        });
+
     };
+
 
     oc_ezdefi_exception.prototype.initSelectOrder = function() {
         var that = this;
@@ -324,7 +363,7 @@ $(function () {
                 cache: true
             },
             escapeMarkup: function (markup) { return markup; },
-            minimumInputLength: 1,
+            minimumInputLength: 0,
             templateResult: that.formatRepo,
             templateSelection: that.formatRepoSelection,
             placeholder: "Enter order"
@@ -334,7 +373,7 @@ $(function () {
 
     oc_ezdefi_exception.prototype.formatRepoSelection = function (repo) {
         return repo.total ? 'Order: ' + repo.id : 'Choose order to assign';
-    }
+    };
 
     oc_ezdefi_exception.prototype.formatRepo = function(repo) {
         if (repo.loading) {

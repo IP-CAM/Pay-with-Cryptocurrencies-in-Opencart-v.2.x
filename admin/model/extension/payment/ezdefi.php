@@ -186,23 +186,32 @@ class ModelExtensionPaymentEzdefi extends Model {
         $this->db->query("DELETE FROM `".DB_PREFIX."ezdefi_exception` WHERE `order_id`=".$order_id);
     }
 
-    public function searchExceptions($keyword, $currency, $page, $limit) {
+    public function searchExceptions($keyword_amount, $keyword_order_id, $keyword_email, $currency, $page, $limit) {
         $start = ($page-1) * $limit;
-        $sql = "select amount_id, currency, GROUP_CONCAT(exception.id , '--', IFNULL(order.order_id,'null'), '--', IFNULL(order.email,'null'), '--', ifnull(exception.expiration,'null'), '--', exception.paid, '--', exception.has_amount, '--', IFNULL(exception.explorer_url, 'null'), '--' , IFNULL(exception.unknown_tx_explorer_url, 'null')  ORDER BY paid DESC) group_order
+
+        $sql = "select amount_id, currency, exception.id , order.order_id, order.email, exception.expiration, exception.paid, exception.has_amount, exception.explorer_url
                 from `".DB_PREFIX."ezdefi_exception` `exception`
                     left join `".DB_PREFIX."order` `order` on exception.order_id = order.order_id
-                where (order.email like '%".$keyword."%'
-                    OR exception.order_id like '%".$keyword."%'
-                    OR exception.amount_id like '%".$keyword."%')";
+                where exception.amount_id like '%".$keyword_amount."%'";
+        if($keyword_order_id) {
+            $sql .= " AND exception.order_id = '".$keyword_order_id."'";
+        }
+        if($keyword_email) {
+            $sql .= " AND order.email = '".$keyword_email."'";
+        }
         if($currency) {
             $sql .= " AND exception.currency = '".strtoupper($currency)."'";
         }
-        $sql .= " group by exception.amount_id, exception.currency, exception.unknown_tx_explorer_url
-                ORDER BY exception.id DESC
+        $sql .= " ORDER BY exception.id DESC
                 LIMIT ".$start.','.$limit;
 
+//        echo $sql;die;
         $query = $this->db->query($sql);
         return $query->rows;
+    }
+
+    public function revertOrderException($exception_id) {
+        $this->db->query("UPDATE `" . DB_PREFIX . "ezdefi_exception` SET `order_id` = null, `paid`=3 WHERE `id` = ".(int)$exception_id);
     }
 
     // ------------------------------order------------------------------------

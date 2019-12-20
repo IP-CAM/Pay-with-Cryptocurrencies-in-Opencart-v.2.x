@@ -45,8 +45,9 @@ $_['text_recommend_variation'] = '0.01';
 $_['edit_success'] = 'Edit success';
 $_['delete_success'] = 'Delete success';
 $_['text_view_transaction'] = 'View Transaction Detail';
+$_['text_gateway_url_default'] = 'http://163.172.170.35:3000/api';
 
-$_['text_ordinal']  = 'STT';
+$_['text_ordinal']  = '#';
 $_['text_currency']  = 'Currency';
 $_['text_amount'] = 'Amount';
 $_['text_order'] = 'Order';
