@@ -72,6 +72,9 @@ $( function() {
         $.validator.addMethod("float", function(value, element) {
             return this.optional( element ) || value.match(/^-?\d*(\.\d+)?$/);
         }, "This field should be float");
+        $.validator.addMethod("more_than_0", function(value, element) {
+            return this.optional( element ) || value > 0;
+        }, "Please enter a value more than 0");
         $( selectors.formConfig ).validate({
             submitHandler: function(form) {
                 form.submit();
@@ -95,7 +98,7 @@ $( function() {
         this.validateAllInput(selectors.coinSymbolInput, {required: true});
         this.validateAllInput(selectors.coinPaymentLifetimeInput, {integer: true});
         this.validateAllInput(selectors.coinSafeBlockDistantInput, {integer: true});
-        this.validateAllInput(selectors.variationInput, {max: 100, float: true, required: () => $(selectors.enableSimplePayInput).is(':checked')});
+        this.validateAllInput(selectors.variationInput, {more_than_0: true, max: 100, float: true, required: () => $(selectors.enableSimplePayInput).is(':checked')});
         this.validateAllInput(selectors.coinDecimalInput, {integer: true, min:2, max:14, required: () => $(selectors.enableSimplePayInput).is(':checked')});
         this.validateAllInput(selectors.enableSimplePayInput, {required: () => !$(selectors.enableEscrowPayInput).is(':checked'), messages: {required: ''} });
         this.validateAllInput(selectors.enableEscrowPayInput, {

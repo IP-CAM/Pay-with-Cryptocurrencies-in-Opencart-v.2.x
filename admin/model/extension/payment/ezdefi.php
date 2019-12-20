@@ -188,6 +188,7 @@ class ModelExtensionPaymentEzdefi extends Model {
 
     public function searchExceptions($keyword_amount, $keyword_order_id, $keyword_email, $currency, $page, $limit) {
         $start = ($page-1) * $limit;
+
         $sql = "select amount_id, currency, exception.id , order.order_id, order.email, exception.expiration, exception.paid, exception.has_amount, exception.explorer_url
                 from `".DB_PREFIX."ezdefi_exception` `exception`
                     left join `".DB_PREFIX."order` `order` on exception.order_id = order.order_id
@@ -201,9 +202,10 @@ class ModelExtensionPaymentEzdefi extends Model {
         if($currency) {
             $sql .= " AND exception.currency = '".strtoupper($currency)."'";
         }
-        $sql .= " group by exception.amount_id, exception.currency
-                ORDER BY exception.id DESC
+        $sql .= " ORDER BY exception.id DESC
                 LIMIT ".$start.','.$limit;
+
+//        echo $sql;die;
         $query = $this->db->query($sql);
         return $query->rows;
     }

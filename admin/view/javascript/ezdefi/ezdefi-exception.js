@@ -84,7 +84,8 @@ $(function () {
                     var hasAmount = exceptionRecord.has_amount;
                     var explorerUrl = exceptionRecord.explorer_url;
                     let orderItem = "<div>";
-                    if(orderId === "null") {
+                    console.log(orderId, exceptionId);
+                    if(orderId == null) {
                         amountId += `<p><a class="exception-order-info__explorer-url" href="${explorerUrl}" target="_blank">${language.viewTransactionDetail}</a></p>`;
                     } else {
                         if(paidStatus === '0') {

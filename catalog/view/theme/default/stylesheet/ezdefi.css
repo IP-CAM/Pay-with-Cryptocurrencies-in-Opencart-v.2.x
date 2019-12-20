@@ -170,7 +170,7 @@ div.escrow-pay-box, div.simple-pay-box {
 
 .ezdefi-icon-apple {
     font-size: 20px;
-    color: #bbb7ce;
+    color: #bbbbbb;
 }
 
 .ezdefi-payment__info {
@@ -247,9 +247,9 @@ div.escrow-pay-box, div.simple-pay-box {
 }
 
 .ezdefi-copy-icon {
-    font-size: 20px;
-    color: lightskyblue;
-    padding-left: 10px;
+    font-size: 16px;
+    color: #999;
+    padding-left: 6px;
 }
 
 .link_use_ezdefi_wallet {
