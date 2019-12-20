@@ -195,17 +195,6 @@ $(function () {
         })
     };
 
-    oc_ezdefi_exception.prototype.convertExceptionResponse = function (data) {
-        for (let i in data) {
-            let orders = data[i].group_order.split(',');
-            for(let i in orders) {
-                orders[i] = orders[i].split('--');
-            }
-            data[i].orders = orders;
-        }
-        return data;
-    };
-
     oc_ezdefi_exception.prototype.deleteException = function (e, exceptionId = null) {
         var that = this;
         if(exceptionId == null) {
