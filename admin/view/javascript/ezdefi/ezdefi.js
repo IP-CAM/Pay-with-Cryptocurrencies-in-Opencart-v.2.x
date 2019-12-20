@@ -160,7 +160,6 @@ $( function() {
         var thisElem = $(this);
         $(this).prop('disabled', true);
 
-
         var url = $(this).data('url_edit');
         var coinId = $(this).data('coin_id');
         var discount = $('#edit-discount-' + coinId).val();
@@ -174,11 +173,11 @@ $( function() {
             method: "POST",
             data: {
                 coin_id: coinId,
-                discount: discount,
-                payment_lifetime: paymentLifetime,
-                wallet_address: walletAddress,
-                safe_block_distant: safeBlockDistant,
-                decimal: decimal
+                coin_discount: discount,
+                coin_payment_life_time: paymentLifetime,
+                coin_wallet_address: walletAddress,
+                coin_safe_block_distant: safeBlockDistant,
+                coin_decimal: decimal
             },
             success: function (response) {
                 var data = JSON.parse(response).data;

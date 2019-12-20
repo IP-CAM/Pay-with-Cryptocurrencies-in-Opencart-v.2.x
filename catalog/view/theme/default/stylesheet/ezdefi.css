@@ -3,10 +3,11 @@
 }
 .ezdefi-select-coin__list {
     max-height: 500px;
+    max-width: 550px;
     margin: 0 auto;
     overflow-x: auto;
     display: grid;
-    grid-template-columns: repeat(3, 175px);
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr) );
     grid-gap: 10px;
     justify-content: center;
 }

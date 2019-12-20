@@ -46,7 +46,12 @@ $_['edit_success'] = 'Edit success';
 $_['delete_success'] = 'Delete success';
 $_['text_view_transaction'] = 'View Transaction Detail';
 $_['text_gateway_url_default'] = 'http://163.172.170.35:3000/api';
-
+$_['text_delete_exception'] = 'Delete exception';
+$_['text_confirm_order'] = 'Confirm Order';
+$_['text_revert_order'] = 'Revert Order';
+$_['text_ask_delete_exception'] = 'Do you want to delete this exception';
+$_['text_ask_confirm_order'] = 'Do you want to confirm this order';
+$_['text_ask_revert_order'] = 'Do you want to revert this order';
 $_['text_ordinal']  = '#';
 $_['text_currency']  = 'Currency';
 $_['text_amount'] = 'Amount';
@@ -69,6 +74,7 @@ $_['text_delete'] = 'Delete';
 $_['text_confirm_paid'] = 'Confirm Paid';
 $_['text_revert'] = 'Revert';
 $_['text_assign'] = 'Assign';
+
 
 //warning
 $_['warning_change_decimal'] = 'Changing Decimal can cause to payment interruption';

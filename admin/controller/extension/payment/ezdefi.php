@@ -153,7 +153,11 @@ class ControllerExtensionPaymentEzdefi extends Controller {
         }
 
         if (isset($this->request->post['payment_ezdefi_enable_simple_pay']) && trim($this->request->post['payment_ezdefi_enable_simple_pay']) !== '') {
-            if(!isset($this->request->post['payment_ezdefi_variation']) || trim($this->request->post['payment_ezdefi_variation']) === '' || $this->request->post['payment_ezdefi_variation'] < 0) {
+            if(!isset($this->request->post['payment_ezdefi_variation']) ||
+                trim($this->request->post['payment_ezdefi_variation']) === '' ||
+                $this->request->post['payment_ezdefi_variation'] <= 0 ||
+                $this->request->post['payment_ezdefi_variation'] >= 100 ||
+                filter_var($this->request->post['payment_ezdefi_variation'], FILTER_VALIDATE_FLOAT) === false) {
                 $this->error['variation'] = $this->language->get('error_variation');
             }
         }
@@ -173,30 +177,7 @@ class ControllerExtensionPaymentEzdefi extends Controller {
 
         if (count($coins_config_data) > 0) {
             foreach ($coins_config_data as $key => $coin_data) {
-                if (isset($coin_data['coin_order']) && (trim($coin_data['coin_order']) === '' || (!filter_var($coin_data['coin_order'], FILTER_VALIDATE_INT) && filter_var($coin_data['coin_order'], FILTER_VALIDATE_INT) !== 0))) {
-                    $this->error['coin_order'] = $this->language->get('error_coin_order');
-                }
-                if (isset($coin_data['coin_id']) && trim($coin_data['coin_id']) === '') {
-                    $this->error['coin_id'] = $this->language->get('error_coin_id');
-                }
-                if (isset($coin_data['coin_symbol']) && trim($coin_data['coin_symbol']) === '') {
-                    $this->error['name'] = $this->language->get('error_name');
-                }
-                if (isset($coin_data['coin_name']) && trim($coin_data['coin_name']) === '') {
-                    $this->error['full_name'] = $this->language->get('error_full_name');
-                }
-                if (isset($coin_data['coin_discount']) && trim($coin_data['coin_discount']) !== '' && ($coin_data['coin_discount'] > 100 || $coin_data['coin_discount'] < 0 )) {
-                    $this->error['discount'] = $this->language->get('error_discount');
-                }
-                if (isset($coin_data['coin_payment_life_time']) && trim($coin_data['coin_payment_life_time']) !== '' && !filter_var($coin_data['coin_payment_life_time'], FILTER_VALIDATE_INT) && filter_var($coin_data['coin_payment_life_time'], FILTER_VALIDATE_INT) !== 0) {
-                    $this->error['payment_lifetime'] = $this->language->get('error_lifetime');
-                }
-                if (isset($coin_data['payment_ezdefi_coin_wallet_address']) && trim($coin_data['payment_ezdefi_coin_wallet_address']) === '') {
-                    $this->error['wallet_address'] = $this->language->get('error_wallet_address');
-                }
-                if (isset($coin_data['coin_safe_block_distant']) && trim($coin_data['coin_safe_block_distant']) !== '' && !filter_var($coin_data['coin_safe_block_distant'], FILTER_VALIDATE_INT) && filter_var($coin_data['coin_safe_block_distant'], FILTER_VALIDATE_INT) !== 0) {
-                    $this->error['safe_block_distant'] = $this->language->get('error_safe_block_distant');
-                }
+                $this->validateCoinConfig($coin_data);
                 if(isset($coin_data['coin_symbol']) && isset($coin_data['coin_name']) && isset($coin_data['coin_wallet_address'])) {
                     $coin_ids[] = $coin_data['coin_id'];
                 }
@@ -207,6 +188,38 @@ class ControllerExtensionPaymentEzdefi extends Controller {
                     $this->error['unique_config_coin'] = $this->language->get('error_unique_config_coin');
                 }
             }
+        }
+
+        return !$this->error;
+    }
+
+    public function validateCoinConfig($coin_data) {
+        if (isset($coin_data['coin_order']) && trim($coin_data['coin_order']) === '' && filter_var($coin_data['coin_order'], FILTER_VALIDATE_INT) === false) {
+            $this->error['coin_order'] = $this->language->get('error_coin_order');
+        }
+        if (isset($coin_data['coin_id']) && trim($coin_data['coin_id']) === '') {
+            $this->error['coin_id'] = $this->language->get('error_coin_id');
+        }
+        if (isset($coin_data['coin_symbol']) && trim($coin_data['coin_symbol']) === '') {
+            $this->error['name'] = $this->language->get('error_name');
+        }
+        if (isset($coin_data['coin_name']) && trim($coin_data['coin_name']) === '') {
+            $this->error['full_name'] = $this->language->get('error_full_name');
+        }
+        if (isset($coin_data['coin_discount']) && trim($coin_data['coin_discount']) !== '' && ($coin_data['coin_discount'] > 100 || $coin_data['coin_discount'] < 0 || filter_var($coin_data['coin_discount'], FILTER_VALIDATE_FLOAT) === false)) {
+            $this->error['discount'] = $this->language->get('error_discount');
+        }
+        if (isset($coin_data['coin_payment_life_time']) && trim($coin_data['coin_payment_life_time']) !== '' && (filter_var($coin_data['coin_payment_life_time'], FILTER_VALIDATE_INT) === false || $coin_data['coin_payment_life_time'] < 0)) {
+            $this->error['payment_lifetime'] = $this->language->get('error_lifetime');
+        }
+        if (isset($coin_data['coin_wallet_address']) && trim($coin_data['coin_wallet_address']) === '') {
+            $this->error['wallet_address'] = $this->language->get('error_wallet_address');
+        }
+        if (isset($coin_data['coin_safe_block_distant']) && trim($coin_data['coin_safe_block_distant']) !== '' && (filter_var($coin_data['coin_safe_block_distant'], FILTER_VALIDATE_INT) === false || $coin_data['coin_safe_block_distant'] < 0)) {
+            $this->error['safe_block_distant'] = $this->language->get('error_safe_block_distant');
+        }
+        if (isset($coin_data['coin_decimal']) && trim($coin_data['coin_decimal']) !== '' && (filter_var($coin_data['coin_decimal'], FILTER_VALIDATE_INT) === false || $coin_data['coin_decimal'] < 0 || $coin_data['coin_decimal'] > 14 )) {
+            $this->error['decimal'] = $this->language->get('error_decimal');
         }
 
         return !$this->error;
@@ -229,12 +242,14 @@ class ControllerExtensionPaymentEzdefi extends Controller {
         $this->load->language('extension/payment/ezdefi');
 
         $this->load->model('extension/payment/ezdefi');
-        $edit_status = $this->model_extension_payment_ezdefi->updateCoinConfig($this->request->post);
-        if($edit_status === TRUE) {
-            return $this->response->setOutput(json_encode(['data' => ['status' => 'success', 'message' =>  $this->language->get('edit_success')]]));
-        } else {
-            return $this->response->setOutput(json_encode(['data' => ['status' => 'failure', 'message' =>  $this->language->get('something_error')]]));
+
+        if($this->validateCoinConfig($this->request->post)) {
+            $edit_status = $this->model_extension_payment_ezdefi->updateCoinConfig($this->request->post);
+            if($edit_status === TRUE) {
+                return $this->response->setOutput(json_encode(['data' => ['status' => 'success', 'message' =>  $this->language->get('edit_success')]]));
+            }
         }
+        return $this->response->setOutput(json_encode(['data' => ['status' => 'failure', 'message' =>  $this->language->get('something_error')]]));
     }
 
     public function checkWalletAddress() {
