@@ -86,7 +86,6 @@ class ControllerExtensionPaymentEzdefi extends Controller {
                 $this->model_checkout_order->addOrderHistory($order_id, $payment['code'],  $message, false);
             }
             if($payment['status'] == 'EXPIRED_DONE') {
-                echo "<pre>";
                 $this->model_extension_payment_ezdefi->setPaidForException($payment['_id'], self::PAID_OUT_TIME, $payment['explorer_url']);
             }
         } elseif (isset($this->request->get['explorerUrl']) && isset($this->request->get['id'])) {
