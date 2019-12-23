@@ -18,7 +18,7 @@
 					<img src="{{ coin_config.logo }}" alt="" class="ezdefi-select-coin-item__logo">
 					<span class="ezdefi-select-coin-item__price"> {{ coin_config.price }} </span>
 					<span class="ezdefi-select-coin-item__symbol">{{coin_config.symbol}}</span>
-					<span class="ezdefi-select-coin-item__discount">-{{coin_config.discount}}%</span>
+					<span class="ezdefi-select-coin-item__discount">-{{coin_config.discount + 0}}%</span>
 					<input type="radio" name="coin-selected-to-order" class="hidden select-coin-checkbox" id="select-coin-{{ coin_config.ezdefi_coin_id }}" value="{{ coin_config.ezdefi_coin_id }}" data-discount="{{ coin_config.discount }}">
 				</label>
 			{% endfor %}
@@ -46,7 +46,7 @@
 						<img src="{{ coin_config.logo }}" alt="" class="ezdefi-select-coin-item__logo">
 						<span class="ezdefi-select-coin-item__price"> {{ coin_config.price }} </span>
 						<span class="ezdefi-select-coin-item__symbol">{{coin_config.symbol}}</span>
-						<span class="ezdefi-select-coin-item__discount">-{{coin_config.discount}}%</span>
+						<span class="ezdefi-select-coin-item__discount">-{{coin_config.discount + 0}}%</span>
 						<input type="radio" name="coin-selected-to-order" class="hidden select-coin-checkbox" id="select-coin-{{ coin_config.ezdefi_coin_id }}" value="{{ coin_config.ezdefi_coin_id }}" data-discount="{{ coin_config.discount }}">
 					</label>
 				{% endfor %}
