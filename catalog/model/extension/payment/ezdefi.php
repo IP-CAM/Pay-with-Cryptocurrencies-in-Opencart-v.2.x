@@ -59,13 +59,16 @@ class ModelExtensionPaymentEzdefi extends Model {
         //create param
         $price = $order_info['total'] - ($order_info['total'] * $coin_config['discount']/100);             // get discount price for this order
         $exchange_rate = $this->sendCurl("/token/exchange/".$order_info['currency_code']."%3A".$coin_config['symbol'], 'GET');
-        $this->addException($order_info['order_id'], strtoupper($coin_config['symbol']), $price * json_decode($exchange_rate)->data, $coin_config['payment_lifetime'], self::NO_AMOUNT);
         $params = "?uoid=".$order_info['order_id']."-0&to=".$coin_config['wallet_address']."&value=".$price."&currency=".$order_info['currency_code']."%3A".$coin_config['symbol']."&safedist=".$coin_config['safe_block_distant']."&callback=".urlencode($callback);
         if($coin_config['payment_lifetime'] > 0) {
             $params .= "&duration=".$coin_config['payment_lifetime'];
         }
         // Send api to create payment in gateway
-        return $this->sendCurl( '/payment/create'.$params, "POST");
+        $payment = $this->sendCurl( '/payment/create'.$params, "POST");
+        $paymentData = json_decode($payment);
+        $this->addException($order_info['order_id'], strtoupper($coin_config['symbol']), $price * json_decode($exchange_rate)->data, $coin_config['payment_lifetime'], self::NO_AMOUNT, null, null, $paymentData->data->_id);
+
+        return $payment;
     }
 
     public function createPaymentSimple($coinId, $callback) {
@@ -82,12 +85,14 @@ class ModelExtensionPaymentEzdefi extends Model {
         $amount = $origin_value * json_decode($exchange_rate)->data;
         $amount_id = $this->createAmountId($coin_config['symbol'], $amount, $coin_config['payment_lifetime'], $coin_config['decimal'], $this->config->get('payment_ezdefi_variation'));
         if($amount_id) {
-            $this->addException($order_info['order_id'], strtoupper($coin_config['symbol']), $amount_id, $coin_config['payment_lifetime'], self::HAS_AMOUNT);
             $params = "?amountId=true&uoid=".$order_info['order_id']."-1&to=".$coin_config['wallet_address']."&value=".$amount_id."&currency=".$coin_config['symbol']."%3A".$coin_config['symbol']."&safedist=".$coin_config['safe_block_distant']."&callback=".urlencode($callback);
             if($coin_config['payment_lifetime'] > 0) {
                 $params .= "&duration=".$coin_config['payment_lifetime'];
             }
-            return $this->sendCurl( '/payment/create'.$params, "POST");
+            $payment = $this->sendCurl( '/payment/create'.$params, "POST");
+            $paymentData = json_decode($payment);
+            $this->addException($order_info['order_id'], strtoupper($coin_config['symbol']), $amount_id, $coin_config['payment_lifetime'], self::HAS_AMOUNT, null, null, $paymentData->data->_id);
+            return $payment;
         } else {
             return false;
         }
@@ -144,17 +149,15 @@ class ModelExtensionPaymentEzdefi extends Model {
 
     public function checkPaymentComplete($payment_id) {
 	    $check_status_response = $this->sendCurl( '/payment/get?paymentid='.$payment_id, 'GET');
-
         if ($check_status_response) {
             $response_data = json_decode($check_status_response)->data;
             $value = $response_data->value * pow(10, - $response_data->decimal);
-
             if($response_data->status == "PENDING") {
                 return ['status' => "PENDING", 'code' => self::PENDING];
             } elseif ($response_data->status == "DONE") {
-                return ['status' => "DONE", 'code' => self::DONE, 'uoid'=> $response_data->uoid, 'currency' => $response_data->currency, 'value' => $value, 'explorer_url' => $response_data->explorer->tx . $response_data->transactionHash];
+                return ['status' => "DONE", 'code' => self::DONE, 'uoid'=> $response_data->uoid, 'currency' => $response_data->currency, 'value' => $value, 'explorer_url' => $response_data->explorer->tx . $response_data->transactionHash, '_id' => $response_data->_id];
             } elseif ($response_data->status == 'EXPIRED_DONE') {
-                return ['status' => 'EXPIRED_DONE', 'uoid'=> $response_data->uoid, 'currency' => $response_data->currency, 'value' => $value, 'explorer_url' => $response_data->explorer->tx . $response_data->transactionHash];
+                return ['status' => 'EXPIRED_DONE', 'uoid'=> $response_data->uoid, 'currency' => $response_data->currency, 'value' => $value, 'explorer_url' => $response_data->explorer->tx . $response_data->transactionHash, '_id' => $response_data->_id];
             }
         } else {
             return ['status' => "failure"];
@@ -162,14 +165,20 @@ class ModelExtensionPaymentEzdefi extends Model {
     }
 
     // ----------------------------------------------------------Exception model------------------------------------------------------------
-    public function addException($order_id, $currency, $amount_id, $expiration, $has_amount, $paid = 0, $explorer_url = null, $unknown_tx_explorer_url = null) {
-        $this->db->query("INSERT INTO `". DB_PREFIX . "ezdefi_exception` (`order_id`, `currency`, `amount_id`, `expiration`, `has_amount`, `paid`, `explorer_url`, `unknown_tx_explorer_url`) VALUES 
-        ('".$order_id."', '".$currency."', '".$amount_id."', DATE_ADD(NOW(), INTERVAL ".$expiration." SECOND), '".$has_amount."', '".$paid."', '".$explorer_url."', '".$unknown_tx_explorer_url."')");
+    public function addException($order_id, $currency, $amount_id, $expiration, $has_amount, $paid = 0, $explorer_url = null, $payment_id = null) {
+        if(!$expiration) $expiration = 0;
+        $this->db->query("INSERT INTO `". DB_PREFIX . "ezdefi_exception` (`payment_id`, `order_id`, `currency`, `amount_id`, `expiration`, `has_amount`, `paid`, `explorer_url`) VALUES 
+        ('".$payment_id."','".$order_id."', '".$currency."', '".$amount_id."', DATE_ADD(NOW(), INTERVAL ".$expiration." SECOND), '".$has_amount."', '".$paid."', '".$explorer_url."')");
     }
 
-    public function setPaidForException($order_id, $currency, $amount_id, $paid = 0, $has_amount, $explorer_url = null) {
-        $this->db->query("UPDATE `". DB_PREFIX . "ezdefi_exception` SET `paid`=".$paid.", `explorer_url`='".$this->db->escape($explorer_url)."' 
-            WHERE `currency` ='".$currency."' AND `order_id`='".$order_id."' AND `amount_id`=".$amount_id." AND `has_amount`=".$has_amount."");
+//    public function setPaidForException($order_id, $currency, $amount_id, $paid = 0, $has_amount, $explorer_url = null) {
+//        $this->db->query("UPDATE `". DB_PREFIX . "ezdefi_exception` SET `paid`=".$paid.", `explorer_url`='".$this->db->escape($explorer_url)."'
+//            WHERE `currency` ='".$currency."' AND `order_id`='".$order_id."' AND `amount_id`=".$amount_id." AND `has_amount`=".$has_amount."");
+//    }
+
+    public function setPaidForException($payment_id, $paid = 0, $explorer_url = null) {
+        $this->db->query("UPDATE `". DB_PREFIX . "ezdefi_exception` SET `paid`=".$paid.", `explorer_url`='".$this->db->escape($explorer_url)."'
+            WHERE `payment_id` = '".$payment_id."'");
     }
 
     public function checkTransaction($transaction_id, $explorer_url) {
@@ -178,8 +187,8 @@ class ModelExtensionPaymentEzdefi extends Model {
 
         $value_response = $transaction_data->value * pow(10, -$transaction_data->decimal);
 
-        if ($transaction_data->status === 'ACCEPTED' && $transaction_data->explorerUrl === $explorer_url) {
-            $this->addException(null, $transaction_data->currency, $value_response, null, 1, 3, null, $transaction_data->explorerUrl);
+        if ($transaction_data->status === 'ACCEPTED') {
+            $this->addException(null, $transaction_data->currency, $value_response, null, 1, 3, $transaction_data->explorerUrl);
         }
         return;
 	}

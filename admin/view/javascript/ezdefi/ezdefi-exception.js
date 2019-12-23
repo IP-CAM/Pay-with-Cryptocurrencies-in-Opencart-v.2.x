@@ -19,6 +19,7 @@ $(function () {
         $("#exception-search-by-amount").change(this.searchException.bind(this));
         $("#exception-search-by-order").change(this.searchException.bind(this));
         $("#exception-search-by-email").change(this.searchException.bind(this));
+        $("#btn-search-exception").click(this.searchException.bind(this));
         $("input[name='filter-by-currency']").change(this.searchException.bind(this));
         $(".tab-radio-input").change(this.selectTabListener);
         this.detectTabToShow();
@@ -260,6 +261,7 @@ $(function () {
                 if(isAssign && oldOrderId) {
                     that.deleteExceptionByOrderId(oldOrderId);
                 } else if( isAssign && !oldOrderId) {
+                    that.deleteExceptionByOrderId(orderId);
                     that.deleteException(null, exceptionId);
                 } else {
                     that.deleteExceptionByOrderId(orderId);
@@ -273,6 +275,7 @@ $(function () {
                 if(isAssign && oldOrderId) {
                     that.deleteExceptionByOrderId(oldOrderId);
                 } else if( isAssign && !oldOrderId) {
+                    that.deleteExceptionByOrderId(orderId);
                     that.deleteException(null, exceptionId);
                 } else {
                     that.deleteExceptionByOrderId(orderId);
