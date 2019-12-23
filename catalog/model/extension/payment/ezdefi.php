@@ -94,8 +94,10 @@ class ModelExtensionPaymentEzdefi extends Model {
     }
 
     public function createAmountId($currency, $amount, $expiration, $decimal, $variation) {
+	    if($expiration == 0) {
+            $expiration = 86400;
+        }
 	    $amount = round($amount, $decimal);
-//	    echo $amount;
         $old_amount = $this->db->query("SELECT `tag_amount`, `id`
                                             from `".DB_PREFIX."ezdefi_amount` 
                                             where `currency`='".$currency."' 
@@ -106,7 +108,6 @@ class ModelExtensionPaymentEzdefi extends Model {
                                             LIMIT 1;");
 	    if ($old_amount->row) {
             $this->db->query("UPDATE `". DB_PREFIX . "ezdefi_amount` SET `expiration`= DATE_ADD(NOW(), INTERVAL ".$expiration." SECOND)  WHERE `id`=".$old_amount->row['id']);
-//            echo '-----'.$old_amount->row['tag_amount'];die;
             return $old_amount->row['tag_amount'];
         } else {
             $this->db->query("START TRANSACTION;");
@@ -126,7 +127,6 @@ class ModelExtensionPaymentEzdefi extends Model {
             if ($variationValue > ($amount * (float)$variation) / 100 ) {
                 return false;
             }
-//            echo '-----'.$amount_id->row['tag_amount'];die;
             return $amount_id->row['tag_amount'];
         }
     }
