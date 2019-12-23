@@ -28,10 +28,11 @@ class ModelExtensionPaymentEzdefi extends Model {
 			CREATE TABLE IF NOT EXISTS `" . DB_PREFIX . "ezdefi_amount` (
                 `id`         int auto_increment,
                 `temp`       INT not null,
-                `amount`     DECIMAL(15, 4) not null,
+                `amount`     DECIMAL(25, 14) not null,
                 `tag_amount` DECIMAL(25, 14) not null,
                 `expiration` TIMESTAMP  not null,
                 `currency`   varchar(255) not null,
+                `decimal`    int not null,
                 primary key (id),
                 constraint tag_amount
                     unique (tag_amount, currency)
@@ -39,6 +40,7 @@ class ModelExtensionPaymentEzdefi extends Model {
         $this->db->query("
             CREATE TABLE IF NOT EXISTS `" . DB_PREFIX . "ezdefi_exception` (
                 `id` int auto_increment,
+                `payment_id` varchar(255) default null,
 			    `order_id` int(11),
                 `amount_id` decimal(25,14) not null,
                 `currency` varchar(255) not null,
@@ -69,6 +71,8 @@ class ModelExtensionPaymentEzdefi extends Model {
         $this->db->query("DROP TABLE IF EXISTS `" . DB_PREFIX . "ezdefi_coin`;");
         $this->db->query("DROP TABLE IF EXISTS `" . DB_PREFIX . "ezdefi_amount`;");
         $this->db->query("DROP TABLE IF EXISTS `" . DB_PREFIX . "ezdefi_exception`;");
+        $this->db->query("DROP EVENT IF EXISTS `ezdefi_remove_amount_id_event`;");
+        $this->db->query("DROP EVENT IF EXISTS `ezdefi_remove_exception_event`;");
     }
 
     public function updateCoins($data) {
@@ -162,20 +166,22 @@ class ModelExtensionPaymentEzdefi extends Model {
     }
 
     //-------------------------------------------------Exception------------------------------------------------------
-    public function getTotalException($keyword, $currency) {
+    public function getTotalException($keyword_amount, $keyword_order_id, $keyword_email, $currency) {
         $sql = "select count(*) as total_exceptions
             from `".DB_PREFIX."ezdefi_exception` `exception`
-                left join `".DB_PREFIX."order` `order` on exception.order_id = order.order_id
-            where (order.email like '%".$keyword."%'
-                OR exception.order_id like '%".$keyword."%'
-                OR exception.amount_id like '%".$keyword."%')";
+                    left join `".DB_PREFIX."order` `order` on exception.order_id = order.order_id
+                where exception.amount_id like '%".$keyword_amount."%'";
+        if($keyword_order_id) {
+            $sql .= " AND exception.order_id = '".$keyword_order_id."'";
+        }
+        if($keyword_email) {
+            $sql .= " AND order.email = '".$keyword_email."'";
+        }
         if($currency) {
             $sql .= " AND exception.currency = '".strtoupper($currency)."'";
         }
-        $sql .= " group by exception.amount_id, exception.currency";
         $query = $this->db->query($sql);
-
-        return $query->num_rows;
+        return $query->row['total_exceptions'];
     }
 
     public function deleteExceptionById($exception_id) {
@@ -189,8 +195,18 @@ class ModelExtensionPaymentEzdefi extends Model {
     public function searchExceptions($keyword_amount, $keyword_order_id, $keyword_email, $currency, $page, $limit) {
         $start = ($page-1) * $limit;
 
-        $sql = "select amount_id, currency, exception.id , order.order_id, order.email, exception.expiration, exception.paid, exception.has_amount, exception.explorer_url
-                from `".DB_PREFIX."ezdefi_exception` `exception`
+        // search exception and prioritize `amount_id` = $amount_id to the top
+        $sql = "select rank, amount_id, currency, exception.id , order.order_id, order.email, exception.expiration, exception.paid, exception.has_amount, exception.explorer_url
+                from (
+                    SELECT 1 as rank, id, payment_id,order_id, amount_id, currency, paid, has_amount, expiration, explorer_url
+                    FROM `".DB_PREFIX."ezdefi_exception` 
+                    WHERE amount_id = '".$keyword_amount."'
+                    UNION 
+                    SELECT 2 as rank, id, payment_id,order_id, amount_id, currency, paid, has_amount, expiration, explorer_url
+                    FROM `".DB_PREFIX."ezdefi_exception` 
+                    WHERE amount_id like '%".$keyword_amount."%'
+                        AND amount_id != '".$keyword_amount."'
+                ) `exception`
                     left join `".DB_PREFIX."order` `order` on exception.order_id = order.order_id
                 where exception.amount_id like '%".$keyword_amount."%'";
         if($keyword_order_id) {
@@ -202,10 +218,9 @@ class ModelExtensionPaymentEzdefi extends Model {
         if($currency) {
             $sql .= " AND exception.currency = '".strtoupper($currency)."'";
         }
-        $sql .= " ORDER BY exception.id DESC
+        $sql .= " ORDER BY exception.rank, exception.id DESC
                 LIMIT ".$start.','.$limit;
 
-//        echo $sql;die;
         $query = $this->db->query($sql);
         return $query->rows;
     }

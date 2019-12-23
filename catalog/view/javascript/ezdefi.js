@@ -176,8 +176,10 @@ $(function () {
         countDownTime(paymentId, data.expiredTime, suffixes);
         $(selectors.deeplink+suffixes).attr('href', data.deepLink);
 
-        let originValueWithDiscount = new BigNumber(originValue).multipliedBy(new BigNumber((100 - discount)/100));
-        $(selectors.originValue + suffixes).html(originValueWithDiscount.toFormat());
+        let originValueBN = BigNumber(originValue);
+        let discountBN = (new BigNumber(100 - discount)).div(new BigNumber(100));
+        let originValueWithDiscount = originValueBN.multipliedBy(discountBN).toFormat();
+        $(selectors.originValue + suffixes).html(originValueWithDiscount);
 
         let decimalBN = new BigNumber(Math.pow(10, data.decimal));
         let valueBN = new BigNumber(data.value);
