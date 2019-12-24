@@ -85,7 +85,13 @@
             {% endif %}
             {% if enable_simple_pay %}
                 <div class="payment-box simple-pay-box">
-                    <div class="loader--simple loader"></div>
+                    <div class="loader--simple loader">
+                        <div class="loader--escrow loader">
+                            <div class="Loader__item"></div>
+                            <div class="Loader__item"></div>
+                            <div class="Loader__item"></div>
+                        </div>
+                    </div>
                     <div class="payment-content--simple">
                         <div class="alert alert-success alert-copy alert-copy-address">
                             <strong>{{ text_success }}</strong> {{ text_copy_address }}

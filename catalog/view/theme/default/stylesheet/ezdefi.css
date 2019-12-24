@@ -294,13 +294,14 @@ div.escrow-pay-box, div.simple-pay-box {
     transform: translateY(-50%) !important;
 }
 
-.Loader {
+.Loader, .loader--escrow, .loader--simple {
     width: 90px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin: 50px
 }
+
 .Loader__item {
     width: 20px;
     height: 20px;
