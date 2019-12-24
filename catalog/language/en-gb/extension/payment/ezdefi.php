@@ -32,5 +32,5 @@ $_['button_close'] = 'Close';
 
 //error
 $_['error_enable_simple_pay'] = 'Simple pay does not enable';
-$_['error_cant_create_payment'] = 'Can not create payment, please try again later';
-$_['error_cant_create_payment_with_amount'] = 'Something error! Server can not create payment now, please choose "Pay with ezDeFi Wallet" to create payment';
+$_['error_cant_create_payment'] = 'Can not create payment, please try again';
+$_['error_cant_create_payment_with_amount'] = 'Can not generate amountID, please choose other coin or ezDeFi wallet to continue';
