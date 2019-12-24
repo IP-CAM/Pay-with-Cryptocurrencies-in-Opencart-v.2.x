@@ -156,6 +156,11 @@
     display: block;
 }
 
+.ezdefi-payment__currency--simple, .ezdefi-payment__currency--escrow {
+    text-transform: uppercase;
+    padding-left: 5px;
+}
+
 div.escrow-pay-box, div.simple-pay-box {
     grid-column: 1/-1;
 }

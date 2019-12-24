@@ -20,6 +20,7 @@ class ModelExtensionPaymentEzdefi extends Model {
 		      `wallet_address`      varchar(255) NOT NULL,
 		      `safe_block_distant`  int(11),
 		      `decimal`             int(11) DEFAULT 8,
+		      `description`         varchar(255) DEFAULT NULL,
 			  `created`             DATETIME NOT NULL,
 			  `modified`            DATETIME NOT NULL,
 			  PRIMARY KEY (`coin_id`)
@@ -88,6 +89,7 @@ class ModelExtensionPaymentEzdefi extends Model {
                     "', `wallet_address` = '" . $this->db->escape($coin_record['coin_wallet_address']) .
                     "', `safe_block_distant` = '" . (int)$coin_record['coin_safe_block_distant'] .
                     "', `decimal` = '" . (int)$coin_record['coin_decimal'] .
+                    "', `description` = '" . $this->db->escape($coin_record['description']) .
                     "', `created` = now(), `modified` = now()");
             } else {
                 $this->db->query("UPDATE `" . DB_PREFIX . "ezdefi_coin` SET `order` = " . (int)$coin_record['coin_order'] . ", `modified` = now()" ." WHERE `ezdefi_coin_id` ='". $this->db->escape($coin_record['coin_id'])."'");

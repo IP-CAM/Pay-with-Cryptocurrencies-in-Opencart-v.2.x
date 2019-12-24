@@ -184,7 +184,7 @@ $(function () {
         let decimalBN = new BigNumber(Math.pow(10, data.decimal));
         let valueBN = new BigNumber(data.value);
         let currencyValue = valueBN.div(decimalBN).toFormat();            // big number
-        $(selectors.currencyValue+suffixes).html(currencyValue + data.currency);
+        $(selectors.currencyValue+suffixes).html(currencyValue);
 
         $("#check-created-payment"+suffixes).prop('checked', true);
         $(selectors.logoCoinSelected).prop('src', data.token ? data.token.logo : '');
