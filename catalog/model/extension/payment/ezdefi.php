@@ -122,7 +122,7 @@ class ModelExtensionPaymentEzdefi extends Model {
                                  INTERVAL ".$expiration." SECOND) as `expiration`,
                                   '".$currency. "' as `currency`, ".(int)$decimal." as `decimal`
                             FROM `".DB_PREFIX."ezdefi_amount` t1
-                            LEFT JOIN `".DB_PREFIX."ezdefi_amount` t2 ON t1.temp + 1 = t2.temp and t1.amount = t2.amount
+                            LEFT JOIN `".DB_PREFIX."ezdefi_amount` t2 ON t1.temp + 1 = t2.temp and t1.amount = t2.amount and t1.currency = t2.currency
                             WHERE t2.temp IS NULL
                                 AND t1.currency = '".$currency."'
                                 AND t1.amount = ROUND(" .$amount.", ".self::MAX_AMOUNT_DECIMAL.");");
