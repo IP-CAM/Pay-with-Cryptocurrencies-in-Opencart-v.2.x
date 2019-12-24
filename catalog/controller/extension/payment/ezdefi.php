@@ -31,6 +31,7 @@ class ControllerExtensionPaymentEzdefi extends Controller {
     }
 
     public function createSimplePayment() {
+        $this->load->language('extension/payment/ezdefi');
         $this->load->model('setting/setting');
         $enable_simple_pay = $this->config->get('payment_ezdefi_enable_simple_pay');
         $callback = $this->url->link('extension/payment/ezdefi/callbackConfirmOrder', '', true);
@@ -50,6 +51,7 @@ class ControllerExtensionPaymentEzdefi extends Controller {
     }
 
     public function createEscrowPayment() {
+        $this->load->language('extension/payment/ezdefi');
         $this->load->model('setting/setting');
         $enable_escrow_pay = $this->config->get('payment_ezdefi_enable_escrow_pay');
         $callback = $this->url->link('extension/payment/ezdefi/callbackConfirmOrder', '', true);

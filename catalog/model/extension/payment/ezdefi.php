@@ -58,17 +58,22 @@ class ModelExtensionPaymentEzdefi extends Model {
         $coin_config = $this->getCoinConfigByEzdefiCoinId($coinId);
         //create param
         $price = $order_info['total'] - ($order_info['total'] * $coin_config['discount']/100);             // get discount price for this order
-        $exchange_rate = $this->sendCurl("/token/exchange/".$order_info['currency_code']."%3A".$coin_config['symbol'], 'GET');
-        $params = "?uoid=".$order_info['order_id']."-0&to=".$coin_config['wallet_address']."&value=".$price."&currency=".$order_info['currency_code']."%3A".$coin_config['symbol']."&safedist=".$coin_config['safe_block_distant']."&callback=".urlencode($callback);
-        if($coin_config['payment_lifetime'] > 0) {
-            $params .= "&duration=".$coin_config['payment_lifetime'];
-        }
-        // Send api to create payment in gateway
-        $payment = $this->sendCurl( '/payment/create'.$params, "POST");
-        $paymentData = json_decode($payment);
-        $this->addException($order_info['order_id'], strtoupper($coin_config['symbol']), $price * json_decode($exchange_rate)->data, $coin_config['payment_lifetime'], self::NO_AMOUNT, null, null, $paymentData->data->_id);
+        if($price > 0) {
+            $exchange_rate = $this->sendCurl("/token/exchange/".$order_info['currency_code']."%3A".$coin_config['symbol'], 'GET');
+            $params = "?uoid=".$order_info['order_id']."-0&to=".$coin_config['wallet_address']."&value=".$price."&currency=".$order_info['currency_code']."%3A".$coin_config['symbol']."&safedist=".$coin_config['safe_block_distant']."&callback=".urlencode($callback);
+            if($coin_config['payment_lifetime'] > 0) {
+                $params .= "&duration=".$coin_config['payment_lifetime'];
+            }
+            // Send api to create payment in gateway
+            $payment = $this->sendCurl( '/payment/create'.$params, "POST");
+            $paymentData = json_decode($payment);
+            $this->addException($order_info['order_id'], strtoupper($coin_config['symbol']), $price * json_decode($exchange_rate)->data, $coin_config['payment_lifetime'], self::NO_AMOUNT, null, null, $paymentData->data->_id);
 
-        return $payment;
+            return $payment;
+        } else {
+            return false;
+        }
+
     }
 
     public function createPaymentSimple($coinId, $callback) {
@@ -80,22 +85,24 @@ class ModelExtensionPaymentEzdefi extends Model {
         $coin_config = $this->getCoinConfigByEzdefiCoinId($coinId);
         // create params
         $origin_value = $order_info['total'] - ($order_info['total'] * $coin_config['discount']/100);                       // get discount price for this order
-        $exchange_rate = $this->sendCurl("/token/exchange/".$order_info['currency_code']."%3A".$coin_config['symbol'], 'GET');
-        //create amount id
-        $amount = $origin_value * json_decode($exchange_rate)->data;
-        $amount_id = $this->createAmountId($coin_config['symbol'], $amount, $coin_config['payment_lifetime'], $coin_config['decimal'], $this->config->get('payment_ezdefi_variation'));
-        if($amount_id) {
-            $params = "?amountId=true&uoid=".$order_info['order_id']."-1&to=".$coin_config['wallet_address']."&value=".$amount_id."&currency=".$coin_config['symbol']."%3A".$coin_config['symbol']."&safedist=".$coin_config['safe_block_distant']."&callback=".urlencode($callback);
-            if($coin_config['payment_lifetime'] > 0) {
-                $params .= "&duration=".$coin_config['payment_lifetime'];
+        if($origin_value > 0) {
+            $exchange_rate = $this->sendCurl("/token/exchange/".$order_info['currency_code']."%3A".$coin_config['symbol'], 'GET');
+            //create amount id
+            $amount = $origin_value * json_decode($exchange_rate)->data;
+            $amount_id = $this->createAmountId($coin_config['symbol'], $amount, $coin_config['payment_lifetime'], $coin_config['decimal'], $this->config->get('payment_ezdefi_variation'));
+
+            if($amount_id) {
+                $params = "?amountId=true&uoid=".$order_info['order_id']."-1&to=".$coin_config['wallet_address']."&value=".$amount_id."&currency=".$coin_config['symbol']."%3A".$coin_config['symbol']."&safedist=".$coin_config['safe_block_distant']."&callback=".urlencode($callback);
+                if($coin_config['payment_lifetime'] > 0) {
+                    $params .= "&duration=".$coin_config['payment_lifetime'];
+                }
+                $payment = $this->sendCurl( '/payment/create'.$params, "POST");
+                $paymentData = json_decode($payment);
+                $this->addException($order_info['order_id'], strtoupper($coin_config['symbol']), $amount_id, $coin_config['payment_lifetime'], self::HAS_AMOUNT, null, null, $paymentData->data->_id);
+                return $payment;
             }
-            $payment = $this->sendCurl( '/payment/create'.$params, "POST");
-            $paymentData = json_decode($payment);
-            $this->addException($order_info['order_id'], strtoupper($coin_config['symbol']), $amount_id, $coin_config['payment_lifetime'], self::HAS_AMOUNT, null, null, $paymentData->data->_id);
-            return $payment;
-        } else {
-            return false;
         }
+        return false;
     }
 
     public function createAmountId($currency, $amount, $expiration, $decimal, $variation) {
