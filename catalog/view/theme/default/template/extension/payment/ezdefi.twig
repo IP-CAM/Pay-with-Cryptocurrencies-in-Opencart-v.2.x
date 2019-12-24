@@ -85,60 +85,70 @@
             {% endif %}
             {% if enable_simple_pay %}
                 <div class="payment-box simple-pay-box">
-					<div class="alert alert-success alert-copy alert-copy-address">
-						<strong>{{ text_success }}</strong> {{ text_copy_address }}
-					</div>
-					<div class="alert alert-success alert-copy alert-copy-amount">
-						<strong>{{ text_success }}</strong> {{ text_copy_amount }}
-					</div>
-                    <div class="ezdefi-payment__value">
-                        <span class="ezdefi-payment__origin-value--simple">{{ origin_value }}</span> <span> {{ origin_currency }}</span>
-                        <span class="ezdefi-payment__icon-convert"><i class="fa fa-retweet" aria-hidden="true"></i></span>
-                        <span class="ezdefi-payment__currency-value--simple"></span><span class="ezdefi-payment__currency--simple"></span>
+                    <div class="payment-content--simple">
+                        <div class="alert alert-success alert-copy alert-copy-address">
+                            <strong>{{ text_success }}</strong> {{ text_copy_address }}
+                        </div>
+                        <div class="alert alert-success alert-copy alert-copy-amount">
+                            <strong>{{ text_success }}</strong> {{ text_copy_amount }}
+                        </div>
+                        <div class="ezdefi-payment__value">
+                            <span class="ezdefi-payment__origin-value--simple">{{ origin_value }}</span> <span> {{ origin_currency }}</span>
+                            <span class="ezdefi-payment__icon-convert"><i class="fa fa-retweet" aria-hidden="true"></i></span>
+                            <span class="ezdefi-payment__currency-value--simple"></span><span class="ezdefi-payment__currency--simple"></span>
+                        </div>
+                        <div class="ezdefi-payment__countdown-box">
+                            <input type="hidden" id="payment-id--simple">
+                            {{ ezdefi_countdown_lifetime_simple }}
+                        </div>
+                        <div class="qrcode-box">
+                            <a href="" target="_blank" class="ezdefi-payment__deeplink ezdefi-payment__deeplink--simple">
+                                <img src="" alt="" class="ezdefi-payment__qr-code--simple">
+                            </a>
+                            <div class="timeout-notification timeout-notification--simple reload-payment" data-suffixes="--simple">
+                                <p>{{ payment_time_out }}</p>
+                            </div>
+                        </div>
+                        <p><b>Address:</b> <span class="ezdefi-payment__wallet-address--simple"></span>
+                            <span class="btn-copy-address"><i class="fa fa-copy ezdefi-copy-icon"></i></span>
+                        </p>
+                        <p><b>Amount:</b> <span class="ezdefi-payment__amount--simple"></span><span class="ezdefi-payment__currency--simple"></span>
+                            <span class="btn-copy-amount"><i class="fa fa-copy ezdefi-copy-icon"></i></span>
+                        </p>
+                        <p class="margin-top-md text-red">{{ text_notify_pay_exact_amount }} <label for="ezdefi-show-payment--escrow" class="link_use_ezdefi_wallet"><i>{{ text_ezdefi_wallet }}</i></label></p>
                     </div>
-                    <div class="ezdefi-payment__countdown-box">
-                        <input type="hidden" id="payment-id--simple">
-                        {{ ezdefi_countdown_lifetime_simple }}
+                    <div class="payment-error--simple">
+                        {{ error_cant_create_amount }}
                     </div>
-					<div class="qrcode-box">
-						<a href="" target="_blank" class="ezdefi-payment__deeplink ezdefi-payment__deeplink--simple">
-							<img src="" alt="" class="ezdefi-payment__qr-code--simple">
-						</a>
-						<div class="timeout-notification timeout-notification--simple reload-payment" data-suffixes="--simple">
-							<p>{{ payment_time_out }}</p>
-						</div>
-					</div>
-                    <p><b>Address:</b> <span class="ezdefi-payment__wallet-address--simple"></span>
-						<span class="btn-copy-address"><i class="fa fa-copy ezdefi-copy-icon"></i></span>
-					</p>
-                    <p><b>Amount:</b> <span class="ezdefi-payment__amount--simple"></span><span class="ezdefi-payment__currency--simple"></span>
-						<span class="btn-copy-amount"><i class="fa fa-copy ezdefi-copy-icon"></i></span>
-					</p>
-                    <p class="margin-top-md text-red">{{ text_notify_pay_exact_amount }} <label for="ezdefi-show-payment--escrow" class="link_use_ezdefi_wallet"><i>{{ text_ezdefi_wallet }}</i></label></p>
                 </div>
             {% endif %}
             {% if enable_escrow_pay %}
                 <div class="payment-box escrow-pay-box">
-                    <div class="ezdefi-payment__value">
-                        <span class="ezdefi-payment__origin-value--escrow">{{ origin_value }} </span> <span> {{ origin_currency }}</span>
-                        <span class="ezdefi-payment__icon-convert"><i class="fa fa-retweet" aria-hidden="true"></i></span>
-                        <span class="ezdefi-payment__currency-value--escrow"></span><span class="ezdefi-payment__currency--escrow"></span>
+                    <div class="payment-content--escrow">
+                        <div class="ezdefi-payment__value">
+                            <span class="ezdefi-payment__origin-value--escrow">{{ origin_value }} </span> <span> {{ origin_currency }}</span>
+                            <span class="ezdefi-payment__icon-convert"><i class="fa fa-retweet" aria-hidden="true"></i></span>
+                            <span class="ezdefi-payment__currency-value--escrow"></span><span class="ezdefi-payment__currency--escrow"></span>
+                        </div>
+                        <div class="ezdefi-payment__countdown-box">
+                            <input type="hidden" id="payment-id--escrow">
+                            {{ ezdefi_countdown_lifetime_escrow }}
+                        </div>
+                        <div class="qrcode-box">
+                            <a href="" class="ezdefi-payment__deeplink" target="_blank">
+                                <img src="" alt="" class="ezdefi-payment__qr-code ezdefi-payment__qr-code--escrow">
+                            </a>
+                            <div class="timeout-notification timeout-notification--escrow reload-payment" data-suffixes="--escrow">
+                                <p>{{ payment_time_out }}</p>
+                            </div>
+                        </div>
+                        <div class="ezdefi-payment__download-link">
+                            <a href="{{ link_download_app_ios }}" target="_blank"><span><i class="fa fa-apple ezdefi-icon-apple"></i></span> {{ text_download_app_ios }}</a>
+                            <a href="{{ link_download_app_android }}" target="_blank"><span><i class="fa fa-android ezdefi-icon-android"></i></span> {{ text_download_app_android }}</a>
+                        </div>
                     </div>
-                    <div class="ezdefi-payment__countdown-box">
-                        <input type="hidden" id="payment-id--escrow">
-                        {{ ezdefi_countdown_lifetime_escrow }}
-                    </div>
-					<div class="qrcode-box">
-						<a href="" class="ezdefi-payment__deeplink" target="_blank">
-							<img src="" alt="" class="ezdefi-payment__qr-code ezdefi-payment__qr-code--escrow">
-						</a>
-						<div class="timeout-notification timeout-notification--escrow reload-payment" data-suffixes="--escrow">
-							<p>{{ payment_time_out }}</p>
-						</div>
-					</div>
-                    <div class="ezdefi-payment__download-link">
-                        <a href="{{ link_download_app_ios }}" target="_blank"><span><i class="fa fa-apple ezdefi-icon-apple"></i></span> {{ text_download_app_ios }}</a>
-                        <a href="{{ link_download_app_android }}" target="_blank"><span><i class="fa fa-android ezdefi-icon-android"></i></span> {{ text_download_app_android }}</a>
+                    <div class="payment-error--escrow">
+                        {{ error_cant_create_payment }}
                     </div>
                 </div>
             {% endif %}
