@@ -303,8 +303,8 @@ div.escrow-pay-box, div.simple-pay-box {
 }
 
 .Loader__item {
-    width: 20px;
-    height: 20px;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
     background: #f9864f;
     margin: 5px;
