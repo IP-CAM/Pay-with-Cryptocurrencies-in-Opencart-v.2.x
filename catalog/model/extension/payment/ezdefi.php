@@ -124,15 +124,17 @@ class ModelExtensionPaymentEzdefi extends Model {
             $this->db->query("START TRANSACTION;");
             $this->db->query("INSERT INTO `".DB_PREFIX."ezdefi_amount` (`temp`, `amount`, `tag_amount`, `expiration`, `currency`, `decimal`)
                             SELECT (case when(MIN(t1.temp + 1) is null) then 0 else MIN(t1.temp + 1) end) as `temp`, " .$amount." as `amount`, 
-                                ".$amount." + (CASE WHEN(MIN(t1.temp + 1) is NULL) THEN 0 WHEN(MIN(t1.temp+1)%2 = 0) then MIN(t1.temp+1)/2 else -(MIN(t1.temp+1)+1)/2 end) * pow(10, -".$decimal.") as `tag_amount`, DATE_ADD(NOW(),
-                                 INTERVAL ".$expiration." SECOND) as `expiration`,
+                                ".$amount." + (CASE WHEN(MIN(t1.temp + 1) is NULL) THEN 0 WHEN(MIN(t1.temp+1)%2 = 0) then MIN(t1.temp+1)/2 else -(MIN(t1.temp+1)+1)/2 end) * pow(10, -".$decimal.") as `tag_amount`,
+                                 DATE_ADD(NOW(), INTERVAL ".$expiration." SECOND) as `expiration`,
                                   '".$currency. "' as `currency`, ".(int)$decimal." as `decimal`
                             FROM `".DB_PREFIX."ezdefi_amount` t1
-                            LEFT JOIN `".DB_PREFIX."ezdefi_amount` t2 ON t1.temp + 1 = t2.temp and t1.amount = t2.amount and t1.currency = t2.currency
+                            LEFT JOIN `".DB_PREFIX."ezdefi_amount` t2 ON t1.temp + 1 = t2.temp and t1.amount = t2.amount and t1.currency = t2.currency and t1.decimal = t2.decimal
                             WHERE t2.temp IS NULL
+                                AND t1.decimal = ".$decimal."
                                 AND t1.currency = '".$currency."'
-                                AND t1.amount = ROUND(" .$amount.", ".self::MAX_AMOUNT_DECIMAL.");");
-            $amount_id = $this->db->query("select tag_amount from `".DB_PREFIX."ezdefi_amount` where `currency` = '" .$currency."' AND `amount`=ROUND(" .$amount.", ".self::MAX_AMOUNT_DECIMAL.") ORDER BY id DESC LIMIT 1;");
+                                AND t1.amount = ROUND(" .$amount.", ".self::MAX_AMOUNT_DECIMAL.")
+                            ON DUPLICATE KEY UPDATE id=LAST_INSERT_ID(id), `expiration` = DATE_ADD(NOW(), INTERVAL ".$expiration." SECOND), `decimal` = ".$decimal.";");
+            $amount_id = $this->db->query("select tag_amount from `".DB_PREFIX."ezdefi_amount` where `id` = LAST_INSERT_ID()");
             $this->db->query("COMMIT;");
             $variationValue = abs($amount_id->row['tag_amount'] - $amount);
 
