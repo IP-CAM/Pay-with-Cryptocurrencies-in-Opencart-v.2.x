@@ -15,12 +15,17 @@
 		<div class="ezdefi-select-coin__list">
 			{% for coin_config in coins_config %}
 				<label for="select-coin-{{ coin_config.ezdefi_coin_id }}" class="ezdefi-change-coin-item">
-					<img src="{{ coin_config.logo }}" alt="" class="ezdefi-select-coin-item__logo">
-					<span class="ezdefi-select-coin-item__price"> {{ coin_config.price }} </span>
-					<span class="ezdefi-select-coin-item__symbol">{{coin_config.symbol}}</span>
-					<span class="ezdefi-select-coin-item__discount">-{{coin_config.discount + 0}}%</span>
-					<input type="radio" name="coin-selected-to-order" class="hidden select-coin-checkbox" id="select-coin-{{ coin_config.ezdefi_coin_id }}" value="{{ coin_config.ezdefi_coin_id }}" data-discount="{{ coin_config.discount }}">
-				</label>
+                    {% if coin_config.description %}
+                        <img src="{{ coin_config.logo }}" alt="" class="ezdefi-select-coin-item__logo" data-toggle="tooltip" title="{{ coin_config.description }}">
+                    {% else %}
+                        <img src="{{ coin_config.logo }}" alt="" class="ezdefi-select-coin-item__logo">
+                    {% endif %}
+
+                    <span class="ezdefi-select-coin-item__price"> {{ coin_config.price }} </span>
+                    <span class="ezdefi-select-coin-item__symbol">{{coin_config.symbol}}</span>
+                    <span class="ezdefi-select-coin-item__discount">-{{coin_config.discount + 0}}%</span>
+                    <input type="radio" name="coin-selected-to-order" class="hidden select-coin-checkbox" id="select-coin-{{ coin_config.ezdefi_coin_id }}" value="{{ coin_config.ezdefi_coin_id }}" data-discount="{{ coin_config.discount }}">
+                </label>
 			{% endfor %}
 		</div>
 		<a href="#" class="ezapy-guide-link" target="_blank">{{ text_guide }}</a>
@@ -89,7 +94,7 @@
                     <div class="ezdefi-payment__value">
                         <span class="ezdefi-payment__origin-value--simple">{{ origin_value }}</span> <span> {{ origin_currency }}</span>
                         <span class="ezdefi-payment__icon-convert"><i class="fa fa-retweet" aria-hidden="true"></i></span>
-                        <span class="ezdefi-payment__currency-value--simple"></span>
+                        <span class="ezdefi-payment__currency-value--simple"></span><span class="ezdefi-payment__currency--simple"></span>
                     </div>
                     <div class="ezdefi-payment__countdown-box">
                         <input type="hidden" id="payment-id--simple">
@@ -117,7 +122,7 @@
                     <div class="ezdefi-payment__value">
                         <span class="ezdefi-payment__origin-value--escrow">{{ origin_value }} </span> <span> {{ origin_currency }}</span>
                         <span class="ezdefi-payment__icon-convert"><i class="fa fa-retweet" aria-hidden="true"></i></span>
-                        <span class="ezdefi-payment__currency-value--escrow"></span>
+                        <span class="ezdefi-payment__currency-value--escrow"></span><span class="ezdefi-payment__currency--escrow"></span>
                     </div>
                     <div class="ezdefi-payment__countdown-box">
                         <input type="hidden" id="payment-id--escrow">
@@ -132,8 +137,8 @@
 						</div>
 					</div>
                     <div class="ezdefi-payment__download-link">
-                        <a href="{{ link_download_app_ios }}"><span><i class="fa fa-apple ezdefi-icon-apple"></i></span> {{ text_download_app_ios }}</a>
-                        <a href="{{ link_download_app_android }}"><span><i class="fa fa-android ezdefi-icon-android"></i></span> {{ text_download_app_android }}</a>
+                        <a href="{{ link_download_app_ios }}" target="_blank"><span><i class="fa fa-apple ezdefi-icon-apple"></i></span> {{ text_download_app_ios }}</a>
+                        <a href="{{ link_download_app_android }}" target="_blank"><span><i class="fa fa-android ezdefi-icon-android"></i></span> {{ text_download_app_android }}</a>
                     </div>
                 </div>
             {% endif %}

@@ -305,6 +305,7 @@ $( function() {
                     <i class="fa fa-arrows" aria-hidden="true"></i>
                     <input type="hidden" class="${this.formatSelectorToClassName(selectors.coinOrderInput)}" name="${data._id}[coin_order]" value="${order}">
                     <input type="hidden" class="${this.formatSelectorToClassName(selectors.coinIdInput)}" name="${data._id}[coin_id]" value="${data._id}">
+                    <input type="hidden" name="${data._id}[description]" value="${data.description ? data.description : ''}">
                 </td>
                 <td>
                     <img src="${data.logo}" alt="" class="coin-config__logo">
