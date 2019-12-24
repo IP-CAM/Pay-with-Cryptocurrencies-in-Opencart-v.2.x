@@ -146,6 +146,8 @@ $(function () {
     };
     
     var createPayment = function (url, coinId, suffixes, discount) {
+        showPaymentLoading(suffixes, true);
+        $(".payment-error"+suffixes).css('display', 'none');
         $.ajax({
             url: url,
             method: "GET",
@@ -156,16 +158,22 @@ $(function () {
                 }
                 var data = JSON.parse(response).data;
                 if(data.status === 'failure') {
+                    renderPayment(suffixes,{},discount);
                     $(".payment-content"+suffixes).css('display', 'none');
                     $(".payment-error"+suffixes).css('display', 'block');
-                    renderPayment(suffixes,{},discount);
+                    $(".loader"+suffixes).css('display', 'none');
                 } else {
-                    $(".payment-content"+suffixes).css('display', 'block');
                     $(".payment-error"+suffixes).css('display', 'none');
                     renderPayment(suffixes,data,discount);
+                    showPaymentLoading(suffixes, false);
                 }
             }
         })
+    };
+
+    var showPaymentLoading = function (suffixes, enable) {
+        $(".payment-content"+suffixes).css('display', enable ? 'none' : 'block');
+        $(".loader"+suffixes).css('display', enable ? 'flex' : 'none');
     };
 
     var renderPayment = function (suffixes, data, discount ) {
