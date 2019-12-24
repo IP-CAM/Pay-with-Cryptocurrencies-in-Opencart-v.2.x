@@ -58,7 +58,7 @@ class ModelExtensionPaymentEzdefi extends Model {
         $coin_config = $this->getCoinConfigByEzdefiCoinId($coinId);
         //create param
         $price = $order_info['total'] - ($order_info['total'] * $coin_config['discount']/100);             // get discount price for this order
-        if((int)$price > 0) {
+        if($price > 0) {
             $exchange_rate = $this->sendCurl("/token/exchange/".$order_info['currency_code']."%3A".$coin_config['symbol'], 'GET');
             $params = "?uoid=".$order_info['order_id']."-0&to=".$coin_config['wallet_address']."&value=".$price."&currency=".$order_info['currency_code']."%3A".$coin_config['symbol']."&safedist=".$coin_config['safe_block_distant']."&callback=".urlencode($callback);
             if($coin_config['payment_lifetime'] > 0) {
@@ -85,7 +85,7 @@ class ModelExtensionPaymentEzdefi extends Model {
         $coin_config = $this->getCoinConfigByEzdefiCoinId($coinId);
         // create params
         $origin_value = $order_info['total'] - ($order_info['total'] * $coin_config['discount']/100);                       // get discount price for this order
-        if((int)$origin_value > 0) {
+        if($origin_value > 0) {
             $exchange_rate = $this->sendCurl("/token/exchange/".$order_info['currency_code']."%3A".$coin_config['symbol'], 'GET');
             //create amount id
             $amount = $origin_value * json_decode($exchange_rate)->data;
