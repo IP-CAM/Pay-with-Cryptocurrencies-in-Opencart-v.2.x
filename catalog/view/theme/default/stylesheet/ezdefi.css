@@ -161,6 +161,18 @@
     padding-left: 5px;
 }
 
+.payment-content--escrow, .payment-content--simple {
+    display: block;
+}
+
+.payment-error--escrow, .payment-error--simple {
+    display: none;
+    text-align: center;
+    font-size: 18px;
+    padding: 40px;
+    font-weight: 500;
+}
+
 div.escrow-pay-box, div.simple-pay-box {
     grid-column: 1/-1;
 }

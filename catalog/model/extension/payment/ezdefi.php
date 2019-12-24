@@ -73,7 +73,6 @@ class ModelExtensionPaymentEzdefi extends Model {
         } else {
             return false;
         }
-
     }
 
     public function createPaymentSimple($coinId, $callback) {
@@ -111,12 +110,12 @@ class ModelExtensionPaymentEzdefi extends Model {
         }
 	    $amount = round($amount, $decimal);
         $old_amount = $this->db->query("SELECT `tag_amount`, `id`
-                                            from `".DB_PREFIX."ezdefi_amount` 
-                                            where `currency`='".$currency."' 
+                                            FROM `".DB_PREFIX."ezdefi_amount` 
+                                            WHERE `currency`='".$currency."' 
                                                 AND `amount`='".$amount."' 
                                                 AND `expiration` < DATE_SUB(NOW(), INTERVAL ".self::MIN_SECOND_REUSE." SECOND)
                                                 AND ( `decimal` = ".(int)$decimal." OR `temp` = 0 )
-                                            order by `temp` 
+                                            ORDER BY `temp` 
                                             LIMIT 1;");
 	    if ($old_amount->row) {
             $this->db->query("UPDATE `". DB_PREFIX . "ezdefi_amount` SET `expiration`= DATE_ADD(NOW(), INTERVAL ".$expiration." SECOND)  WHERE `id`=".$old_amount->row['id']);
@@ -178,11 +177,6 @@ class ModelExtensionPaymentEzdefi extends Model {
         $this->db->query("INSERT INTO `". DB_PREFIX . "ezdefi_exception` (`payment_id`, `order_id`, `currency`, `amount_id`, `expiration`, `has_amount`, `paid`, `explorer_url`) VALUES 
         ('".$payment_id."','".$order_id."', '".$currency."', '".$amount_id."', DATE_ADD(NOW(), INTERVAL ".$expiration." SECOND), '".$has_amount."', '".$paid."', '".$explorer_url."')");
     }
-
-//    public function setPaidForException($order_id, $currency, $amount_id, $paid = 0, $has_amount, $explorer_url = null) {
-//        $this->db->query("UPDATE `". DB_PREFIX . "ezdefi_exception` SET `paid`=".$paid.", `explorer_url`='".$this->db->escape($explorer_url)."'
-//            WHERE `currency` ='".$currency."' AND `order_id`='".$order_id."' AND `amount_id`=".$amount_id." AND `has_amount`=".$has_amount."");
-//    }
 
     public function setPaidForException($payment_id, $paid = 0, $explorer_url = null) {
         $this->db->query("UPDATE `". DB_PREFIX . "ezdefi_exception` SET `paid`=".$paid.", `explorer_url`='".$this->db->escape($explorer_url)."'

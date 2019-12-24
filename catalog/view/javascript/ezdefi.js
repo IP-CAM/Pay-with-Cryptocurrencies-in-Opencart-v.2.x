@@ -156,9 +156,12 @@ $(function () {
                 }
                 var data = JSON.parse(response).data;
                 if(data.status === 'failure') {
-                    alert(data.message);
+                    $(".payment-content"+suffixes).css('display', 'none');
+                    $(".payment-error"+suffixes).css('display', 'block');
                     renderPayment(suffixes,{},discount);
                 } else {
+                    $(".payment-content"+suffixes).css('display', 'block');
+                    $(".payment-error"+suffixes).css('display', 'none');
                     renderPayment(suffixes,data,discount);
                 }
             }
