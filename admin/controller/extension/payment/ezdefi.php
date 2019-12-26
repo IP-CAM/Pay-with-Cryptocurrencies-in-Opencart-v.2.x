@@ -261,6 +261,11 @@ class ControllerExtensionPaymentEzdefi extends Controller {
     }
 
     public function install() {
+        $this->load->language('extension/payment/ezdefi');
+
+        $this->load->model('setting/setting');
+        $this->model_setting_setting->editSetting('payment_ezdefi', ['payment_ezdefi_gateway_api_url' => $this->language->get('config_gateway_api_url_default')]);
+
         $this->load->model('extension/payment/ezdefi');
         $this->model_extension_payment_ezdefi->install();
     }

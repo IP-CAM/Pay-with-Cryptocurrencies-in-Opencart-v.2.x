@@ -2,6 +2,9 @@
 // Heading
 $_['heading_title']		 = 'ezDeFi (pay with cryptocurrency)';
 
+// Config
+$_['config_gateway_api_url_default'] = 'https://merchant-api.ezdefi.com/api';
+
 // Entry
 $_['entry_enable_extension'] = 'Enable/Disable';
 $_['entry_gateway_api_url'] = 'GATEWAY API URL';
