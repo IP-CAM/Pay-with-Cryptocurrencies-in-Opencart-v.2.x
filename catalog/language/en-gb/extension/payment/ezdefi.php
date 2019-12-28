@@ -21,9 +21,9 @@ $_['text_copy_amount'] = 'Amount was copied to the clipboard.';
 
 
 //link
-$_['link_guide'] = '#';
-$_['link_download_app_ios']= '#';
-$_['link_download_app_android']= '#';
+$_['link_guide'] = 'https://help.ezdefi.com';
+$_['link_download_app_ios']= 'https://ezdefi.com/ios';
+$_['link_download_app_android']= 'https://ezdefi.com/android';
 
 //button
 $_['button_next'] = 'Next';
