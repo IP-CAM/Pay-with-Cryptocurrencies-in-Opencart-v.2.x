@@ -1,6 +1,6 @@
 <?php
 // Heading
-$_['heading_title']		 = 'ezDeFi (pay with cryptocurrency)';
+$_['heading_title']		 = 'ezDeFi - Bitcoin, Ethereum and Cryptocurrencies Payment Gateway';
 
 // Config
 $_['config_gateway_api_url_default'] = 'https://merchant-api.ezdefi.com/api';
