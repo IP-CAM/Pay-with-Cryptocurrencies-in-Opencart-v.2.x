@@ -30,9 +30,9 @@
 		</div>
 		<a href="{{ link_guide }}" class="ezapy-guide-link" target="_blank">{{ text_guide }}</a>
         {% if enable_simple_pay %}
-		    <button class="ezdefi-btn-create-payment" data-url_create_payment="{{ url_create_simple_payment }}" disabled> Tiếp theo </button>
+		    <button class="ezdefi-btn-create-payment" data-url_create_payment="{{ url_create_simple_payment }}" disabled> {{ button_next }} </button>
         {% else %}
-            <button class="ezdefi-btn-create-payment" data-url_create_payment="{{ url_create_escrow_payment }}" disabled> Tiếp theo </button>
+            <button class="ezdefi-btn-create-payment" data-url_create_payment="{{ url_create_escrow_payment }}" disabled> {{ button_next }} </button>
         {% endif %}
     </div>
 	<div class="ezdefi-payment-box">

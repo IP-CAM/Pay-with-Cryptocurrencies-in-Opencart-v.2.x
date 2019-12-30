@@ -13,7 +13,7 @@ $_['entry_order_status'] = 'ORDER STATUS';
 $_['entry_payment_method'] = 'PAYMENT METHOD';
 $_['entry_pay_with_any_crypto_wallet'] = 'Pay with any crypto wallet';
 $_['entry_pay_with_ezdefi_wallet'] = 'Pay with ezDeFi wallet';
-$_['entry_pay_variation'] = 'ACCEPTABLE  PRICE AVAIABLE';
+$_['entry_pay_variation'] = 'ACCEPTABLE  PRICE AVAILABLE';
 
 //Button
 $_['button_add'] = 'Add more';
@@ -48,7 +48,6 @@ $_['text_recommend_variation'] = '0.01';
 $_['edit_success'] = 'Edit success';
 $_['delete_success'] = 'Delete success';
 $_['text_view_transaction'] = 'View Transaction Detail';
-$_['text_gateway_url_default'] = 'http://163.172.170.35:3000/api';
 $_['text_delete_exception'] = 'Delete exception';
 $_['text_confirm_order'] = 'Confirm Order';
 $_['text_revert_order'] = 'Revert Order';
