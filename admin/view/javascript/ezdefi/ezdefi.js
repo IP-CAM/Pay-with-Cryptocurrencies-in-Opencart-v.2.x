@@ -89,7 +89,7 @@ $( function() {
         });
 
         this.validateAllInput(selectors.gatewayApiUrlInput, {url:true, required: true});
-        this.validateAllInput(selectors.apiKeyInput, {required: true});
+        // this.validateAllInput(selectors.apiKeyInput, {required: true});
         this.validateAllInput(selectors.orderStatusInput, {required: true});
         this.validateAllInput(selectors.coinDiscountInput, {max: 100, min:0, float: true});
         this.validateAllInput(selectors.coinNameInput, {required: true});
@@ -106,6 +106,19 @@ $( function() {
             messages: {required: 'Choose at least one payment method'},
         });
         this.validateAllInput(selectors.coinWalletAddressInput, {required: true});
+        this.validateApiKey();
+    };
+
+    oc_ezdefi_admin.prototype.validateApiKey = function() {
+        $(selectors.apiKeyInput).rules('add', {
+            required: true,
+            remote: {
+                url: $(selectors.formConfig).data('url_validate_api_key'),
+            },
+            messages: {
+                remote: "This wallet address is invalid"
+            }
+        });
     };
 
     oc_ezdefi_admin.prototype.validateAllInput = function(selector, rules) {
