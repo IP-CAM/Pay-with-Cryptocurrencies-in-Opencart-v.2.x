@@ -135,13 +135,14 @@ class ModelExtensionPaymentEzdefi extends Model {
         }
     }
 
-    public function deleteCoinConfigByCoinId($coinId) {
-        return $this->db->query("DELETE FROM `" . DB_PREFIX . "ezdefi_coin` WHERE `ezdefi_coin_id` = '".$coinId."'");
+    public function deleteCoinConfigByCoinId($coin_id) {
+        return $this->db->query("DELETE FROM `" . DB_PREFIX . "ezdefi_coin` WHERE `ezdefi_coin_id` = '".$coin_id."'");
     }
 
-    public function getAllCoinAvailable($apiUrl, $keyword) {
-        $url = $apiUrl . "/token/list?keyword=$keyword";
-        $list_coin_support = $this->sendCurl($url, "GET");
+    public function getAllCoinAvailable($api_url, $api_key, $keyword) {
+        if(!$api_key) return 'Not Found';
+        $url = $api_url . "/token/list?keyword=$keyword";
+        $list_coin_support = $this->sendCurl($url, "GET", $api_key);
 
         if($list_coin_support) {
             return $list_coin_support;
@@ -150,19 +151,15 @@ class ModelExtensionPaymentEzdefi extends Model {
         }
     }
 
-    public function checkWalletAddress($apiUrl, $api_key, $address) {
-        $list_wallet = $this->sendCurl($apiUrl . '/user/list_wallet', "GET", $api_key);
-        if ($list_wallet) {
-            $Wallets_data = json_decode($list_wallet)->data;
-            foreach ($Wallets_data as $key => $Wallet_data) {
-                if($Wallet_data->address === $address) {
-                    echo "true";
-                    return;
-                }
-            }
-            echo "false";
+    public function checkApiKey($apiUrl, $api_key) {
+        $list_wallet = $this->sendCurl($apiUrl . '/user/show', "GET", $api_key);
+
+        $list_wallet_data = json_decode($list_wallet);
+
+        if($list_wallet_data && $list_wallet_data->code == 1 && $list_wallet_data->message == 'ok') {
+            return 'true';
         } else {
-            return json_encode(['status' => 'failure', 'message' => 'Something error when get list wallet']);
+            return 'false';
         }
 
     }

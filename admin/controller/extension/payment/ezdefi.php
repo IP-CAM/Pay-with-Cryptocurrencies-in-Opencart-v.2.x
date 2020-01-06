@@ -16,7 +16,7 @@ class ControllerExtensionPaymentEzdefi extends Controller {
 
         $data['action'] = $this->url->link('extension/payment/ezdefi/update', 'user_token=' . $this->session->data['user_token'], true);
         $data['url_get_coin'] = $this->url->link('extension/payment/ezdefi/fetchCoin', 'user_token=' . $this->session->data['user_token'], true);
-        $data['url_validate_wallet'] = $this->url->link('extension/payment/ezdefi/checkWalletAddress', 'user_token=' . $this->session->data['user_token'], true);
+        $data['url_validate_api_key'] = $this->url->link('extension/payment/ezdefi/checkApiKey', 'user_token=' . $this->session->data['user_token'], true);
         $data['url_delete'] = $this->url->link('extension/payment/ezdefi/deleteCoinConfig', 'user_token=' . $this->session->data['user_token'], true);
         $data['url_edit'] = $this->url->link('extension/payment/ezdefi/editCoinConfig', 'user_token=' . $this->session->data['user_token'], true);
         $data['url_delete_exception'] = $this->url->link('extension/payment/ezdefi/deleteException', 'user_token=' . $this->session->data['user_token'], true);
@@ -252,12 +252,14 @@ class ControllerExtensionPaymentEzdefi extends Controller {
         return $this->response->setOutput(json_encode(['data' => ['status' => 'failure', 'message' =>  $this->language->get('something_error')]]));
     }
 
-    public function checkWalletAddress() {
+    public function checkApiKey() {
         $this->load->model('setting/setting');
         $api_url = $this->config->get('payment_ezdefi_gateway_api_url');
-        $api_key = $this->config->get('payment_ezdefi_api_key');
+        $api_key = $this->request->get['payment_ezdefi_api_key'];
+
         $this->load->model('extension/payment/ezdefi');
-        return $this->response->setOutput($this->model_extension_payment_ezdefi->checkWalletAddress($api_url, $api_key, $this->request->get['address']));
+
+        return $this->response->setOutput($this->model_extension_payment_ezdefi->checkApiKey($api_url, $api_key));
     }
 
     public function install() {
@@ -278,8 +280,9 @@ class ControllerExtensionPaymentEzdefi extends Controller {
     public function fetchCoin() {
         $this->load->model('setting/setting');
         $api_url = $this->config->get('payment_ezdefi_gateway_api_url');
+        $api_key = $this->config->get('payment_ezdefi_api_key');
         $this->load->model('extension/payment/ezdefi');
-        return $this->response->setOutput($this->model_extension_payment_ezdefi->getAllCoinAvailable($api_url,  $this->request->get['keyword']));
+        return $this->response->setOutput($this->model_extension_payment_ezdefi->getAllCoinAvailable($api_url, $api_key,  $this->request->get['keyword']));
     }
 
     public function deleteException() {
