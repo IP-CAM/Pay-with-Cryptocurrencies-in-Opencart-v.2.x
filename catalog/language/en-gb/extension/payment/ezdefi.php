@@ -18,6 +18,7 @@ $_['text_create_payment_success'] = ' Create payment success';
 $_['text_success'] = 'Success!';
 $_['text_copy_address'] = 'Address was copied to the clipboard.';
 $_['text_copy_amount'] = 'Amount was copied to the clipboard.';
+$_['text_click_to_pay'] = 'Click to pay';
 
 
 //link

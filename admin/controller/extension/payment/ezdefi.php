@@ -35,13 +35,16 @@ class ControllerExtensionPaymentEzdefi extends Controller {
         } else {
             $data['payment_ezdefi_gateway_api_url'] = '';
         }
-
         if($this->config->has('payment_ezdefi_api_key')){
             $data['payment_ezdefi_api_key'] = $this->config->get('payment_ezdefi_api_key');
         } else {
             $data['payment_ezdefi_api_key'] = '';
         }
-
+        if($this->config->has('payment_ezdefi_first_time_config')){
+            $data['payment_ezdefi_first_time_config'] = $this->config->get('payment_ezdefi_first_time_config');
+        } else {
+            $data['payment_ezdefi_first_time_config'] = '';
+        }
         if($this->config->has('payment_ezdefi_enable_simple_pay')){
             $data['payment_ezdefi_enable_simple_pay'] = $this->config->get('payment_ezdefi_enable_simple_pay');
         } else {
@@ -124,6 +127,8 @@ class ControllerExtensionPaymentEzdefi extends Controller {
                 $data_setting['payment_ezdefi_enable_escrow_pay'] = $this->request->post['payment_ezdefi_enable_escrow_pay'];
                 unset($this->request->post['payment_ezdefi_enable_escrow_pay']);
             }
+
+            $data_setting['payment_ezdefi_first_time_config'] = 0;
 
             $this->load->model('extension/payment/ezdefi');
             $this->model_extension_payment_ezdefi->updateCoins($this->request->post);
@@ -267,6 +272,7 @@ class ControllerExtensionPaymentEzdefi extends Controller {
 
         $this->load->model('setting/setting');
         $this->model_setting_setting->editSetting('payment_ezdefi', ['payment_ezdefi_gateway_api_url' => $this->language->get('config_gateway_api_url_default')]);
+        $this->model_setting_setting->editSetting('payment_ezdefi', ['payment_ezdefi_first_time_config' => 1]);
 
         $this->load->model('extension/payment/ezdefi');
         $this->model_extension_payment_ezdefi->install();

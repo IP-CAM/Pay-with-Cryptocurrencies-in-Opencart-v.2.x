@@ -31,7 +31,7 @@ $_['tab_exception'] = 'ezDeFi exception management';
 $_['text_symbol'] = 'Name';
 $_['text_name'] = 'Full Name';
 $_['text_discount'] = 'Discount';
-$_['text_payment_lifetime'] = 'Expiration (seconds)';
+$_['text_payment_lifetime'] = 'Expiration (minutes)';
 $_['text_wallet_address'] = 'Wallet address';
 $_['text_safe_block_distant'] = 'Block Confirmation';
 $_['text_decimal'] = 'Decimal';
@@ -76,7 +76,8 @@ $_['text_delete'] = 'Delete';
 $_['text_confirm_paid'] = 'Confirm Paid';
 $_['text_revert'] = 'Revert';
 $_['text_assign'] = 'Assign';
-
+$_['text_register'] = 'Register';
+$_['text_link_register'] = 'https://merchant.ezdefi.com/';
 
 //warning
 $_['warning_change_decimal'] = 'Changing Decimal can cause to payment interruption';
