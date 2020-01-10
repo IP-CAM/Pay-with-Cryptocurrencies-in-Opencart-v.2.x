@@ -37,6 +37,30 @@ $( function() {
         $(selectors.enableSimplePayInput).click(this.showSimplePayConfig);
         $(selectors.editCoinDecimalInput).focus(this.showWarningChangeDecimal);
         $(selectors.modalEditCoin).on("hide.bs.modal", this.revertEditInput);
+        if($("#is-first-time-config").val() == 1) {
+            this.selectCoinListener({params: {data: {
+                logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1.png',
+                name: 'Bitcoin',
+                symbol: 'btc',
+                _id: '5e144ac31565572569b8868a',
+                suggestedDecimal: 8,
+            }}});
+            this.selectCoinListener({params: {data: {
+                logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png',
+                name: 'Ethereum',
+                symbol: 'eth',
+                _id: '5e144af81565572569b8868b',
+                suggestedDecimal: 8,
+            }}});
+            this.selectCoinListener({params: {data: {
+                logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/2714.png',
+                name: 'NewSD',
+                symbol: 'newsd',
+                _id: '5e144d161565572569b88693',
+                suggestedDecimal: 4,
+            }}});
+        }
+
         this.showSimplePayConfig();
         this.initSortable();
         this.initValidate();
@@ -138,11 +162,9 @@ $( function() {
         if($(selectors.enableSimplePayInput).is(':checked')) {
             $(selectors.decimalBox).css('display','block');
             $(selectors.variationBox).css('display','block');
-            $(".coin-decimal").css('display','table-cell');
         } else {
             $(selectors.decimalBox).css('display','none');
             $(selectors.variationBox).css('display','none');
-            $(".coin-decimal").css('display','none');
         }
     };
 
@@ -257,6 +279,7 @@ $( function() {
                 <td><input type="text" class="form-control"></td>
                 <td><input type="text" class="form-control"></td>
                 <td><input type="text" class="form-control"></td>
+                <td><input type="text" class="form-control"></td>
             </tr>`;
         $(selectors.coinConfigTable).append(container);
 
@@ -332,15 +355,18 @@ $( function() {
                 <td>${data.name} <input type="hidden" class="${this.formatSelectorToClassName(selectors.coinNameInput)}" value="${data.name}" name="${data._id}[coin_name]"> </td>
                 <td>
                     <div class="row">
-                        <div class="col-sm-10"><input type="number" class="form-control ${this.formatSelectorToClassName(selectors.coinDiscountInput)} validate-float" name="${data._id}[coin_discount]"></div>
+                        <div class="col-sm-10">
+                            <input type="number" class="form-control ${this.formatSelectorToClassName(selectors.coinDiscountInput)} validate-float" name="${data._id}[coin_discount]" value="0">
+                        </div>
                         <div class="col-sm-2 text-left"></div>
                     </div>
                 </td>
-                <td><input type="number" class="form-control ${this.formatSelectorToClassName(selectors.coinPaymentLifetimeInput)} only-positive-integer" name="${data._id}[coin_payment_life_time]"></td>
+                <td><input type="number" class="form-control ${this.formatSelectorToClassName(selectors.coinPaymentLifetimeInput)} only-positive-integer" name="${data._id}[coin_payment_life_time]" value="15"></td>
                 <td><input type="text" class="form-control ${this.formatSelectorToClassName(selectors.coinWalletAddressInput)}" name="${data._id}[coin_wallet_address]"></td>
-                <td><input type="number" class="form-control ${this.formatSelectorToClassName(selectors.coinSafeBlockDistantInput)} only-positive-integer" name="${data._id}[coin_safe_block_distant]"></td>
+                <td><input type="number" class="form-control ${this.formatSelectorToClassName(selectors.coinSafeBlockDistantInput)} only-positive-integer" name="${data._id}[coin_safe_block_distant]" value="1"></td>
                 <td><input type="number" class="form-control ${this.formatSelectorToClassName(selectors.coinDecimalInput)} only-positive-integer" name="${data._id}[coin_decimal]" value="${data.suggestedDecimal}"></td>
             </tr>`;
+
             $(selectors.coinConfigTable).append(container);
             $(selectors.cloneRowCoinConfig).remove();
 

@@ -85,7 +85,7 @@ class ModelExtensionPaymentEzdefi extends Model {
                     "', `symbol` = '" . $this->db->escape($coin_record['coin_symbol']) .
                     "', `name` = '" . $this->db->escape($coin_record['coin_name']) .
                     "', `discount` = '" .(float)$coin_record['coin_discount'] .
-                    "', `payment_lifetime` = '" . (int)$coin_record['coin_payment_life_time'].
+                    "', `payment_lifetime` = '" . (int)($coin_record['coin_payment_life_time']*60).
                     "', `wallet_address` = '" . $this->db->escape($coin_record['coin_wallet_address']) .
                     "', `safe_block_distant` = '" . (int)$coin_record['coin_safe_block_distant'] .
                     "', `decimal` = '" . (int)$coin_record['coin_decimal'] .
@@ -99,7 +99,7 @@ class ModelExtensionPaymentEzdefi extends Model {
 
     public function updateCoinConfig($dataUpdate) {
          return $this->db->query("UPDATE `" . DB_PREFIX . "ezdefi_coin` SET `discount` = '" . (float)$dataUpdate['coin_discount'] .
-            "', `payment_lifetime` = '". (int)$dataUpdate['coin_payment_life_time'].
+            "', `payment_lifetime` = '". (int)($dataUpdate['coin_payment_life_time']*60).
             "', `wallet_address` = '". $this->db->escape($dataUpdate['coin_wallet_address']).
             "', `safe_block_distant` = '". (int)$dataUpdate['coin_safe_block_distant'].
             "', `decimal` = '". (int)$dataUpdate['coin_decimal'].
@@ -141,7 +141,8 @@ class ModelExtensionPaymentEzdefi extends Model {
 
     public function getAllCoinAvailable($api_url, $api_key, $keyword) {
         if(!$api_key) return 'Not Found';
-        $url = $api_url . "/token/list?keyword=$keyword";
+        $url = $api_url . '/token/list?keyword='.$keyword.'&domain='.HTTPS_CATALOG.'&platform=opencart-'.VERSION;
+
         $list_coin_support = $this->sendCurl($url, "GET", $api_key);
 
         if($list_coin_support) {

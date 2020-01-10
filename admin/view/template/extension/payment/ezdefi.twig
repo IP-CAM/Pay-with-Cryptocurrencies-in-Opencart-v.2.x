@@ -5,6 +5,7 @@
     <input type="hidden" id="url-delete-exception-by-order-id" value="{{ url_delete_exception_by_order_id }}">
     <input type="hidden" id="url-get-order-pending" value="{{ url_get_order_pending }}">
     <input type="hidden" id="url-revert-order-exception" value="{{ url_revert_order_exception }}">
+    <input type="hidden" id="is-first-time-config" value="{{ payment_ezdefi_first_time_config }}">
     {# Ezdefi header #}
     <div class="page-header">
         <div class="container-fluid">
@@ -53,8 +54,13 @@
 
                     <div class="form-group">
                         <label class="control-label col-sm-3" for="gateway-api-url"> {{ entry_api_key }} </label>
-                        <div class="col-sm-9">
-                            <input type="text" id="api-key-input" class="form-control col-md-9" name="payment_ezdefi_api_key" value="{{ payment_ezdefi_api_key }}">
+                        <div class="col-sm-8">
+                            <input type="text" id="api-key-input" class="form-control" name="payment_ezdefi_api_key" value="{{ payment_ezdefi_api_key }}">
+                        </div>
+                        <div class="col-sm-1">
+                            <a href="{{ text_link_register }}" target="_blank">
+                                {{ text_register }}
+                            </a>
                         </div>
                     </div>
                     <div class="form-group">
@@ -112,7 +118,7 @@
                                 </td>
                                 <td class="padding-top-md">{{coin_config.name}}</td>
                                 <td class="padding-top-md"><span class="coin-discount">{{ coin_config.discount + 0 }}</span>%</td>
-                                <td class="coin-payment-lifetime padding-top-md">{{ coin_config.payment_lifetime }}</td>
+                                <td class="coin-payment-lifetime padding-top-md">{{ coin_config.payment_lifetime / 60 }}</td>
                                 <td class="coin-wallet-address padding-top-md">{{ coin_config.wallet_address }}</td>
                                 <td class="coin-safe-block-distant padding-top-md">{{ coin_config.safe_block_distant }}</td>
                                 <td class="coin-decimal padding-top-md">{{ coin_config.decimal }}</td>
