@@ -4,7 +4,7 @@ class ModelExtensionPaymentEzdefi extends Model {
     const DONE = 2;
     const HAS_AMOUNT = 1;
     const NO_AMOUNT = 0;
-    const MAX_AMOUNT_DECIMAL = 14;
+    const MAX_AMOUNT_DECIMAL = 30;
     const MIN_SECOND_REUSE = 10;
     const DEFAULT_DECIMAL_LIST_COIN = 12;
 
