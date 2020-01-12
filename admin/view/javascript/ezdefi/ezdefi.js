@@ -44,6 +44,7 @@ $( function() {
                 symbol: 'btc',
                 _id: '5e144ac31565572569b8868a',
                 suggestedDecimal: 8,
+                decimal: 8,
             }}});
             this.selectCoinListener({params: {data: {
                 logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png',
@@ -51,6 +52,7 @@ $( function() {
                 symbol: 'eth',
                 _id: '5e144af81565572569b8868b',
                 suggestedDecimal: 8,
+                decimal: 18,
             }}});
             this.selectCoinListener({params: {data: {
                 logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/2714.png',
@@ -58,6 +60,7 @@ $( function() {
                 symbol: 'newsd',
                 _id: '5e144d161565572569b88693',
                 suggestedDecimal: 4,
+                decimal: 6,
             }}});
         }
 
@@ -113,7 +116,6 @@ $( function() {
         });
 
         this.validateAllInput(selectors.gatewayApiUrlInput, {url:true, required: true});
-        // this.validateAllInput(selectors.apiKeyInput, {required: true});
         this.validateAllInput(selectors.orderStatusInput, {required: true});
         this.validateAllInput(selectors.coinDiscountInput, {max: 100, min:0, float: true});
         this.validateAllInput(selectors.coinNameInput, {required: true});
@@ -123,15 +125,34 @@ $( function() {
         this.validateAllInput(selectors.coinPaymentLifetimeInput, {integer: true});
         this.validateAllInput(selectors.coinSafeBlockDistantInput, {integer: true});
         this.validateAllInput(selectors.variationInput, {more_than_0: true, max: 100, float: true, required: () => $(selectors.enableSimplePayInput).is(':checked')});
-        this.validateAllInput(selectors.coinDecimalInput, {integer: true, min:2, max:14, required: () => $(selectors.enableSimplePayInput).is(':checked')});
         this.validateAllInput(selectors.enableSimplePayInput, {required: () => !$(selectors.enableEscrowPayInput).is(':checked'), messages: {required: ''} });
         this.validateAllInput(selectors.enableEscrowPayInput, {
             required: () => !$(selectors.enableSimplePayInput).is(':checked'),
             messages: {required: 'Choose at least one payment method'},
         });
+        this.validateDecimal();
         this.validateAllInput(selectors.coinWalletAddressInput, {required: true});
         this.validateApiKey();
     };
+
+    oc_ezdefi_admin.prototype.validateDecimal= function() {
+        $(selectors.coinDecimalInput).each(function () {
+            let coinId = $(this).data('coin-id');
+            let maxDecimal = $('#max-decimal-'+coinId).val();
+            let rules = {max: parseInt(maxDecimal), min: 1}
+            let inputName = $(this).attr('name');
+
+            console.log(maxDecimal);
+
+            if(inputName) {
+                $(`input[name="${inputName}"]`).rules('add', rules);
+            } else {
+                var id = $(this).attr('id');
+                $('#'+id).rules('add', rules);
+            }
+
+        });
+    }
 
     oc_ezdefi_admin.prototype.validateApiKey = function() {
         $(selectors.apiKeyInput).rules('add', {
@@ -258,6 +279,7 @@ $( function() {
         $('#edit-safe-block-distant-' + coinId).val(oldSafeBlockDistant);
         $('#edit-decimal-' + coinId).val(oldDecimal);
         $(".warning-edit-decimal").css('display', 'none');
+        $(selectors.formConfig).valid();
     };
 
     oc_ezdefi_admin.prototype.addCoinConfigListener = function() {
@@ -338,7 +360,7 @@ $( function() {
         if(!duplicate) {
             var container = `<tr>
                 <td class="sortable-handle">
-                    <i class="fa fa-arrows" aria-hidden="true"></i>
+                    <i class="fa fa-arrows margin-top-md" aria-hidden="true"></i>
                     <input type="hidden" class="${this.formatSelectorToClassName(selectors.coinOrderInput)}" name="${data._id}[coin_order]" value="${order}">
                     <input type="hidden" class="${this.formatSelectorToClassName(selectors.coinIdInput)}" name="${data._id}[coin_id]" value="${data._id}">
                     <input type="hidden" name="${data._id}[description]" value="${data.description ? data.description : ''}">
@@ -364,11 +386,16 @@ $( function() {
                 <td><input type="number" class="form-control ${this.formatSelectorToClassName(selectors.coinPaymentLifetimeInput)} only-positive-integer" name="${data._id}[coin_payment_life_time]" value="15"></td>
                 <td><input type="text" class="form-control ${this.formatSelectorToClassName(selectors.coinWalletAddressInput)}" name="${data._id}[coin_wallet_address]"></td>
                 <td><input type="number" class="form-control ${this.formatSelectorToClassName(selectors.coinSafeBlockDistantInput)} only-positive-integer" name="${data._id}[coin_safe_block_distant]" value="1"></td>
-                <td><input type="number" class="form-control ${this.formatSelectorToClassName(selectors.coinDecimalInput)} only-positive-integer" name="${data._id}[coin_decimal]" value="${data.suggestedDecimal}"></td>
+                <td>
+                    <input type="number" class="form-control ${this.formatSelectorToClassName(selectors.coinDecimalInput)} only-positive-integer" name="${data._id}[coin_decimal]" value="${data.suggestedDecimal}" data-coin-id="${data._id}">
+                    <input type="hidden" class="only-positive-integer" value="${data.decimal}" id="max-decimal-${data._id}" name="${data._id}[max_currency_decimal]"">
+                </td>
+                
             </tr>`;
 
             $(selectors.coinConfigTable).append(container);
             $(selectors.cloneRowCoinConfig).remove();
+
 
             this.initValidate();
             this.initCancelSelectCoin();

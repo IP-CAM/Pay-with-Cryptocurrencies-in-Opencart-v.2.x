@@ -148,7 +148,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label>{{ text_payment_lifetime }}</label>
-                                        <input type="number" class="form-control coin-config__payment-lifetime only-positive-integer" id="edit-payment-lifetime-{{ coin_config.ezdefi_coin_id }}" value="{{ coin_config.payment_lifetime }}" name="{{ coin_config.ezdefi_coin_id }}['edit_payment_lifetime']">
+                                        <input type="number" class="form-control coin-config__payment-lifetime only-positive-integer" id="edit-payment-lifetime-{{ coin_config.ezdefi_coin_id }}" value="{{ coin_config.payment_lifetime / 60 }}" name="{{ coin_config.ezdefi_coin_id }}['edit_payment_lifetime']">
                                     </div>
                                     <div class="form-group">
                                         <label> {{ text_wallet_address }} </label>
@@ -160,7 +160,8 @@
                                     </div>
                                     <div class="form-group">
                                         <label>{{ text_decimal }}</label>
-                                        <input type="number" class="form-control edit-coin-config__decimal coin-config__decimal only-positive-integer" id="edit-decimal-{{ coin_config.ezdefi_coin_id }}" value="{{ coin_config.decimal }}" name="{{ coin_config.ezdefi_coin_id }}['edit_coin_decimal']">
+                                        <input type="number" class="form-control edit-coin-config__decimal coin-config__decimal only-positive-integer" id="edit-decimal-{{ coin_config.ezdefi_coin_id }}" value="{{ coin_config.decimal }}" name="{{ coin_config.ezdefi_coin_id }}['edit_coin_decimal']" data-coin-id="{{ coin_config.ezdefi_coin_id }}">
+                                        <input type="hidden" value="{{ coin_config.currency_decimal }}" id="max-decimal-{{ coin_config.ezdefi_coin_id }}">
                                         <div class="warning-edit-decimal padding-none col-lg-12">
                                             {{ warning_change_decimal }}
                                         </div>

@@ -223,8 +223,11 @@ class ControllerExtensionPaymentEzdefi extends Controller {
         if (isset($coin_data['coin_safe_block_distant']) && trim($coin_data['coin_safe_block_distant']) !== '' && (filter_var($coin_data['coin_safe_block_distant'], FILTER_VALIDATE_INT) === false || $coin_data['coin_safe_block_distant'] < 0)) {
             $this->error['safe_block_distant'] = $this->language->get('error_safe_block_distant');
         }
-        if (isset($coin_data['coin_decimal']) && trim($coin_data['coin_decimal']) !== '' && (filter_var($coin_data['coin_decimal'], FILTER_VALIDATE_INT) === false || $coin_data['coin_decimal'] < 0 || $coin_data['coin_decimal'] > 14 )) {
+        if (isset($coin_data['coin_decimal']) && trim($coin_data['coin_decimal']) !== '' && (filter_var($coin_data['coin_decimal'], FILTER_VALIDATE_INT) === false || $coin_data['coin_decimal'] < 1 || $coin_data['coin_decimal'] > 30 )) {
             $this->error['decimal'] = $this->language->get('error_decimal');
+        }
+        if (isset($coin_data['max_currency_decimal']) && trim($coin_data['max_currency_decimal']) !== '' && (filter_var($coin_data['max_currency_decimal'], FILTER_VALIDATE_INT) === false || $coin_data['max_currency_decimal'] < 1 || $coin_data['max_currency_decimal'] > 30 )) {
+            $this->error['max_currency_decimal'] = $this->language->get('max_currency_decimal');
         }
 
         return !$this->error;

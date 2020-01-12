@@ -19,7 +19,8 @@ class ModelExtensionPaymentEzdefi extends Model {
 		      `payment_lifetime`    int(11),
 		      `wallet_address`      varchar(255) NOT NULL,
 		      `safe_block_distant`  int(11),
-		      `decimal`             int(11) DEFAULT 8,
+		      `decimal`             int(5) NOT NULL,
+		      `currency_decimal`    int(5) NOT NULL,
 		      `description`         varchar(255) DEFAULT NULL,
 			  `created`             DATETIME NOT NULL,
 			  `modified`            DATETIME NOT NULL,
@@ -29,8 +30,8 @@ class ModelExtensionPaymentEzdefi extends Model {
 			CREATE TABLE IF NOT EXISTS `" . DB_PREFIX . "ezdefi_amount` (
                 `id`         int auto_increment,
                 `temp`       INT not null,
-                `amount`     DECIMAL(25, 14) not null,
-                `tag_amount` DECIMAL(25, 14) not null,
+                `amount`     DECIMAL(60, 30) not null,
+                `tag_amount` DECIMAL(60, 30) not null,
                 `expiration` TIMESTAMP  not null,
                 `currency`   varchar(255) not null,
                 `decimal`    int not null,
@@ -43,7 +44,7 @@ class ModelExtensionPaymentEzdefi extends Model {
                 `id` int auto_increment,
                 `payment_id` varchar(255) default null,
 			    `order_id` int(11),
-                `amount_id` decimal(25,14) not null,
+                `amount_id` decimal(60,30) not null,
                 `currency` varchar(255) not null,
 		        `paid` int(4) default 0,
 		        `has_amount` tinyint(1) not null,
@@ -89,6 +90,7 @@ class ModelExtensionPaymentEzdefi extends Model {
                     "', `wallet_address` = '" . $this->db->escape($coin_record['coin_wallet_address']) .
                     "', `safe_block_distant` = '" . (int)$coin_record['coin_safe_block_distant'] .
                     "', `decimal` = '" . (int)$coin_record['coin_decimal'] .
+                    "', `currency_decimal` = '" . (int)$coin_record['max_currency_decimal'] .
                     "', `description` = '" . $this->db->escape($coin_record['description']) .
                     "', `created` = now(), `modified` = now()");
             } else {
