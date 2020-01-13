@@ -177,6 +177,14 @@ div.escrow-pay-box, div.simple-pay-box {
     grid-column: 1/-1;
 }
 
+.simple-method-with-full-qrcode, .simple-method-with-only-address-qrcode {
+    display: none;
+}
+
+#choose-full-qrcode-radio:checked ~ .simple-method-with-full-qrcode, #choose-only-address-qrcode-radio:checked ~ .simple-method-with-only-address-qrcode {
+    display: block;
+}
+
 .ezdefi-payment__content > input {
     display: none;
 }
