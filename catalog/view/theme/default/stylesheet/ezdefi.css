@@ -257,9 +257,10 @@ div.escrow-pay-box, div.simple-pay-box {
 }
 
 .timeout-notification >p {
+    font-size: 12px;
     position: absolute;
     width: 100%;
-    top: 50%;
+    top: 43%;
     left: 50%;
     transform: translate(-50%, -50%);
 }
@@ -307,7 +308,7 @@ div.escrow-pay-box, div.simple-pay-box {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin: 50px
+    margin: 50px 0;
 }
 
 .Loader__item {
