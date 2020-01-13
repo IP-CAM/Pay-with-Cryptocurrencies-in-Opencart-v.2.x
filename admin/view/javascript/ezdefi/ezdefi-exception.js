@@ -124,7 +124,7 @@ $(function () {
                     dataHtml += `<tr>
                                 <td>${tmp}</td>
                                 <td>${currency}</td>
-                                <td>${amountId}</td>
+                                <td>${parseFloat(amountId)} </td>
                                 <td>${orderItem}</td>
                             </tr>`;
                     tmp++;
