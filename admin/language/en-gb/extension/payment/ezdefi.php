@@ -76,7 +76,7 @@ $_['text_delete'] = 'Delete';
 $_['text_confirm_paid'] = 'Confirm Paid';
 $_['text_revert'] = 'Revert';
 $_['text_assign'] = 'Assign';
-$_['text_register'] = 'Register';
+$_['text_register'] = 'Register to get API Key';
 $_['text_link_register'] = 'https://merchant.ezdefi.com/';
 
 //warning

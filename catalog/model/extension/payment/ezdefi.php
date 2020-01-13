@@ -88,8 +88,7 @@ class ModelExtensionPaymentEzdefi extends Model {
             $exchange_rate = $this->sendCurl("/token/exchange/".$order_info['currency_code']."%3A".$coin_config['symbol'], 'GET');
             //create amount id
             $amount = $origin_value * json_decode($exchange_rate)->data;
-            $amount_id = $this->createAmountId($coin_config['symbol'], $amount, $coin_config['payment_lifetime'], $coin_config['decimal'], $this->config->get('payment_ezdefi_variation'));
-
+            $amount_id = $this->createAmountId($coin_config['symbol'], $amount, $coin_config['payment_lifetime'], $coin_config['decimal'], $this->config->get('payment_ezdefi_variation')) + 0;
             if($amount_id) {
                 $params = "?amountId=true&uoid=".$order_info['order_id']."-1&to=".$coin_config['wallet_address']."&value=".$amount_id."&currency=".$coin_config['symbol']."%3A".$coin_config['symbol']."&safedist=".$coin_config['safe_block_distant']."&callback=".urlencode($callback);
                 if($coin_config['payment_lifetime'] > 0) {

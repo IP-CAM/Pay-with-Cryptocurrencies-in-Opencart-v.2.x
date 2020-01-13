@@ -1,26 +1,27 @@
 $(function () {
     var selectors = {
-        btnGetQrCode: '.ezdefi-btn-create-payment',
-        coinSelectedToPaymentInput: 'input[name="coin-selected-to-order"]',
-        selectCoinBox: '.ezdefi-select-coin-box',
-        changeCoinBox: '.ezdefi-change-coin-box',
-        paymentbox: '.ezdefi-payment-box',
-        paymentContent: '.ezdefi-payment__content',
-        deeplink: '.ezdefi-payment__deeplink',
-        qrCodeImg: '.ezdefi-payment__qr-code',
-        timeoutNotify: '.timeout-notification',
-        countDownTime: '.ezdefi-payment__countdown-lifeTime',
-        originValue: '.ezdefi-payment__origin-value',
-        currencyValue: '.ezdefi-payment__currency-value',
-        logoCoinSelected: '.ezdefi-payment__coin-logo',
-        nameCoinSelected: '.ezdefi-payment__coin-name',
-        urlCheckOrderCompleteInput: '#url-check-order-complete',
-        orderIdInput: '#order-id',
-        paymentIdInput: '#payment-id',
-        btnChange: '.ezdefi-payment__btn-change-coin',
-        tooltipShowDiscount: '.tooltip-show-discount',
-        countDownLabel: '.ezdefi-countdown-lifetime',
-        btnReloadPayment: '.reload-payment'
+        btnGetQrCode                : '.ezdefi-btn-create-payment',
+        coinSelectedToPaymentInput  : 'input[name="coin-selected-to-order"]',
+        selectCoinBox               : '.ezdefi-select-coin-box',
+        changeCoinBox               : '.ezdefi-change-coin-box',
+        paymentbox                  : '.ezdefi-payment-box',
+        paymentContent              : '.ezdefi-payment__content',
+        deeplink                    : '.ezdefi-payment__deeplink',
+        qrCodeImg                   : '.ezdefi-payment__qr-code',
+        alternativeQrCode           : '.ezdefi-payment__alternative-qr-code',
+        timeoutNotify               : '.timeout-notification',
+        countDownTime               : '.ezdefi-payment__countdown-lifeTime',
+        originValue                 : '.ezdefi-payment__origin-value',
+        currencyValue               : '.ezdefi-payment__currency-value',
+        logoCoinSelected            : '.ezdefi-payment__coin-logo',
+        nameCoinSelected            : '.ezdefi-payment__coin-name',
+        urlCheckOrderCompleteInput  : '#url-check-order-complete',
+        orderIdInput                : '#order-id',
+        paymentIdInput              : '#payment-id',
+        btnChange                   : '.ezdefi-payment__btn-change-coin',
+        tooltipShowDiscount         : '.tooltip-show-discount',
+        countDownLabel              : '.ezdefi-countdown-lifetime',
+        btnReloadPayment            : '.reload-payment'
     };
 
     var global = {
@@ -165,7 +166,6 @@ $(function () {
                 } else {
                     $(".payment-error"+suffixes).css('display', 'none');
                     renderPayment(suffixes,data,discount);
-                    showPaymentLoading(suffixes, false);
                 }
             }
         })
@@ -207,10 +207,12 @@ $(function () {
         $(selectors.paymentbox).css('display','block');
         $(selectors.paymentContent).css('display','grid');
         $(selectors.qrCodeImg+suffixes).prop('src', data.qr);
-        $(".ezdefi-payment__alternative-qr-code" + suffixes).prop('src', "https://chart.googleapis.com/chart?cht=qr&chl="+data.to+"&chs=200x200&chld=L|0")
+        $(selectors.alternativeQrCode + suffixes).prop('src', "https://chart.googleapis.com/chart?cht=qr&chl="+data.to+"&chs=200x200&chld=L|0")
         $('.ezdefi-payment__wallet-address'+suffixes).html(data.to);
         $('.ezdefi-payment__amount'+suffixes).html(currencyValue);
         $('.ezdefi-payment__currency'+suffixes).html(data.currency);
+
+        showPaymentLoading(suffixes, false);
     };
 
     var checkOrderComplete = function () {
@@ -265,6 +267,7 @@ $(function () {
     };
 
     var enablePaymentTimeout = function(suffixes, enable) {
+        $(selectors.alternativeQrCode+suffixes).css('filter', enable ? 'blur(5px)' : 'none');
         $(selectors.qrCodeImg+suffixes).css('filter', enable ? 'blur(5px)' : 'none');
         $(selectors.timeoutNotify+suffixes).css('display', enable ? 'block' : 'none');
     };
