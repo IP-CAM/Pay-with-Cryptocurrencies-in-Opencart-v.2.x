@@ -18,8 +18,10 @@ $_['text_create_payment_success'] = ' Create payment success';
 $_['text_success'] = 'Success!';
 $_['text_copy_address'] = 'Address was copied to the clipboard.';
 $_['text_copy_amount'] = 'Amount was copied to the clipboard.';
-$_['text_click_to_pay'] = 'Click to pay';
-
+$_['text_click_to_pay'] = 'Scan QR Code or Click to pay';
+$_['text_use_previous_qr'] = 'Use previous QR Code';
+$_['text_choose_alternative_qr'] = 'If you get error when scanning this QR Code, please use';
+$_['text_use_alternative_qr'] = 'alternative QR Code';
 
 //link
 $_['link_guide'] = 'https://help.ezdefi.com';

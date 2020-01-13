@@ -164,7 +164,6 @@ class ModelExtensionPaymentEzdefi extends Model {
         } else {
             return 'false';
         }
-
     }
 
     //-------------------------------------------------Exception------------------------------------------------------

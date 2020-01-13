@@ -207,6 +207,7 @@ $(function () {
         $(selectors.paymentbox).css('display','block');
         $(selectors.paymentContent).css('display','grid');
         $(selectors.qrCodeImg+suffixes).prop('src', data.qr);
+        $(".ezdefi-payment__alternative-qr-code" + suffixes).prop('src', "https://chart.googleapis.com/chart?cht=qr&chl="+data.to+"&chs=200x200&chld=L|0")
         $('.ezdefi-payment__wallet-address'+suffixes).html(data.to);
         $('.ezdefi-payment__amount'+suffixes).html(currencyValue);
         $('.ezdefi-payment__currency'+suffixes).html(data.currency);
