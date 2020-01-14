@@ -139,10 +139,8 @@ $( function() {
         $(selectors.coinDecimalInput).each(function () {
             let coinId = $(this).data('coin-id');
             let maxDecimal = $('#max-decimal-'+coinId).val();
-            let rules = {max: parseInt(maxDecimal), min: 1}
+            let rules = {max: parseInt(maxDecimal), min: 2};
             let inputName = $(this).attr('name');
-
-            console.log(maxDecimal);
 
             if(inputName) {
                 $(`input[name="${inputName}"]`).rules('add', rules);
