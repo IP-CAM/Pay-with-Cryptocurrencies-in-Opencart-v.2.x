@@ -159,7 +159,7 @@ $( function() {
                 url: $(selectors.formConfig).data('url_validate_api_key'),
             },
             messages: {
-                remote: "This wallet address is invalid"
+                remote: "This Api Key is invalid"
             }
         });
     };
