@@ -258,9 +258,16 @@ class ModelExtensionPaymentEzdefi extends Model {
         curl_setopt_array($curl, array(
             CURLOPT_URL => $url,
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => $method,
-            CURLOPT_HTTPHEADER => $curlopt_httpheader,
+            CURLOPT_HEADER         => false,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_ENCODING       => "",
+            CURLOPT_AUTOREFERER    => true,
+            CURLOPT_CONNECTTIMEOUT => 120,
+            CURLOPT_TIMEOUT        => 120,
+            CURLOPT_MAXREDIRS      => 10,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_CUSTOMREQUEST  => $method,
+            CURLOPT_HTTPHEADER     => $curlopt_httpheader,
         ));
         $response = curl_exec($curl);
         $err = curl_error($curl);
