@@ -349,12 +349,8 @@ $(function () {
                 },
                 processResults: function (data, params) {
                     params.page = params.page || 1;
-                    global.temp = 0;
                     return {
-                        results: data.data,
-                        pagination: {
-                            more: 1
-                        }
+                        results: data.data
                     };
                 },
                 cache: true
