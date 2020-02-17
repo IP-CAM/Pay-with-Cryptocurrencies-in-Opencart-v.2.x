@@ -128,6 +128,7 @@
 
 .btn-choose-payment-type {
     margin-top: 10px;
+    margin-bottom: 0;
     padding: 10px 10px 0 10px;
     text-align: center;
     border-bottom: 1px solid #999;
@@ -177,11 +178,32 @@ div.escrow-pay-box, div.simple-pay-box {
     grid-column: 1/-1;
 }
 
-.simple-method-with-full-qrcode, .simple-method-with-only-address-qrcode {
+.ezdefi-payment__deeplink {
+    display: inline-block;
+    padding: 5px;
+    border: 1px solid #999;
+    border-radius: 3px;
+    margin-bottom: 10px;
+}
+
+.ezdefi-payment__deeplink>p {
+    margin: 0;
+}
+
+.btn-copy-address, .btn-copy-amount {
+    height: 18px;
+    margin: 0;
+    background: #3333;
+    border-radius: 10px;
+    padding: 2px;
+    cursor: pointer;
+}
+
+.simple-method-with-full-qrcode, .simple-method-with-alternative-qrcode {
     display: none;
 }
 
-#choose-full-qrcode-radio:checked ~ .simple-method-with-full-qrcode, #choose-only-address-qrcode-radio:checked ~ .simple-method-with-only-address-qrcode {
+#choose-full-qrcode-radio:checked ~ .simple-method-with-full-qrcode, #choose-alternative-qrcode-radio:checked ~ .simple-method-with-alternative-qrcode {
     display: block;
 }
 
@@ -219,17 +241,22 @@ div.escrow-pay-box, div.simple-pay-box {
 
 .payment-box {
     margin: 0 auto;
+    padding-bottom: 30px;
     display: block;
     text-align: center;
+    width: 100%;
+    border-right: 1px solid #999;
+    border-bottom: 1px solid #999;
+    border-left: 1px solid #999;
+    box-sizing: border-box;
+    min-height: 120px;
+    position: relative;
 }
 
 .create-payment-loading {
     display: none;
 }
 
-.ezdefi-payment__deeplink {
-    display: block;
-}
 
 .qrcode-box {
     position: relative;
@@ -270,7 +297,7 @@ div.escrow-pay-box, div.simple-pay-box {
 }
 
 .ezdefi-payment__download-link>a {
-    display: block;
+    display: inline-block;
 }
 
 .ezdefi-copy-icon {
@@ -308,7 +335,7 @@ div.escrow-pay-box, div.simple-pay-box {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin: 50px 0;
+    margin: 50px auto;
 }
 
 .Loader__item {

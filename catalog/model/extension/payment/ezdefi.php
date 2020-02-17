@@ -35,7 +35,6 @@ class ModelExtensionPaymentEzdefi extends Model {
             $symbols .= $symbols === '' ? $coin['symbol'] : ','.$coin['symbol'];
         }
         $exchanges_response = $this->sendCurl('/token/exchanges?amount='.$order['total'].'&from='.$order['currency_code'].'&to='.$symbols, 'GET');
-
         if($exchanges_response) {
             $exchanges_data = json_decode($exchanges_response)->data;
             foreach ($exchanges_data as $currency_exchange) {
