@@ -92,72 +92,80 @@
                     </div>
                     <div class="payment-content--simple">
                         <input type="radio" name="choose-simple-method-qrcode-input" class="hidden" id="choose-full-qrcode-radio" checked>
-                        <input type="radio" name="choose-simple-method-qrcode-input" class="hidden" id="choose-only-address-qrcode-radio">
+                        <input type="radio" name="choose-simple-method-qrcode-input" class="hidden" id="choose-alternative-qrcode-radio">
 
-                        <div class="simple-method-with-full-qrcode">
-                            <div class="alert alert-success alert-copy alert-copy-address">
-                                <strong>{{ text_success }}</strong> {{ text_copy_address }}
-                            </div>
-                            <div class="alert alert-success alert-copy alert-copy-amount">
-                                <strong>{{ text_success }}</strong> {{ text_copy_amount }}
-                            </div>
-                            <div class="ezdefi-payment__value">
-                                <span class="ezdefi-payment__origin-value--simple">{{ origin_value }}</span> <span> {{ origin_currency }}</span>
-                                <span class="ezdefi-payment__icon-convert"><i class="fa fa-retweet" aria-hidden="true"></i></span>
-                                <span class="ezdefi-payment__currency-value--simple"></span><span class="ezdefi-payment__currency--simple"></span>
-                            </div>
-                            <div class="ezdefi-payment__countdown-box">
-                                <input type="hidden" id="payment-id--simple">
-                                {{ ezdefi_countdown_lifetime_simple }}
-                            </div>
-                            <div class="qrcode-box">
-                                <a href="" target="_blank" class="ezdefi-payment__deeplink ezdefi-payment__deeplink--simple">
-                                    <img src="" alt="" class="ezdefi-payment__qr-code--simple">
-                                    <p>{{ text_click_to_pay }}</p>
-                                </a>
-                                <div class="timeout-notification timeout-notification--simple reload-payment" data-suffixes="--simple">
-                                    <p>{{ payment_time_out }}</p>
-                                </div>
-                            </div>
-                            <p class="margin-top-md text-red">{{ text_choose_alternative_qr }}
-                                <label class="link_use_ezdefi_wallet" for="choose-only-address-qrcode-radio">{{ text_use_alternative_qr }}</label>
-                            </p>
+{#                        <div class="simple-method-with-full-qrcode">#}
+                        <div class="alert alert-success alert-copy alert-copy-address">
+                            <strong>{{ text_success }}</strong> {{ text_copy_address }}
                         </div>
-                        <div class="simple-method-with-only-address-qrcode">
-                            <div class="alert alert-success alert-copy alert-copy-address">
-                                <strong>{{ text_success }}</strong> {{ text_copy_address }}
-                            </div>
-                            <div class="alert alert-success alert-copy alert-copy-amount">
-                                <strong>{{ text_success }}</strong> {{ text_copy_amount }}
-                            </div>
-                            <div class="ezdefi-payment__value">
-                                <span class="ezdefi-payment__origin-value--simple">{{ origin_value }}</span> <span> {{ origin_currency }}</span>
-                                <span class="ezdefi-payment__icon-convert"><i class="fa fa-retweet" aria-hidden="true"></i></span>
-                                <span class="ezdefi-payment__currency-value--simple"></span><span class="ezdefi-payment__currency--simple"></span>
-                            </div>
-                            <div class="ezdefi-payment__countdown-box">
-                                <input type="hidden" id="payment-id--simple">
-                                {{ ezdefi_countdown_lifetime_simple }}
-                            </div>
-                            <div class="qrcode-box">
-                                <a href="" target="_blank" class="ezdefi-payment__deeplink ezdefi-payment__deeplink--simple">
-                                    <img src="" alt="" class="ezdefi-payment__alternative-qr-code--simple">
-                                    <p>{{ text_click_to_pay }}</p>
-                                </a>
-                                <div class="timeout-notification timeout-notification--simple reload-payment" data-suffixes="--simple">
-                                    <p>{{ payment_time_out }}</p>
-                                </div>
-                            </div>
-                            <p><b>Address:</b> <span class="ezdefi-payment__wallet-address--simple"></span>
-                                <span class="btn-copy-address"><i class="fa fa-copy ezdefi-copy-icon"></i></span>
-                            </p>
-                            <p><b>Amount:</b> <span class="ezdefi-payment__amount--simple"></span><span class="ezdefi-payment__currency--simple"></span>
-                                <span class="btn-copy-amount"><i class="fa fa-copy ezdefi-copy-icon"></i></span>
-                            </p>
-                            <p class="margin-top-md text-red">{{ text_notify_pay_exact_amount }} <label for="ezdefi-show-payment--escrow" class="link_use_ezdefi_wallet"><i>{{ text_ezdefi_wallet }}</i></label></p>
-                            <label class="link_use_ezdefi_wallet" for="choose-full-qrcode-radio">{{ text_use_previous_qr }}</label>
+                        <div class="alert alert-success alert-copy alert-copy-amount">
+                            <strong>{{ text_success }}</strong> {{ text_copy_amount }}
                         </div>
+                        <div class="ezdefi-payment__value">
+                            <span class="ezdefi-payment__origin-value--simple">{{ origin_value }}</span> <span> {{ origin_currency }}</span>
+                            <span class="ezdefi-payment__icon-convert"><i class="fa fa-retweet" aria-hidden="true"></i></span>
+                            <span class="ezdefi-payment__currency-value--simple"></span><span class="ezdefi-payment__currency--simple"></span>
+                        </div>
+                        <div class="ezdefi-payment__countdown-box">
+                            <input type="hidden" id="payment-id--simple">
+                            {{ ezdefi_countdown_lifetime_simple }}
+                        </div>
+                        <div class="qrcode-box simple-method-with-full-qrcode" >
+                            <a href="" target="_blank" class="ezdefi-payment__deeplink ezdefi-payment__deeplink--simple">
+                                <img src="" alt="" class="ezdefi-payment__qr-code--simple">
+                                <p>{{ text_click_to_pay }}</p>
+                            </a>
+                            <div class="timeout-notification timeout-notification--simple reload-payment" data-suffixes="--simple">
+                                <p>{{ payment_time_out }}</p>
+                            </div>
+                        </div>
+
+{#                        </div>#}
+{#                        <div class="simple-method-with-only-address-qrcode">#}
+{#                            <div class="alert alert-success alert-copy alert-copy-address">#}
+{#                                <strong>{{ text_success }}</strong> {{ text_copy_address }}#}
+{#                            </div>#}
+{#                            <div class="alert alert-success alert-copy alert-copy-amount">#}
+{#                                <strong>{{ text_success }}</strong> {{ text_copy_amount }}#}
+{#                            </div>#}
+{#                        <div class="ezdefi-payment__value">#}
+{#                            <span class="ezdefi-payment__origin-value--simple">{{ origin_value }}</span> <span> {{ origin_currency }}</span>#}
+{#                            <span class="ezdefi-payment__icon-convert"><i class="fa fa-retweet" aria-hidden="true"></i></span>#}
+{#                            <span class="ezdefi-payment__currency-value--simple"></span><span class="ezdefi-payment__currency--simple"></span>#}
+{#                        </div>#}
+{#                        <div class="ezdefi-payment__countdown-box">#}
+{#                            <input type="hidden" id="payment-id--simple">#}
+{#                            {{ ezdefi_countdown_lifetime_simple }}#}
+{#                        </div>#}
+                        <div class="qrcode-box simple-method-with-alternative-qrcode">
+                            <a href="" target="_blank" class="ezdefi-payment__deeplink ezdefi-payment__deeplink--simple">
+                                <img src="" alt="" class="ezdefi-payment__alternative-qr-code--simple">
+                                <p>{{ text_click_to_pay }}</p>
+                            </a>
+                            <div class="timeout-notification timeout-notification--simple reload-payment" data-suffixes="--simple">
+                                <p>{{ payment_time_out }}</p>
+                            </div>
+                        </div>
+                        <p style="margin-bottom: 3px;">
+                            <b>Address:</b>
+                            <span class="btn-copy-address">
+                                <span class="ezdefi-payment__wallet-address--simple"></span>
+                                <span><i class="fa fa-copy ezdefi-copy-icon"></i></span>
+                            </span>
+                        </p>
+                        <p><b>Amount:</b>
+                            <span class="btn-copy-amount">
+                                <span class="ezdefi-payment__amount--simple"></span>
+                                <span class="copy-address-icon"><i class="fa fa-copy ezdefi-copy-icon"></i></span>
+                            </span>
+                        </p>
+                        <p class="margin-top-md text-red simple-method-with-full-qrcode">{{ text_choose_alternative_qr }}
+                            <label class="link_use_ezdefi_wallet" for="choose-alternative-qrcode-radio">{{ text_use_alternative_qr }}</label>
+                        </p>
+                        <p class="margin-top-md text-red simple-method-with-alternative-qrcode">{{ text_notify_pay_exact_amount }} <label for="ezdefi-show-payment--escrow" class="link_use_ezdefi_wallet"><i>{{ text_ezdefi_wallet }}</i></label></p>
+                        <label class="link_use_ezdefi_wallet simple-method-with-alternative-qrcode" for="choose-full-qrcode-radio">{{ text_use_previous_qr }}</label>
                     </div>
+{#                    </div>#}
                     <div class="payment-error--simple">
                         {{ error_cant_create_amount }}
                     </div>
@@ -190,8 +198,12 @@
                             </div>
                         </div>
                         <div class="ezdefi-payment__download-link">
-                            <a href="{{ link_download_app_ios }}" target="_blank"><span><i class="fa fa-apple ezdefi-icon-apple"></i></span> {{ text_download_app_ios }}</a>
-                            <a href="{{ link_download_app_android }}" target="_blank"><span><i class="fa fa-android ezdefi-icon-android"></i></span> {{ text_download_app_android }}</a>
+                            <a href="{{ link_download_app_ios }}" target="_blank">
+                                <img src="catalog/view/theme/default/image/ezdefi/ios-icon.png" alt="">
+                            </a>
+                            <a href="{{ link_download_app_android }}" target="_blank">
+                                <img src="catalog/view/theme/default/image/ezdefi/android-icon.png" alt="">
+                            </a>
                         </div>
                     </div>
                     <div class="payment-error--escrow">
