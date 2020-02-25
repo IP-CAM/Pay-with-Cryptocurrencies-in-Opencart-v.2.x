@@ -1,12 +1,14 @@
 <?php
 
-class ModelExtensionPaymentEzdefi extends Model {
-    CONST TIME_REMOVE_AMOUNT_ID = 3;
-    CONST TIME_REMOVE_EXCEPTION = 7;
-    CONST ORDER_STATUS_PENDING = 0;
+class ModelExtensionPaymentEzdefi extends Model
+{
+    CONST TIME_REMOVE_AMOUNT_ID    = 3;
+    CONST TIME_REMOVE_EXCEPTION    = 7;
+    CONST ORDER_STATUS_PENDING     = 0;
     CONST NUMBER_OF_ORDERS_IN_PAGE = 10;
 
-    public function install() {
+    public function install()
+    {
         $this->db->query("
 			CREATE TABLE IF NOT EXISTS `" . DB_PREFIX . "ezdefi_coin` (
 			  `coin_id`             int auto_increment,
@@ -55,21 +57,22 @@ class ModelExtensionPaymentEzdefi extends Model {
 
         $this->db->query("
             CREATE EVENT IF NOT EXISTS `ezdefi_remove_amount_id_event`
-            ON SCHEDULE EVERY ".self::TIME_REMOVE_AMOUNT_ID." DAY
+            ON SCHEDULE EVERY " . self::TIME_REMOVE_AMOUNT_ID . " DAY
             STARTS DATE(NOW())
             DO
             DELETE FROM `" . DB_PREFIX . "ezdefi_tag_amount` WHERE DATEDIFF( NOW( ) ,  expiration ) >= 86400;");
 
         $this->db->query("
             CREATE EVENT  IF NOT EXISTS `ezdefi_remove_exception_event`
-            ON SCHEDULE EVERY ".self::TIME_REMOVE_EXCEPTION." DAY
+            ON SCHEDULE EVERY " . self::TIME_REMOVE_EXCEPTION . " DAY
             STARTS DATE(NOW())
             DO
             DELETE FROM `" . DB_PREFIX . "ezdefi_exception` WHERE DATEDIFF( NOW( ) ,  expiration ) >= 86400;");
         $this->db->query("SET GLOBAL event_scheduler='ON';");
     }
 
-    public function uninstall() {
+    public function uninstall()
+    {
         $this->db->query("DROP TABLE IF EXISTS `" . DB_PREFIX . "ezdefi_coin`;");
         $this->db->query("DROP TABLE IF EXISTS `" . DB_PREFIX . "ezdefi_amount`;");
         $this->db->query("DROP TABLE IF EXISTS `" . DB_PREFIX . "ezdefi_exception`;");
@@ -77,16 +80,17 @@ class ModelExtensionPaymentEzdefi extends Model {
         $this->db->query("DROP EVENT IF EXISTS `ezdefi_remove_exception_event`;");
     }
 
-    public function updateCoins($data) {
-        foreach($data as $key => $coin_record) {
-            if(isset($coin_record['coin_wallet_address'])) {
+    public function updateCoins($data)
+    {
+        foreach ($data as $key => $coin_record) {
+            if (isset($coin_record['coin_wallet_address'])) {
                 $this->db->query("INSERT INTO `" . DB_PREFIX . "ezdefi_coin` SET `ezdefi_coin_id` = '" . $this->db->escape($coin_record['coin_id']) .
                     "', `order` = '" . (int)$coin_record['coin_order'] .
                     "', `logo` = '" . $this->db->escape($coin_record['coin_logo']) .
                     "', `symbol` = '" . $this->db->escape($coin_record['coin_symbol']) .
                     "', `name` = '" . $this->db->escape($coin_record['coin_name']) .
-                    "', `discount` = '" .(float)$coin_record['coin_discount'] .
-                    "', `payment_lifetime` = '" . (int)($coin_record['coin_payment_life_time']*60).
+                    "', `discount` = '" . (float)$coin_record['coin_discount'] .
+                    "', `payment_lifetime` = '" . (int)($coin_record['coin_payment_life_time'] * 60) .
                     "', `wallet_address` = '" . $this->db->escape($coin_record['coin_wallet_address']) .
                     "', `safe_block_distant` = '" . (int)$coin_record['coin_safe_block_distant'] .
                     "', `decimal` = '" . (int)$coin_record['coin_decimal'] .
@@ -94,21 +98,23 @@ class ModelExtensionPaymentEzdefi extends Model {
                     "', `description` = '" . $this->db->escape($coin_record['description']) .
                     "', `created` = now(), `modified` = now()");
             } else {
-                $this->db->query("UPDATE `" . DB_PREFIX . "ezdefi_coin` SET `order` = " . (int)$coin_record['coin_order'] . ", `modified` = now()" ." WHERE `ezdefi_coin_id` ='". $this->db->escape($coin_record['coin_id'])."'");
+                $this->db->query("UPDATE `" . DB_PREFIX . "ezdefi_coin` SET `order` = " . (int)$coin_record['coin_order'] . ", `modified` = now()" . " WHERE `ezdefi_coin_id` ='" . $this->db->escape($coin_record['coin_id']) . "'");
             }
         }
     }
 
-    public function updateCoinConfig($dataUpdate) {
-         return $this->db->query("UPDATE `" . DB_PREFIX . "ezdefi_coin` SET `discount` = '" . (float)$dataUpdate['coin_discount'] .
-            "', `payment_lifetime` = '". (int)($dataUpdate['coin_payment_life_time']*60).
-            "', `wallet_address` = '". $this->db->escape($dataUpdate['coin_wallet_address']).
-            "', `safe_block_distant` = '". (int)$dataUpdate['coin_safe_block_distant'].
-            "', `decimal` = '". (int)$dataUpdate['coin_decimal'].
-            "', `modified` = now()" ." WHERE `ezdefi_coin_id` ='". $this->db->escape($dataUpdate['coin_id'])."'");
+    public function updateCoinConfig($dataUpdate)
+    {
+        return $this->db->query("UPDATE `" . DB_PREFIX . "ezdefi_coin` SET `discount` = '" . (float)$dataUpdate['coin_discount'] .
+            "', `payment_lifetime` = '" . (int)($dataUpdate['coin_payment_life_time'] * 60) .
+            "', `wallet_address` = '" . $this->db->escape($dataUpdate['coin_wallet_address']) .
+            "', `safe_block_distant` = '" . (int)$dataUpdate['coin_safe_block_distant'] .
+            "', `decimal` = '" . (int)$dataUpdate['coin_decimal'] .
+            "', `modified` = now()" . " WHERE `ezdefi_coin_id` ='" . $this->db->escape($dataUpdate['coin_id']) . "'");
     }
 
-    public function checkUniqueCoinConfig($coinIds) {
+    public function checkUniqueCoinConfig($coinIds)
+    {
         $sql = "SELECT `ezdefi_coin_id` FROM `" . DB_PREFIX . "ezdefi_coin` WHERE";
 
         foreach ($coinIds as $key => $coinId) {
@@ -126,7 +132,8 @@ class ModelExtensionPaymentEzdefi extends Model {
         }
     }
 
-    public function getCoinsConfig() {
+    public function getCoinsConfig()
+    {
         $query = $this->db->query("SELECT * FROM `" . DB_PREFIX . "ezdefi_coin` WHERE 1 ORDER BY `order` ASC");
 
         if ($query->num_rows) {
@@ -137,29 +144,45 @@ class ModelExtensionPaymentEzdefi extends Model {
         }
     }
 
-    public function deleteCoinConfigByCoinId($coin_id) {
-        return $this->db->query("DELETE FROM `" . DB_PREFIX . "ezdefi_coin` WHERE `ezdefi_coin_id` = '".$coin_id."'");
+    public function deleteCoinConfigByCoinId($coin_id)
+    {
+        return $this->db->query("DELETE FROM `" . DB_PREFIX . "ezdefi_coin` WHERE `ezdefi_coin_id` = '" . $coin_id . "'");
     }
 
-    public function getAllCoinAvailable($api_url, $api_key, $keyword) {
-        if(!$api_key) return 'Not Found';
-        $url = $api_url . '/token/list?keyword='.$keyword.'&domain='.HTTPS_CATALOG.'&platform=opencart-'.VERSION;
+    public function getAllCoinAvailable($api_url, $api_key, $keyword)
+    {
+        if (!$api_key) return 'Not Found';
+        $url = $api_url . '/token/list?keyword=' . $keyword . '&domain=' . HTTPS_CATALOG . '&platform=opencart-' . VERSION;
 
         $list_coin_support = $this->sendCurl($url, "GET", $api_key);
 
-        if($list_coin_support) {
+        if ($list_coin_support) {
             return $list_coin_support;
         } else {
             return json_encode(['status' => 'failure', 'message' => 'Something error when get coins']);
         }
     }
 
-    public function checkApiKey($apiUrl, $api_key) {
+    public function checkApiKey($apiUrl, $api_key)
+    {
         $list_wallet = $this->sendCurl($apiUrl . '/user/show', "GET", $api_key);
 
         $list_wallet_data = json_decode($list_wallet);
 
-        if($list_wallet_data && $list_wallet_data->code == 1 && $list_wallet_data->message == 'ok') {
+        if ($list_wallet_data && $list_wallet_data->code == 1 && $list_wallet_data->message == 'ok') {
+            return 'true';
+        } else {
+            return 'false';
+        }
+    }
+
+    public function checkPublicKey($public_key, $api_url, $api_key)
+    {
+        $website_data = $this->sendCurl($api_url . '/website/' . $public_key, "GET", $api_key);
+
+        $website_data_obj = json_decode($website_data);
+
+        if ($website_data_obj && $website_data_obj->code == 1 && $website_data_obj->message == 'ok') {
             return 'true';
         } else {
             return 'false';
@@ -167,79 +190,85 @@ class ModelExtensionPaymentEzdefi extends Model {
     }
 
     //-------------------------------------------------Exception------------------------------------------------------
-    public function getTotalException($keyword_amount, $keyword_order_id, $keyword_email, $currency) {
+    public function getTotalException($keyword_amount, $keyword_order_id, $keyword_email, $currency)
+    {
         $sql = "select count(*) as total_exceptions
-            from `".DB_PREFIX."ezdefi_exception` `exception`
-                    left join `".DB_PREFIX."order` `order` on exception.order_id = order.order_id
-                where exception.amount_id like '%".$keyword_amount."%'";
-        if($keyword_order_id) {
-            $sql .= " AND exception.order_id = '".$keyword_order_id."'";
+            from `" . DB_PREFIX . "ezdefi_exception` `exception`
+                    left join `" . DB_PREFIX . "order` `order` on exception.order_id = order.order_id
+                where exception.amount_id like '%" . $keyword_amount . "%'";
+        if ($keyword_order_id) {
+            $sql .= " AND exception.order_id = '" . $keyword_order_id . "'";
         }
-        if($keyword_email) {
-            $sql .= " AND order.email = '".$keyword_email."'";
+        if ($keyword_email) {
+            $sql .= " AND order.email = '" . $keyword_email . "'";
         }
-        if($currency) {
-            $sql .= " AND exception.currency = '".strtoupper($currency)."'";
+        if ($currency) {
+            $sql .= " AND exception.currency = '" . strtoupper($currency) . "'";
         }
         $query = $this->db->query($sql);
         return $query->row['total_exceptions'];
     }
 
-    public function deleteExceptionById($exception_id) {
-        $this->db->query("DELETE FROM `".DB_PREFIX."ezdefi_exception` WHERE `id`=".$exception_id);
+    public function deleteExceptionById($exception_id)
+    {
+        $this->db->query("DELETE FROM `" . DB_PREFIX . "ezdefi_exception` WHERE `id`=" . $exception_id);
     }
 
-    public function deleteExceptionByOrderId($order_id) {
-        $this->db->query("DELETE FROM `".DB_PREFIX."ezdefi_exception` WHERE `order_id`=".$order_id);
+    public function deleteExceptionByOrderId($order_id)
+    {
+        $this->db->query("DELETE FROM `" . DB_PREFIX . "ezdefi_exception` WHERE `order_id`=" . $order_id);
     }
 
-    public function searchExceptions($keyword_amount, $keyword_order_id, $keyword_email, $currency, $page, $limit) {
-        $start = ($page-1) * $limit;
+    public function searchExceptions($keyword_amount, $keyword_order_id, $keyword_email, $currency, $page, $limit)
+    {
+        $start = ($page - 1) * $limit;
 
         // search exception and prioritize `amount_id` = $amount_id to the top
         $sql = "select rank, amount_id, currency, exception.id , order.order_id, order.email, exception.expiration, exception.paid, exception.has_amount, exception.explorer_url
                 from (
                     SELECT 1 as rank, id, payment_id,order_id, amount_id, currency, paid, has_amount, expiration, explorer_url
-                    FROM `".DB_PREFIX."ezdefi_exception` 
-                    WHERE amount_id = '".$keyword_amount."'
+                    FROM `" . DB_PREFIX . "ezdefi_exception` 
+                    WHERE amount_id = '" . $keyword_amount . "'
                     UNION 
                     SELECT 2 as rank, id, payment_id,order_id, amount_id, currency, paid, has_amount, expiration, explorer_url
-                    FROM `".DB_PREFIX."ezdefi_exception` 
-                    WHERE amount_id like '%".$keyword_amount."%'
-                        AND amount_id != '".$keyword_amount."'
+                    FROM `" . DB_PREFIX . "ezdefi_exception` 
+                    WHERE amount_id like '%" . $keyword_amount . "%'
+                        AND amount_id != '" . $keyword_amount . "'
                 ) `exception`
-                    left join `".DB_PREFIX."order` `order` on exception.order_id = order.order_id
-                where exception.amount_id like '%".$keyword_amount."%'";
-        if($keyword_order_id) {
-            $sql .= " AND exception.order_id = '".$keyword_order_id."'";
+                    left join `" . DB_PREFIX . "order` `order` on exception.order_id = order.order_id
+                where exception.amount_id like '%" . $keyword_amount . "%'";
+        if ($keyword_order_id) {
+            $sql .= " AND exception.order_id = '" . $keyword_order_id . "'";
         }
-        if($keyword_email) {
-            $sql .= " AND order.email = '".$keyword_email."'";
+        if ($keyword_email) {
+            $sql .= " AND order.email = '" . $keyword_email . "'";
         }
-        if($currency) {
-            $sql .= " AND exception.currency = '".strtoupper($currency)."'";
+        if ($currency) {
+            $sql .= " AND exception.currency = '" . strtoupper($currency) . "'";
         }
         $sql .= " ORDER BY exception.rank, exception.id DESC
-                LIMIT ".$start.','.$limit;
+                LIMIT " . $start . ',' . $limit;
 
         $query = $this->db->query($sql);
         return $query->rows;
     }
 
-    public function revertOrderException($exception_id) {
-        $this->db->query("UPDATE `" . DB_PREFIX . "ezdefi_exception` SET `order_id` = null, `paid`=3 WHERE `id` = ".(int)$exception_id);
+    public function revertOrderException($exception_id)
+    {
+        $this->db->query("UPDATE `" . DB_PREFIX . "ezdefi_exception` SET `order_id` = null, `paid`=3 WHERE `id` = " . (int)$exception_id);
     }
 
     // ------------------------------order------------------------------------
-    public function searchOrderPending($keyword = '', $page) {
-        $start = self::NUMBER_OF_ORDERS_IN_PAGE * ($page-1);
+    public function searchOrderPending($keyword = '', $page)
+    {
+        $start = self::NUMBER_OF_ORDERS_IN_PAGE * ($page - 1);
         $query = $this->db->query("SELECT email, order_id as id, date_added, total, currency_code, firstname, lastname 
-                                    FROM `".DB_PREFIX."order` 
-                                    WHERE (email like '%".$this->db->escape($keyword)."%'
-                                        OR order_id like '%".$this->db->escape($keyword)."%'
+                                    FROM `" . DB_PREFIX . "order` 
+                                    WHERE (email like '%" . $this->db->escape($keyword) . "%'
+                                        OR order_id like '%" . $this->db->escape($keyword) . "%'
                                         OR CONCAT(firstname, ' ', lastname) LIKE '%" . $this->db->escape($keyword) . "%')
-                                        AND order_status_id = ".self::ORDER_STATUS_PENDING."
-                                    LIMIT ".$start.",".self::NUMBER_OF_ORDERS_IN_PAGE);
+                                        AND order_status_id = " . self::ORDER_STATUS_PENDING . "
+                                    LIMIT " . $start . "," . self::NUMBER_OF_ORDERS_IN_PAGE);
         return $query->rows;
     }
 
@@ -249,14 +278,15 @@ class ModelExtensionPaymentEzdefi extends Model {
      * @param null $api_key
      * @return bool|string
      */
-    public function sendCurl($url, $method, $api_key = null) {
+    public function sendCurl($url, $method, $api_key = null)
+    {
         $curlopt_httpheader = ['accept: application/xml'];
         if ($api_key) {
-            $curlopt_httpheader[] =  'api-key: '.$api_key;
+            $curlopt_httpheader[] = 'api-key: ' . $api_key;
         }
         $curl = curl_init();
         curl_setopt_array($curl, array(
-            CURLOPT_URL => $url,
+            CURLOPT_URL            => $url,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_HEADER         => false,
             CURLOPT_FOLLOWLOCATION => true,
@@ -270,7 +300,7 @@ class ModelExtensionPaymentEzdefi extends Model {
             CURLOPT_HTTPHEADER     => $curlopt_httpheader,
         ));
         $response = curl_exec($curl);
-        $err = curl_error($curl);
+        $err      = curl_error($curl);
         curl_close($curl);
         if ($err) {
             return false;
