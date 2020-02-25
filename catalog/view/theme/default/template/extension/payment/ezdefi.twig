@@ -13,18 +13,18 @@
 
 	<div class="ezdefi-select-coin-box">
 		<div class="ezdefi-select-coin__list">
-			{% for coin_config in coins_config %}
-				<label for="select-coin-{{ coin_config.ezdefi_coin_id }}" class="ezdefi-change-coin-item">
-                    {% if coin_config.description %}
-                        <img src="{{ coin_config.logo }}" alt="" class="ezdefi-select-coin-item__logo" data-toggle="tooltip" title="{{ coin_config.description }}">
+			{% for coin in coins %}
+				<label for="select-coin-{{ coin._id }}" class="ezdefi-change-coin-item">
+                    {% if coin.token.description %}
+                        <img src="{{ coin.token.logo }}" alt="" class="ezdefi-select-coin-item__logo" data-toggle="tooltip" title="{{ coin.token.description }}">
                     {% else %}
-                        <img src="{{ coin_config.logo }}" alt="" class="ezdefi-select-coin-item__logo">
+                        <img src="{{ coin.token.logo }}" alt="" class="ezdefi-select-coin-item__logo">
                     {% endif %}
 
-                    <span class="ezdefi-select-coin-item__price"> {{ coin_config.price }} </span>
-                    <span class="ezdefi-select-coin-item__symbol">{{coin_config.symbol}}</span>
-                    <span class="ezdefi-select-coin-item__discount">-{{coin_config.discount + 0}}%</span>
-                    <input type="radio" name="coin-selected-to-order" class="hidden select-coin-checkbox" id="select-coin-{{ coin_config.ezdefi_coin_id }}" value="{{ coin_config.ezdefi_coin_id }}" data-discount="{{ coin_config.discount }}">
+                    <span class="ezdefi-select-coin-item__price"> {{ coin.token.price }} </span>
+                    <span class="ezdefi-select-coin-item__symbol">{{ coin.token.symbol }}</span>
+                    <span class="ezdefi-select-coin-item__discount">-{{ coin.discount + 0}}%</span>
+                    <input type="radio" name="coin-selected-to-order" class="hidden select-coin-checkbox" id="select-coin-{{ coin._id }}" value="{{ coin._id }}" data-discount="{{ coin.discount }}">
                 </label>
 			{% endfor %}
 		</div>
@@ -46,13 +46,17 @@
 		</div>
 		<div class="ezdefi-change-coin-box margin-top-md">
 			<div class="ezdefi-select-coin__list">
-				{% for coin_config in coins_config %}
-					<label for="select-coin-{{ coin_config.ezdefi_coin_id }}" class="ezdefi-change-coin-item">
-						<img src="{{ coin_config.logo }}" alt="" class="ezdefi-select-coin-item__logo">
-						<span class="ezdefi-select-coin-item__price"> {{ coin_config.price }} </span>
-						<span class="ezdefi-select-coin-item__symbol">{{coin_config.symbol}}</span>
-						<span class="ezdefi-select-coin-item__discount">-{{coin_config.discount + 0}}%</span>
-						<input type="radio" name="coin-selected-to-order" class="hidden select-coin-checkbox" id="select-coin-{{ coin_config.ezdefi_coin_id }}" value="{{ coin_config.ezdefi_coin_id }}" data-discount="{{ coin_config.discount }}">
+				{% for coin in coins %}
+					<label for="select-coin-{{ coin._id }}" class="ezdefi-change-coin-item">
+                        {% if coin.token.description %}
+                            <img src="{{ coin.token.logo }}" alt="" class="ezdefi-select-coin-item__logo" data-toggle="tooltip" title="{{ coin.token.description }}">
+                        {% else %}
+                            <img src="{{ coin.token.logo }}" alt="" class="ezdefi-select-coin-item__logo">
+                        {% endif %}
+						<span class="ezdefi-select-coin-item__price"> {{ coin.token.price }} </span>
+						<span class="ezdefi-select-coin-item__symbol">{{coin.token.symbol}}</span>
+						<span class="ezdefi-select-coin-item__discount">-{{coin.discount + 0}}%</span>
+						<input type="radio" name="coin-selected-to-order" class="hidden select-coin-checkbox" id="select-coin-{{ coin._id }}" value="{{ coin._id }}" data-discount="{{ coin.discount }}">
 					</label>
 				{% endfor %}
 			</div>
