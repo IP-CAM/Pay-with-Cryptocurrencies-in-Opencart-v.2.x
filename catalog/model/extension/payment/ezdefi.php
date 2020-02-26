@@ -27,121 +27,27 @@ class ModelExtensionPaymentEzdefi extends Model {
 		return $method_data;
 	}
 
-	public function getCoinsConfigWithPrice($order) {
-        $query = $this->db->query("SELECT * FROM `" . DB_PREFIX . "ezdefi_coin` WHERE 1 ORDER BY `order` ASC");
-        $coins = $query->rows;
+    public function getCoinsWithPrice($currencies, $price, $originCurrency) {
         $symbols = '';
-        foreach ($coins as $coin) {
-            $symbols .= $symbols === '' ? $coin['symbol'] : ','.$coin['symbol'];
+        foreach ($currencies as $key => $currency) {
+            $symbols .= $symbols === '' ? $currency->token->symbol : ','.$currency->token->symbol;
         }
-        $exchanges_response = $this->sendCurl('/token/exchanges?amount='.$order['total'].'&from='.$order['currency_code'].'&to='.$symbols, 'GET');
-        if($exchanges_response) {
-            $exchanges_data = json_decode($exchanges_response)->data;
-            foreach ($exchanges_data as $currency_exchange) {
-                foreach ($coins as $key => $coin) {
-                    if ($coin['symbol'] == $currency_exchange->token) {
-                        $coins[$key]['price'] = round($currency_exchange->amount * ((100 - $coin['discount']) / 100), self::DEFAULT_DECIMAL_LIST_COIN);
+
+        $exchangesResponse = $this->sendCurl('/token/exchanges?amount='.$price.'&from='.$originCurrency.'&to='.$symbols, 'GET');
+
+        if($exchangesResponse) {
+            $exchangesData = json_decode($exchangesResponse)->data;
+            foreach ($exchangesData as $currencyExchange) {
+                foreach ($currencies as $key => $currency) {
+                    if ($currency->token->symbol == $currencyExchange->token) {
+                        $currencies[$key]->token->price = round($currencyExchange->amount * ((100 - $currency->discount) / 100), self::DEFAULT_DECIMAL_LIST_COIN);
                     }
                 }
             }
         }
-
-        return $coins;
+        return $currencies;
     }
 
-    public function createPaymentEscrow($coinId, $callback) {
-        // get Order Info
-        $this->load->model('checkout/order');
-        $order_info = $this->model_checkout_order->getOrder($this->session->data['order_id']);
-        // get coin config
-        $coin_config = $this->getCoinConfigByEzdefiCoinId($coinId);
-        //create param
-        $price = $order_info['total'] - ($order_info['total'] * $coin_config['discount']/100);             // get discount price for this order
-        if($price > 0) {
-            $exchange_rate = $this->sendCurl("/token/exchange/".$order_info['currency_code']."%3A".$coin_config['symbol'], 'GET');
-            $params = "?uoid=".$order_info['order_id']."-0&to=".$coin_config['wallet_address']."&value=".$price."&currency=".$order_info['currency_code']."%3A".$coin_config['symbol']."&safedist=".$coin_config['safe_block_distant']."&callback=".urlencode($callback);
-            if($coin_config['payment_lifetime'] > 0) {
-                $params .= "&duration=".$coin_config['payment_lifetime'];
-            }
-            // Send api to create payment in gateway
-            $payment = $this->sendCurl( '/payment/create'.$params, "POST");
-            $paymentData = json_decode($payment);
-            $this->addException($order_info['order_id'], strtoupper($coin_config['symbol']), $price * json_decode($exchange_rate)->data, $coin_config['payment_lifetime'], self::NO_AMOUNT, null, null, $paymentData->data->_id);
-
-            return $payment;
-        } else {
-            return false;
-        }
-    }
-
-    public function createPaymentSimple($coinId, $callback) {
-        // get Order Info
-        $this->load->model('checkout/order');
-        $order_info = $this->model_checkout_order->getOrder($this->session->data['order_id']);
-        // get config
-        $this->load->model('setting/setting');
-        $coin_config = $this->getCoinConfigByEzdefiCoinId($coinId);
-        // create params
-        $origin_value = $order_info['total'] - ($order_info['total'] * $coin_config['discount']/100);                       // get discount price for this order
-        if($origin_value > 0) {
-            $exchange_rate = $this->sendCurl("/token/exchange/".$order_info['currency_code']."%3A".$coin_config['symbol'], 'GET');
-            //create amount id
-            $amount = $origin_value * json_decode($exchange_rate)->data;
-            $amount_id = $this->createAmountId($coin_config['symbol'], $amount, $coin_config['payment_lifetime'], $coin_config['decimal'], $this->config->get('payment_ezdefi_variation')) + 0;
-            if($amount_id) {
-                $params = "?amountId=true&uoid=".$order_info['order_id']."-1&to=".$coin_config['wallet_address']."&value=".$amount_id."&currency=".$coin_config['symbol']."%3A".$coin_config['symbol']."&safedist=".$coin_config['safe_block_distant']."&callback=".urlencode($callback);
-                if($coin_config['payment_lifetime'] > 0) {
-                    $params .= "&duration=".$coin_config['payment_lifetime'];
-                }
-                $payment = $this->sendCurl( '/payment/create'.$params, "POST");
-                $paymentData = json_decode($payment);
-                $this->addException($order_info['order_id'], strtoupper($coin_config['symbol']), $amount_id, $coin_config['payment_lifetime'], self::HAS_AMOUNT, null, null, $paymentData->data->_id);
-                return $payment;
-            }
-        }
-        return false;
-    }
-
-    public function createAmountId($currency, $amount, $expiration, $decimal, $variation) {
-	    if($expiration == 0) {
-            $expiration = 86400;
-        }
-	    $amount = round($amount, $decimal);
-        $old_amount = $this->db->query("SELECT `tag_amount`, `id`
-                                            FROM `".DB_PREFIX."ezdefi_amount` 
-                                            WHERE `currency`='".$currency."' 
-                                                AND `amount`='".$amount."' 
-                                                AND `expiration` < DATE_SUB(NOW(), INTERVAL ".self::MIN_SECOND_REUSE." SECOND)
-                                                AND ( `decimal` = ".(int)$decimal." OR `temp` = 0 )
-                                            ORDER BY `temp` 
-                                            LIMIT 1;");
-	    if ($old_amount->row) {
-            $this->db->query("UPDATE `". DB_PREFIX . "ezdefi_amount` SET `expiration`= DATE_ADD(NOW(), INTERVAL ".$expiration." SECOND)  WHERE `id`=".$old_amount->row['id']);
-            return $old_amount->row['tag_amount'];
-        } else {
-            $this->db->query("START TRANSACTION;");
-            $this->db->query("INSERT INTO `".DB_PREFIX."ezdefi_amount` (`temp`, `amount`, `tag_amount`, `expiration`, `currency`, `decimal`)
-                            SELECT (case when(MIN(t1.temp + 1) is null) then 0 else MIN(t1.temp + 1) end) as `temp`, " .$amount." as `amount`, 
-                                ".$amount." + (CASE WHEN(MIN(t1.temp + 1) is NULL) THEN 0 WHEN(MIN(t1.temp+1)%2 = 0) then MIN(t1.temp+1)/2 else -(MIN(t1.temp+1)+1)/2 end) * pow(10, -".$decimal.") as `tag_amount`,
-                                 DATE_ADD(NOW(), INTERVAL ".$expiration." SECOND) as `expiration`,
-                                  '".$currency. "' as `currency`, ".(int)$decimal." as `decimal`
-                            FROM `".DB_PREFIX."ezdefi_amount` t1
-                            LEFT JOIN `".DB_PREFIX."ezdefi_amount` t2 ON t1.temp + 1 = t2.temp and t1.amount = t2.amount and t1.currency = t2.currency and t1.decimal = t2.decimal
-                            WHERE t2.temp IS NULL
-                                AND t1.decimal = ".$decimal."
-                                AND t1.currency = '".$currency."'
-                                AND t1.amount = ROUND(" .$amount.", ".self::MAX_AMOUNT_DECIMAL.")
-                            ON DUPLICATE KEY UPDATE id=LAST_INSERT_ID(id), `expiration` = DATE_ADD(NOW(), INTERVAL ".$expiration." SECOND), `decimal` = ".$decimal.";");
-            $amount_id = $this->db->query("select tag_amount from `".DB_PREFIX."ezdefi_amount` where `id` = LAST_INSERT_ID()");
-            $this->db->query("COMMIT;");
-            $variationValue = abs($amount_id->row['tag_amount'] - $amount);
-
-            if ($variationValue > ($amount * (float)$variation) / 100 ) {
-                return false;
-            }
-            return $amount_id->row['tag_amount'];
-        }
-    }
 
     public function getCoinConfigByEzdefiCoinId($coin_id) {
         $query = $this->db->query("SELECT * FROM `" . DB_PREFIX . "ezdefi_coin` WHERE `ezdefi_coin_id` ='".$coin_id."' LIMIT 1");
@@ -200,7 +106,43 @@ class ModelExtensionPaymentEzdefi extends Model {
     }
 
     // --------------------------------------------------------End exception model-----------------------------------------------------------
-    public function sendCurl($api, $method) {
+
+
+
+    // -----------------------------------------------------------Curl--------------------------------------------------------------------
+    public function createPayment($param) {
+        return $this->sendCurl('/payment/create', 'POST', $param);
+    }
+
+    public function getWebsiteData () {
+        $public_key = $api_key = $this->config->get('payment_ezdefi_public_key');
+        $website_data = $this->sendCurl('/website/' . $public_key, 'GET');
+        return json_decode($website_data)->data;
+    }
+
+    public function getCurrency($id, $coins = null) {
+	    if(!$coins) {
+            $coins = json_decode(json_encode($this->getWebsiteData()->coins), true);
+        }
+
+        $currencyKey = array_search($id, array_column($coins, '_id'));
+        return $coins[$currencyKey];
+    }
+
+    public function getCurrencies() {
+        $coins = json_decode(json_encode($this->getWebsiteData()->coins), true);
+        return $coins;
+    }
+
+    public function getExchange($originCurrency, $currency) {
+        $exchangeRate = $this->sendCurl("/token/exchange/".$originCurrency."%3A".$currency, 'GET');
+
+        if ($exchangeRate) {
+            return json_decode($exchangeRate)->data;
+        }
+    }
+
+    public function sendCurl($api, $method, $params = []) {
         $this->load->model('setting/setting');
         $this->load->model('extension/payment/ezdefi');
 
@@ -208,8 +150,15 @@ class ModelExtensionPaymentEzdefi extends Model {
         $api_key = $this->config->get('payment_ezdefi_api_key');
 
         $curl = curl_init();
+
+        if(!empty($params)) {
+            $url =  $api_url.$api.'?'. http_build_query($params);
+        } else {
+            $url = $api_url.$api;
+        }
+
         curl_setopt_array($curl, array(
-            CURLOPT_URL => $api_url. $api,
+            CURLOPT_URL => $url,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_HEADER         => false,
             CURLOPT_FOLLOWLOCATION => true,
