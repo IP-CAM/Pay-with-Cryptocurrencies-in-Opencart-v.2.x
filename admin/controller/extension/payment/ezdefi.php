@@ -49,6 +49,8 @@ class ControllerExtensionPaymentEzdefi extends Controller
             $data['payment_ezdefi_public_key'] = '';
         }
 
+        $data['coins'] = $this->model_extension_payment_ezdefi->getCurrencies();
+
         $this->document->addStyle('view/javascript/jquery/jquery-ui/jquery-ui.css');
         $this->document->addStyle('view/stylesheet/ezdefi/jquery-validation.min.css');
         $this->document->addStyle('view/stylesheet/ezdefi/pagination.min.css');

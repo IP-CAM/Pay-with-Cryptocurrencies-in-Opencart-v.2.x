@@ -35,7 +35,6 @@ class ModelExtensionPaymentEzdefi extends Model {
 
         $exchangesResponse = $this->sendCurl('/token/exchanges?amount='.$price.'&from='.$originCurrency.'&to='.$symbols, 'GET');
 
-
         if($exchangesResponse) {
             $exchangesData = json_decode($exchangesResponse)->data;
             foreach ($exchangesData as $currencyExchange) {
@@ -47,35 +46,6 @@ class ModelExtensionPaymentEzdefi extends Model {
             }
         }
         return $currencies;
-    }
-
-    public function createPaymentEscrow($coinId, $callback) {
-        // get Order Info
-        $this->load->model('checkout/order');
-        $order_info = $this->model_checkout_order->getOrder($this->session->data['order_id']);
-        // get coin config
-        $coin_config = $this->getCoinConfigByEzdefiCoinId($coinId);
-        //create param
-        $price = $order_info['total'] - ($order_info['total'] * $coin_config['discount']/100);             // get discount price for this order
-        if($price > 0) {
-            $exchange_rate = $this->sendCurl("/token/exchange/".$order_info['currency_code']."%3A".$coin_config['symbol'], 'GET');
-            $params = "?uoid=".$order_info['order_id']."-0&to=".$coin_config['wallet_address']."&value=".$price."&currency=".$order_info['currency_code']."%3A".$coin_config['symbol']."&safedist=".$coin_config['safe_block_distant']."&callback=".urlencode($callback);
-            if($coin_config['payment_lifetime'] > 0) {
-                $params .= "&duration=".$coin_config['payment_lifetime'];
-            }
-            // Send api to create payment in gateway
-            $payment = $this->sendCurl( '/payment/create'.$params, "POST");
-            $paymentData = json_decode($payment);
-            $this->addException($order_info['order_id'], strtoupper($coin_config['symbol']), $price * json_decode($exchange_rate)->data, $coin_config['payment_lifetime'], self::NO_AMOUNT, null, null, $paymentData->data->_id);
-
-            return $payment;
-        } else {
-            return false;
-        }
-    }
-
-    public function createPayment($param) {
-        return $this->sendCurl('/payment/create', 'POST', $param);
     }
 
 
@@ -140,6 +110,10 @@ class ModelExtensionPaymentEzdefi extends Model {
 
 
     // -----------------------------------------------------------Curl--------------------------------------------------------------------
+    public function createPayment($param) {
+        return $this->sendCurl('/payment/create', 'POST', $param);
+    }
+
     public function getWebsiteData () {
         $public_key = $api_key = $this->config->get('payment_ezdefi_public_key');
         $website_data = $this->sendCurl('/website/' . $public_key, 'GET');

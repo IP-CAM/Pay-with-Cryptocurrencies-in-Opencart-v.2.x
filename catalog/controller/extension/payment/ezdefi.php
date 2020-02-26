@@ -17,9 +17,9 @@ class ControllerExtensionPaymentEzdefi extends Controller
 
         $website_data = $this->model_extension_payment_ezdefi->getWebsiteData();
 
+        $order                             = $this->model_checkout_order->getOrder($this->session->data['order_id']);
         $data['store_url']                 = HTTPS_SERVER;
         $data['order_id']                  = $this->session->data['order_id'];
-        $order                             = $this->model_checkout_order->getOrder($this->session->data['order_id']);
         $data['origin_value']              = (float)$order['total'];
         $data['origin_currency']           = $order['currency_code'];
         $data['coins']                     = $this->model_extension_payment_ezdefi->getCoinsWithPrice($website_data->coins, $order['total'], $order['currency_code']);
@@ -48,7 +48,7 @@ class ControllerExtensionPaymentEzdefi extends Controller
         $amount            = round($this->model_extension_payment_ezdefi->getExchange($order_info['currency_code'], $coin['token']['symbol']) * $order_info['total'] * (100 - $coin['discount']) / 100, $coin['decimal']);
 
         if ($enable_simple_pay) {
-            $params = [
+            $params       = [
                 'uoid'     => $order_info['order_id'],
                 'amountId' => true,
                 'coinId'   => $coin['_id'],
@@ -86,7 +86,7 @@ class ControllerExtensionPaymentEzdefi extends Controller
         $coin              = $this->model_extension_payment_ezdefi->getCurrency($coin_id, json_decode(json_encode($website_data->coins), true));
 
         if ($enable_simple_pay) {
-            $params = [
+            $params       = [
                 'uoid'     => $order_info['order_id'],
                 'amountId' => false,
                 'value'    => $order_info['total'] * (100 - $coin['discount']) / 100,

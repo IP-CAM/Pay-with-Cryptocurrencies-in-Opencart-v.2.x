@@ -86,10 +86,10 @@
                         <label for="filter-exception-by-currency-all" class="margin-top-5"> All coin </label>
                         <input type="radio" name="filter-by-currency" value="" id="filter-exception-by-currency-all" checked>
                     </div>
-                    {% for coin_config in coins_config %}
+                    {% for coin in coins %}
                         <div class="exception-filter-currency-item">
-                            <label for="filter-exception-by-currency-{{ coin_config.symbol }}"><img src="{{ coin_config.logo }}" alt="" class="small-logo"> {{ coin_config.symbol }}</label>
-                            <input type="radio" name="filter-by-currency" value="{{ coin_config.symbol }}" id="filter-exception-by-currency-{{ coin_config.symbol }}">
+                            <label for="filter-exception-by-currency-{{ coin.token.symbol }}"><img src="{{ coin.token.logo }}" alt="" class="small-logo"> {{ coin.token.symbol }}</label>
+                            <input type="radio" name="filter-by-currency" value="{{ coin.token.symbol }}" id="filter-exception-by-currency-{{ coin.token.symbol }}">
                         </div>
                     {% endfor %}
 
