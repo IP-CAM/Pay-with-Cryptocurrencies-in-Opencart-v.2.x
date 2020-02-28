@@ -149,6 +149,12 @@ $(function () {
     var createPayment = function (url, coinId, suffixes, discount) {
         showPaymentLoading(suffixes, true);
         $(".payment-error"+suffixes).css('display', 'none');
+        $(selectors.selectCoinBox).css('display', 'none');
+        $(selectors.changeCoinBox).css('display', 'none');
+        $(selectors.btnChange).css('display','block');
+        $(selectors.paymentbox).css('display','block');
+        $('.ezdefi-payment__content').css('display','grid');
+
         $.ajax({
             url: url,
             method: "GET",
@@ -201,10 +207,7 @@ $(function () {
         $(selectors.logoCoinSelected).prop('src', data.token ? data.token.logo : '');
         $(selectors.nameCoinSelected).html(  data.token ? data.token.symbol.toUpperCase() + '/' + data.token.name : '');
         $(selectors.tooltipShowDiscount).attr('data-content', 'Discount: ' + discount + '%');
-        $(selectors.selectCoinBox).css('display', 'none');
-        $(selectors.changeCoinBox).css('display', 'none');
-        $(selectors.btnChange).css('display','block');
-        $(selectors.paymentbox).css('display','block');
+
         $(selectors.paymentContent).css('display','grid');
         $(selectors.qrCodeImg+suffixes).prop('src', data.qr);
         $(selectors.alternativeQrCode + suffixes).prop('src', "https://chart.googleapis.com/chart?cht=qr&chl="+data.to+"&chs=200x200&chld=L|0")

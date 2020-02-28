@@ -15,15 +15,16 @@ class ControllerExtensionPaymentEzdefi extends Controller
         $this->load->model('extension/payment/ezdefi');
         $this->load->language('extension/payment/ezdefi');
 
-        $data['store_url'] = HTTPS_SERVER;
+        $website_data = $this->model_extension_payment_ezdefi->getWebsiteData();
 
-        $data['order_id']                  = $this->session->data['order_id'];
         $order                             = $this->model_checkout_order->getOrder($this->session->data['order_id']);
+        $data['store_url']                 = HTTPS_SERVER;
+        $data['order_id']                  = $this->session->data['order_id'];
         $data['origin_value']              = (float)$order['total'];
         $data['origin_currency']           = $order['currency_code'];
-        $data['coins_config']              = $this->model_extension_payment_ezdefi->getCoinsConfigWithPrice($order);
-        $data['enable_simple_pay']         = $this->config->get('payment_ezdefi_enable_simple_pay');
-        $data['enable_escrow_pay']         = $this->config->get('payment_ezdefi_enable_escrow_pay');
+        $data['coins']                     = $this->model_extension_payment_ezdefi->getCoinsWithPrice($website_data->coins, $order['total'], $order['currency_code']);
+        $data['enable_simple_pay']         = $website_data->website->payAnyWallet;
+        $data['enable_escrow_pay']         = $website_data->website->payEzdefiWallet;
         $data['url_check_order_complete']  = $this->url->link('extension/payment/ezdefi/checkOrderComplete', '', true);
         $data['url_create_simple_payment'] = $this->url->link('extension/payment/ezdefi/createSimplePayment', '', true);
         $data['url_create_escrow_payment'] = $this->url->link('extension/payment/ezdefi/createEscrowPayment', '', true);
@@ -35,13 +36,30 @@ class ControllerExtensionPaymentEzdefi extends Controller
     {
         $this->load->language('extension/payment/ezdefi');
         $this->load->model('setting/setting');
-        $enable_simple_pay = $this->config->get('payment_ezdefi_enable_simple_pay');
+        $this->load->model('extension/payment/ezdefi');
+        $this->load->model('checkout/order');
+
+        $order_info        = $this->model_checkout_order->getOrder($this->session->data['order_id']);
+        $website_data      = $this->model_extension_payment_ezdefi->getWebsiteData();
+        $enable_simple_pay = $website_data->website->payAnyWallet;
         $callback          = $this->url->link('extension/payment/ezdefi/callbackConfirmOrder', '', true);
         $coin_id           = $this->request->get['coin_id'];
+        $coin              = $this->model_extension_payment_ezdefi->getCurrency($coin_id, json_decode(json_encode($website_data->coins), true));
+        $amount            = round($this->model_extension_payment_ezdefi->getExchange($order_info['currency_code'], $coin['token']['symbol']) * $order_info['total'] * (100 - $coin['discount']) / 100, $coin['decimal']);
 
         if ($enable_simple_pay) {
-            $this->load->model('extension/payment/ezdefi');
-            $payment_info = $this->model_extension_payment_ezdefi->createPaymentSimple($coin_id, $callback);
+            $params       = [
+                'uoid'     => $order_info['order_id'],
+                'amountId' => true,
+                'coinId'   => $coin['_id'],
+                'value'    => $amount,
+                'to'       => $coin['walletAddress'],
+                'currency' => $coin['token']['symbol'] . ':' . $coin['token']['symbol'],
+                'safedist' => $coin['blockConfirmation'],
+                'duration' => $coin['expiration'] * 60,
+                'callback' => $callback
+            ];
+            $payment_info = $this->model_extension_payment_ezdefi->createPayment($params);
             if ($payment_info) {
                 return $this->response->setOutput($payment_info);
             } else {
@@ -54,14 +72,31 @@ class ControllerExtensionPaymentEzdefi extends Controller
 
     public function createEscrowPayment()
     {
+
         $this->load->language('extension/payment/ezdefi');
         $this->load->model('setting/setting');
-        $enable_escrow_pay = $this->config->get('payment_ezdefi_enable_escrow_pay');
+        $this->load->model('extension/payment/ezdefi');
+        $this->load->model('checkout/order');
+
+        $order_info        = $this->model_checkout_order->getOrder($this->session->data['order_id']);
+        $website_data      = $this->model_extension_payment_ezdefi->getWebsiteData();
+        $enable_simple_pay = $website_data->website->payEzdefiWallet;
         $callback          = $this->url->link('extension/payment/ezdefi/callbackConfirmOrder', '', true);
         $coin_id           = $this->request->get['coin_id'];
-        if ($enable_escrow_pay) {
-            $this->load->model('extension/payment/ezdefi');
-            $payment_info = $this->model_extension_payment_ezdefi->createPaymentEscrow($coin_id, $callback);
+        $coin              = $this->model_extension_payment_ezdefi->getCurrency($coin_id, json_decode(json_encode($website_data->coins), true));
+
+        if ($enable_simple_pay) {
+            $params       = [
+                'uoid'     => $order_info['order_id'],
+                'amountId' => false,
+                'value'    => $order_info['total'] * (100 - $coin['discount']) / 100,
+                'to'       => $coin['walletAddress'],
+                'currency' => $order_info['currency_code'] . ':' . $coin['token']['symbol'],
+                'safedist' => $coin['blockConfirmation'],
+                'duration' => $coin['expiration'] * 60,
+                'callback' => $callback
+            ];
+            $payment_info = $this->model_extension_payment_ezdefi->createPayment($params);
             if ($payment_info) {
                 return $this->response->setOutput($payment_info);
             } else {
