@@ -75,7 +75,7 @@ $(function () {
                 let tmp = (pagination.pageNumber - 1) * pagination.pageSize + 1;
                 $.each(response, function (exceptionKey, exceptionRecord) {
                     let currency = exceptionRecord.currency;
-                    let amountId = exceptionRecord.amount_id;
+                    let amountId = parseFloat(exceptionRecord.amount_id);
                     var exceptionId = exceptionRecord.id;
                     var orderId = exceptionRecord.order_id;
                     var email = exceptionRecord.email;
@@ -105,7 +105,7 @@ $(function () {
                             </div>
                             <div class="exception-order-button-box">`;
                         orderItem += paidStatus == 1 ? `<button class="btn btn-primary btn-revert-order" data-toggle="modal" data-target="#modal-revert-order-exception" data-exception-id="${exceptionId}" data-order-id="${orderId}">${language.revert}</button>
-                                                            <button class="btn btn-danger btn-delete-exception" data-toggle="modal" data-target="#delete-order-exception" data-exception-id="${exceptionId}">${language.delete}</button>` : '';
+                                                        <button class="btn btn-danger btn-delete-exception" data-toggle="modal" data-target="#delete-order-exception" data-exception-id="${exceptionId}">${language.delete}</button>` : '';
                         orderItem += paidStatus != 1 ? `<button class="btn btn-primary btn-confirm-paid" data-toggle="modal" data-target="#confirm-paid-order-exception" data-exception-id="${exceptionId}" data-order-id="${orderId}">${language.confirmPaid}</button>
                                                         <button class="btn btn-danger btn-delete-exception" data-toggle="modal" data-target="#delete-order-exception" data-exception-id="${exceptionId}">${language.delete}</button>` : '';
                         orderItem +=`
@@ -123,8 +123,8 @@ $(function () {
                                 </div>`;
                     dataHtml += `<tr>
                                 <td>${tmp}</td>
-                                <td>${currency}</td>
-                                <td>${parseFloat(amountId)} </td>
+                                <td class="text-uppercase">${currency}</td>
+                                <td>${amountId} </td>
                                 <td>${orderItem}</td>
                             </tr>`;
                     tmp++;
