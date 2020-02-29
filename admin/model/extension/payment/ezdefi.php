@@ -39,6 +39,17 @@ class ModelExtensionPaymentEzdefi extends Model
     }
 
     //-------------------------------------------------Exception------------------------------------------------------
+    public function getExceptionById($exception_id) {
+        $query = $this->db->query("SELECT * FROM `" . DB_PREFIX . "ezdefi_exception` WHERE `id` ='".$exception_id."' LIMIT 1");
+        if ($query->num_rows) {
+            $exception = $query->rows;
+            return $exception[0];
+        } else {
+            return false;
+        }
+    }
+
+
     public function getTotalException($keyword_amount, $keyword_order_id, $keyword_email, $currency)
     {
         $sql = "select count(*) as total_exceptions
@@ -119,6 +130,16 @@ class ModelExtensionPaymentEzdefi extends Model
                                         AND order_status_id = " . self::ORDER_STATUS_PENDING . "
                                     LIMIT " . $start . "," . self::NUMBER_OF_ORDERS_IN_PAGE);
         return $query->rows;
+    }
+
+    public function setProcessingForOrder($order_id) {
+        $this->db->query("UPDATE `" . DB_PREFIX . "order`  SET `order_status_id`='1' WHERE  `order_id`=".$order_id);
+        $this->db->query("INSERT INTO `" . DB_PREFIX . "order_history` (`order_id`, `order_status_id`, `notify`, `comment`, `date_added`) VALUES (".$order_id.", '2', '0', 'Set order status to Processing from Ezdefi Exception magement', DATE(NOW()) )" );
+    }
+
+    public function setPendingForOrder($order_id) {
+        $this->db->query("UPDATE `" . DB_PREFIX . "order`  SET `order_status_id`='0' WHERE  `order_id`=".$order_id);
+        $this->db->query("INSERT INTO `" . DB_PREFIX . "order_history` (`order_id`, `order_status_id`, `notify`, `comment`, `date_added`) VALUES (".$order_id.", '0', '0', 'Set order status to Pending from Ezdefi Exception magement', DATE(NOW()) )" );
     }
 
     // --------------------------------------- curl---------------------------------------------

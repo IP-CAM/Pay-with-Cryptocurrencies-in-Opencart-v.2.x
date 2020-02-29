@@ -5,6 +5,8 @@
     <input type="hidden" id="url-delete-exception-by-order-id" value="<?php echo $url_delete_exception_by_order_id ?>">
     <input type="hidden" id="url-get-order-pending" value="<?php echo $url_get_order_pending ?>">
     <input type="hidden" id="url-revert-order-exception" value="<?php echo $url_revert_order_exception ?>">
+    <input type="hidden" id="url-confirm-order" value="<?php echo url_confirm_order ?>">
+    <input type="hidden" id="url-assign-order" value="<?php echo url_assign_order ?>">
     <div class="page-header">
         <div class="container-fluid">
             <div class="pull-right">
