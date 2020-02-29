@@ -1,0 +1,245 @@
+.ezdefi-tab-box {
+    display: flex;
+    margin-bottom: 5px;
+}
+.ezdefi-btn-tab {
+    color: #007bff;
+    flex:50%;
+    text-align: center;
+    background: #fff;
+    padding: 10px;
+    border-bottom: 1px solid #888;
+}
+
+.ezdefi-btn-tab:hover {
+    color: #00509b;
+    border-top: 1px solid #aaa;
+    border-left: 1px solid #aaa;
+    border-right: 1px solid #aaa;
+    border-radius: 4px 4px 0 0;
+}
+
+.ezdefi-admin-content-box {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto auto;
+}
+
+.ezdefi-btn-config-tab {
+    grid-column: 1/2;
+    grid-row: 1/2;
+}
+
+.ezdefi-btn-exception-tab {
+    grid-column: 2/3;
+    grid-row: 1/2
+
+}
+.config-content-tab {
+    grid-column: 1/3;
+    grid-row: 2/3;
+}
+
+.exception-content-tab {
+    grid-column: 1/3;
+    grid-row: 3/4;
+}
+
+#ezdefi-config-tab:checked ~ .ezdefi-btn-config-tab, #ezdefi-exception-tab:checked ~ .ezdefi-btn-exception-tab {
+    color: #333;
+    border: 1px solid #888;
+    border-radius: 4px 4px 0 0;
+    border-bottom-color: transparent;
+}
+
+#ezdefi-config-tab:checked ~ .config-content-tab, #ezdefi-exception-tab:checked ~ .exception-content-tab {
+    display: block;
+}
+
+.search-exception-input {
+    border-radius: 5px;
+    padding: 4px;
+    border-color: #999;
+    padding-left: 8px;
+    padding-right: 20px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.config-content-tab, .exception-content-tab {
+    display: none;
+}
+
+/*config*/
+.coin-config__logo {
+    height: 50px;
+}
+
+.btn-edit, .btn-delete, .ezdefi-btn {
+    cursor: pointer;
+}
+
+.payment-method-box {
+    display: grid;
+    grid-template-columns: auto;
+    grid-template-rows: repeat(4, auto);
+}
+
+.payment-method-label {
+    display: grid;
+    grid-template-columns: 20px repeat(2, 250px);
+}
+
+.payment-method-label>input {
+    grid-column: 1/span 1;
+}
+.payment-method-label>p {
+    grid-column: 2/span 1;
+    grid-row: 1/span 1;
+}
+
+.variation-box {
+    display: grid;
+    grid-template-columns: 70px 20px auto;
+    grid-template-rows: repeat(2, auto);
+    grid-column-gap: 10px;
+}
+.variation-percent {
+    grid-column: 2/3;
+    grid-row: 1/2;
+}
+
+.variation-description {
+    grid-column: 1/-1;
+    grid-row: 2/-1;
+}
+.variation-box >label.error {
+    padding-top: 10px;
+}
+
+.warning-edit-decimal {
+    color: red;
+    font-weight: bold;
+    display: none;
+}
+
+.select-coin__logo {
+    width: 30px;
+}
+
+.select-coin__name {
+    padding-left: 15px;
+}
+
+/*exception*/
+.exception-loading-icon {
+    display: none;
+    margin-right: 5px;
+
+}
+
+.exception-order-info__data {
+    /*display: inline-block;*/
+    /*word-wrap: break-word;*/
+}
+
+.exception-order-info__explorer-url {
+    display: inline-block;
+    word-wrap: break-word;
+    max-width: 300px;
+}
+
+.ezdefi-search-box {
+    width: 100%;
+    text-align: center;
+}
+
+#exception-search-input {
+    width: 50%;
+    padding: 3px;
+    border-color: lightskyblue;
+    border-radius: 5px;
+}
+
+.small-logo {
+    width: 30px;
+}
+
+.exception-filter-currency-box {
+    width: 100%;
+    text-align: center;
+}
+
+.exception-filter-currency-item {
+    display: inline-block;
+    vertical-align:center;
+
+    padding: 5px;
+}
+
+.exception-filter-currency-item>input {
+    margin-left: 3px;
+    margin-top: 5px;
+    vertical-align:center;
+}
+
+.exception-order-box {
+    display: flex;
+    margin-bottom: 10px;
+    justify-content: space-around;
+}
+.exception-order-info {
+    width: 500px;
+}
+.exception-order-button-box {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.exception-order-button-box > button {
+    margin-bottom: 5px;
+}
+
+.exception-order-label-1 {
+    display: inline-block;
+    width: 150px;
+    font-weight: bold;
+}
+
+.exception-order-label-2 {
+    display: inline-block;
+    width: 80px;
+    font-weight: bold;
+}
+
+.background-grey {
+    background-color: rgba(228, 228, 228, 0.47);
+}
+
+/*GENEAL*/
+.margin-top-5 {
+    margin-top: 5px;
+}
+
+.margin-right-10 {
+    margin-right: 10px !important;
+}
+
+.padding-top-md {
+    padding-top: 25px !important;
+}
+.padding-top-10 {
+    padding-top: 10px;
+}
+
+.table tbody > tr > td {
+    vertical-align: top;
+}
+
+.align-left {
+    text-align: left !important;
+}
+
+.padding-none {
+    padding: 0;
+}
