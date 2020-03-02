@@ -229,7 +229,7 @@ class ControllerExtensionPaymentEzdefi extends Controller
     {
         $this->load->model('extension/payment/ezdefi');
 
-        $exception_id     = isset($this->request->get['exception_id']) ? $this->request->get['exception_id'] : '';
+        $exception_id     = isset($this->request->post['exception_id']) ? $this->request->post['exception_id'] : '';
         $exception = $this->model_extension_payment_ezdefi->getExceptionById($exception_id);
 
         $this->model_extension_payment_ezdefi->setProcessingForOrder($exception['order_id']);
@@ -241,12 +241,14 @@ class ControllerExtensionPaymentEzdefi extends Controller
     public function assignOrder() {
         $this->load->model('extension/payment/ezdefi');
 
-        $exception_id     = isset($this->request->get['exception_id']) ? $this->request->get['exception_id'] : '';
-        $order_id_to_assign = isset($this->request->get['order_id']) ? $this->request->get['order_id'] : '';
+        $exception_id     = isset($this->request->post['exception_id']) ? $this->request->post['exception_id'] : '';
+        $order_id_to_assign = isset($this->request->post['order_id']) ? $this->request->post['order_id'] : '';
         $exception = $this->model_extension_payment_ezdefi->getExceptionById($exception_id);
 
         $this->model_extension_payment_ezdefi->setProcessingForOrder($order_id_to_assign);
-        $this->model_extension_payment_ezdefi->deleteExceptionByOrderId($exception['order_id']);
+        if($exception['order_id']) {
+            $this->model_extension_payment_ezdefi->deleteExceptionByOrderId($exception['order_id']);
+        }
         $this->model_extension_payment_ezdefi->deleteExceptionById($exception_id);
 
         return $this->response->setOutput(json_encode(['status' => 'success']));
@@ -255,7 +257,7 @@ class ControllerExtensionPaymentEzdefi extends Controller
     public function revertOrderException()
     {
         $this->load->model('extension/payment/ezdefi');
-        $exception_id = isset($this->request->get['exception_id']) ? $this->request->get['exception_id'] : '';
+        $exception_id = isset($this->request->post['exception_id']) ? $this->request->post['exception_id'] : '';
         $exception = $this->model_extension_payment_ezdefi->getExceptionById($exception_id);
 
         $this->model_extension_payment_ezdefi->setPendingForOrder($exception['order_id']);

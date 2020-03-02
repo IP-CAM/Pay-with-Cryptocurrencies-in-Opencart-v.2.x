@@ -22,7 +22,7 @@ class ModelExtensionPaymentEzdefi extends Model {
 				'code'       => 'ezdefi',
 				'title'      => $this->language->get('text_title'),
 				'terms'      => '',
-				'sort_order' => $this->config->get('payment_ezdefi_sort_order')
+				'sort_order' => $this->config->get('ezdefi_sort_order')
 			);
 		}
 		return $method_data;
@@ -116,7 +116,7 @@ class ModelExtensionPaymentEzdefi extends Model {
     }
 
     public function getWebsiteData () {
-        $public_key = $api_key = $this->config->get('payment_ezdefi_public_key');
+        $public_key = $api_key = $this->config->get('ezdefi_public_key');
         $website_data = $this->sendCurl('/website/' . $public_key, 'GET');
         return json_decode($website_data)->data;
     }
@@ -147,8 +147,8 @@ class ModelExtensionPaymentEzdefi extends Model {
         $this->load->model('setting/setting');
         $this->load->model('extension/payment/ezdefi');
 
-        $api_url = $this->config->get('payment_ezdefi_gateway_api_url');
-        $api_key = $this->config->get('payment_ezdefi_api_key');
+        $api_url = $this->config->get('ezdefi_gateway_api_url');
+        $api_key = $this->config->get('ezdefi_api_key');
 
         $curl = curl_init();
 

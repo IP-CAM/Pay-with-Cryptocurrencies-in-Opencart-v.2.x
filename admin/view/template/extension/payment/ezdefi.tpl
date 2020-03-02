@@ -1,12 +1,14 @@
 <?php echo $header; ?>  <?php echo $column_left ?>
 <div id="content">
-    <input type="hidden" id="url-delete-exception" value="<?php echo $url_delete_exception ?>">
     <input type="hidden" id="url-add-order-history" value="<?php echo $url_add_order_history ?>">
     <input type="hidden" id="url-delete-exception-by-order-id" value="<?php echo $url_delete_exception_by_order_id ?>">
     <input type="hidden" id="url-get-order-pending" value="<?php echo $url_get_order_pending ?>">
-    <input type="hidden" id="url-revert-order-exception" value="<?php echo $url_revert_order_exception ?>">
-    <input type="hidden" id="url-confirm-order" value="<?php echo url_confirm_order ?>">
-    <input type="hidden" id="url-assign-order" value="<?php echo url_assign_order ?>">
+    <input type="hidden" id="url-delete-exception" value="<?php echo $url_delete_exception ?>">
+    <input type="hidden" id="url-revert-order" value="<?php echo $url_revert_order_exception ?>">
+    <input type="hidden" id="url-confirm-order" value="<?php echo $url_confirm_order ?>">
+    <input type="hidden" id="url-assign-order" value="<?php echo $url_assign_order ?>">
+
+
     <div class="page-header">
         <div class="container-fluid">
             <div class="pull-right">
@@ -87,11 +89,13 @@
                         <label for="filter-exception-by-currency-all" class="margin-top-5"> All coin </label>
                         <input type="radio" name="filter-by-currency" value="" id="filter-exception-by-currency-all" checked>
                     </div>
-                    <?php foreach($coins as $coin) { ?>
-                        <div class="exception-filter-currency-item">
-                            <label for="filter-exception-by-currency-<?php $coin['token']['symbol'] ?>"><img src="<?php echo $coin['token']['logo'] ?>" alt="" class="small-logo"> <?php $coin['token']['symbol'] ?></label>
-                            <input type="radio" name="filter-by-currency" value="<?php echo $coin['token']['symbol'] ?>" id="filter-exception-by-currency-<?php echo $coin['token']['symbol'] ?>">
-                        </div>
+                    <?php if($coins) { ?>
+                        <?php foreach($coins as $coin) { ?>
+                            <div class="exception-filter-currency-item">
+                                <label for="filter-exception-by-currency-<?php $coin['token']['symbol'] ?>"><img src="<?php echo $coin['token']['logo'] ?>" alt="" class="small-logo"> <?php $coin['token']['symbol'] ?></label>
+                                <input type="radio" name="filter-by-currency" value="<?php echo $coin['token']['symbol'] ?>" id="filter-exception-by-currency-<?php echo $coin['token']['symbol'] ?>">
+                            </div>
+                        <?php } ?>
                     <?php } ?>
                 </div>
                 <br>
