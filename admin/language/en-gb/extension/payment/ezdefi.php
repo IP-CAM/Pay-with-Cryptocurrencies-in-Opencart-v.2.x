@@ -7,13 +7,9 @@ $_['config_gateway_api_url_default'] = 'https://merchant-api.ezdefi.com/api';
 
 // Entry
 $_['entry_enable_extension'] = 'Enable/Disable';
-$_['entry_gateway_api_url'] = 'GATEWAY API URL';
-$_['entry_api_key'] = 'API KEY';
-$_['entry_order_status'] = 'ORDER STATUS';
-$_['entry_payment_method'] = 'PAYMENT METHOD';
-$_['entry_pay_with_any_crypto_wallet'] = 'Pay with any crypto wallet';
-$_['entry_pay_with_ezdefi_wallet'] = 'Pay with ezDeFi wallet';
-$_['entry_pay_variation'] = 'ACCEPTABLE  PRICE AVAILABLE';
+$_['entry_gateway_api_url'] = 'Gateway API URL';
+$_['entry_api_key'] = 'API key';
+$_['entry_public_key'] = 'Public key';
 
 //Button
 $_['button_add'] = 'Add more';

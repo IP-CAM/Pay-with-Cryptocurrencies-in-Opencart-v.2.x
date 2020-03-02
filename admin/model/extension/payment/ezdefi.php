@@ -2,10 +2,9 @@
 
 class ModelExtensionPaymentEzdefi extends Model
 {
-    CONST TIME_REMOVE_AMOUNT_ID    = 3;
     CONST TIME_REMOVE_EXCEPTION    = 7;
     CONST ORDER_STATUS_PENDING     = 1;
-    CONST ORDER_STATUS_NOT_CONFIRM = 0;
+    CONST ORDER_STATUS_PROCESSING  = 2;
     CONST NUMBER_OF_ORDERS_IN_PAGE = 10;
 
     public function install()
@@ -130,22 +129,21 @@ class ModelExtensionPaymentEzdefi extends Model
                                     WHERE (email like '%" . $this->db->escape($keyword) . "%'
                                         OR order_id like '%" . $this->db->escape($keyword) . "%'
                                         OR CONCAT(firstname, ' ', lastname) LIKE '%" . $this->db->escape($keyword) . "%')
-                                        AND ( order_status_id = " . self::ORDER_STATUS_PENDING . "
-                                        OR order_status_id = " . self::ORDER_STATUS_NOT_CONFIRM . " )
+                                        AND ( order_status_id = " . self::ORDER_STATUS_PENDING . ")
                                     LIMIT " . $start . "," . self::NUMBER_OF_ORDERS_IN_PAGE);
         return $query->rows;
     }
 
     public function setProcessingForOrder($order_id)
     {
-        $this->db->query("UPDATE `" . DB_PREFIX . "order`  SET `order_status_id`='2' WHERE  `order_id`=" . $order_id);
-        $this->db->query("INSERT INTO `" . DB_PREFIX . "order_history` (`order_id`, `order_status_id`, `notify`, `comment`, `date_added`) VALUES (" . $order_id . ", '2', '0', 'Set order status to Processing from Ezdefi Exception magement', DATE(NOW()) )");
+        $this->db->query("UPDATE `" . DB_PREFIX . "order`  SET `order_status_id`='".self::ORDER_STATUS_PROCESSING."' WHERE  `order_id`=" . $order_id);
+        $this->db->query("INSERT INTO `" . DB_PREFIX . "order_history` (`order_id`, `order_status_id`, `notify`, `comment`, `date_added`) VALUES (" . $order_id . ", '".self::ORDER_STATUS_PROCESSING."', '0', 'Set order status to Processing from Ezdefi Exception magement', DATE(NOW()) )");
     }
 
     public function setPendingForOrder($order_id)
     {
-        $this->db->query("UPDATE `" . DB_PREFIX . "order`  SET `order_status_id`='1' WHERE  `order_id`=" . $order_id);
-        $this->db->query("INSERT INTO `" . DB_PREFIX . "order_history` (`order_id`, `order_status_id`, `notify`, `comment`, `date_added`) VALUES (" . $order_id . ", '1', '0', 'Set order status to Pending from Ezdefi Exception magement', DATE(NOW()) )");
+        $this->db->query("UPDATE `" . DB_PREFIX . "order`  SET `order_status_id`='" . self::ORDER_STATUS_PENDING . "' WHERE  `order_id`=" . $order_id);
+        $this->db->query("INSERT INTO `" . DB_PREFIX . "order_history` (`order_id`, `order_status_id`, `notify`, `comment`, `date_added`) VALUES (" . $order_id . ", '" . self::ORDER_STATUS_PENDING . "', '0', 'Set order status to Pending from Ezdefi Exception magement', DATE(NOW()) )");
     }
 
     // --------------------------------------- curl---------------------------------------------

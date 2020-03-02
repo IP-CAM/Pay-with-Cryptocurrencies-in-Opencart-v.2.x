@@ -66,7 +66,7 @@
                         <div class="col-sm-offset-3 col-sm-9"><a href="<?php echo $text_link_register ?>" target="_blank"><?php echo $text_register ?></a></div>
                     </div>
                     <div class="form-group">
-                        <label class="control-label col-sm-3" for="public-key-input"> <?php echo $entry_api_key ?> </label>
+                        <label class="control-label col-sm-3" for="public-key-input"> <?php echo $entry_public_key ?> </label>
                         <div class="col-sm-9">
                             <input type="text" id="public-key-input" class="form-control" name="ezdefi_public_key" value="<?php echo $ezdefi_public_key ?>">
                         </div>

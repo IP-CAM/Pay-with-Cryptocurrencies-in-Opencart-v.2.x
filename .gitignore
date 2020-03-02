@@ -105,9 +105,11 @@ catalog/view/theme/default/image/*
 !catalog/view/theme/default/image/ezdefi
 
 
+!catalog/view/theme/default/stylesheet
 catalog/view/theme/default/stylesheet/*
 !catalog/view/theme/default/stylesheet/ezdefi.css
 
+!catalog/view/theme/default/template
 catalog/view/theme/default/template/*
 !catalog/view/theme/default/template/extension/
 catalog/view/theme/default/template/extension/*

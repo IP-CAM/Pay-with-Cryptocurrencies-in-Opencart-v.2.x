@@ -224,7 +224,6 @@ class ControllerExtensionPaymentEzdefi extends Controller
         return $this->response->setOutput(json_encode($result));
     }
 
-
     public function confirmOrder()
     {
         $this->load->model('extension/payment/ezdefi');

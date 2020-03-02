@@ -277,6 +277,5 @@ $(function () {
         $(selectors.timeoutNotify+suffixes).css('display', enable ? 'block' : 'none');
     };
 
-
     checkOrderComplete();
 });
