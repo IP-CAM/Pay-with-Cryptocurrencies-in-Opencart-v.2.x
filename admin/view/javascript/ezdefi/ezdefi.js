@@ -73,9 +73,6 @@ $(function () {
 
         $(selectors.apiKeyInput).val(apiKey);
         $(selectors.publicKeyInput).val(publicKey);
-
-        $(selectors.apiKeyInput).valid();
-        $(selectors.publicKeyInput).valid();
     };
 
     new oc_ezdefi_admin();

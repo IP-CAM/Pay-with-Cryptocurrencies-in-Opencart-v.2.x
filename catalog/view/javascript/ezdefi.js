@@ -36,22 +36,16 @@ $(function () {
         for(let i in global.countDownInterval) {
             clearInterval(global.countDownInterval[i]);
         }
+        $(selectors.countDownLabel).html( '0:0');
+
         $(selectors.changeCoinBox).css('display', 'block');
         $(selectors.paymentContent).css('display', 'none');
         $(selectors.qrCodeImg).prop('src', '');
         $(selectors.deeplink).attr('href', '');
         $(selectors.currencyValue).html('');
         $(selectors.btnChange).css('display','none');
-        $(selectors.coinSelectedToPaymentInput).each(function () {
-            $(this).prop("checked", false);
-        });
-        $(selectors.btnGetQrCode).prop("disabled", true);
         $("#check-created-payment--simple").prop('checked', false);
         $("#check-created-payment--escrow").prop('checked', false);
-        $("label.ezdefi-change-coin-item").css({
-            border: '1px solid #d8d8d8',
-            background: 'inherit'
-        });
     });
 
     $(selectors.coinSelectedToPaymentInput).click(function () {
@@ -145,7 +139,7 @@ $(function () {
         document.execCommand("copy");
         document.body.removeChild(tmpElem);
     };
-    
+
     var createPayment = function (url, coinId, suffixes, discount) {
         showPaymentLoading(suffixes, true);
         $(".payment-error"+suffixes).css('display', 'none');
@@ -242,6 +236,7 @@ $(function () {
     };
 
     var countDownTime = function (paymentId, expiredTime, suffixes) {
+        renderTimeOut(expiredTime, suffixes);
         global.countDownInterval[suffixes] = setInterval(function () {
             var currentPaymentId = $(selectors.paymentIdInput+suffixes).val();
             if(currentPaymentId !== paymentId) {
@@ -251,15 +246,7 @@ $(function () {
                 var timestampCountdown = new Date(expiredTime) - new Date();
                 var secondToCountdown = Math.floor(timestampCountdown/1000);
                 if(secondToCountdown >= 0) {
-                    var hours = Math.floor(secondToCountdown / 3600);
-                    secondToCountdown %= 3600;
-                    var minutes = Math.floor(secondToCountdown / 60);
-                    var seconds = secondToCountdown % 60;
-                    if(hours > 0 ) {
-                        $(selectors.countDownLabel + suffixes).html(hours +':'+ minutes +':' + seconds);
-                    } else {
-                        $(selectors.countDownLabel + suffixes).html(minutes +':' + seconds);
-                    }
+                    renderTimeOut(expiredTime, suffixes)
                 } else {
                     $(selectors.countDownLabel + suffixes).html('0:0');
                     enablePaymentTimeout(suffixes, true);
@@ -269,12 +256,26 @@ $(function () {
         }, 1000);
     };
 
+    var renderTimeOut = function (expiredTime, suffixes) {
+        var timestampCountdown = new Date(expiredTime) - new Date();
+        var secondToCountdown = Math.floor(timestampCountdown/1000);
+
+        var hours = Math.floor(secondToCountdown / 3600);
+        secondToCountdown %= 3600;
+        var minutes = Math.floor(secondToCountdown / 60);
+        var seconds = secondToCountdown % 60;
+        if(hours > 0 ) {
+            $(selectors.countDownLabel + suffixes).html(hours +':'+ minutes +':' + seconds);
+        } else {
+            $(selectors.countDownLabel + suffixes).html(minutes +':' + seconds);
+        }
+    };
+
     var enablePaymentTimeout = function(suffixes, enable) {
         $(selectors.alternativeQrCode+suffixes).css('filter', enable ? 'blur(5px)' : 'none');
         $(selectors.qrCodeImg+suffixes).css('filter', enable ? 'blur(5px)' : 'none');
         $(selectors.timeoutNotify+suffixes).css('display', enable ? 'block' : 'none');
     };
-
 
     checkOrderComplete();
 });

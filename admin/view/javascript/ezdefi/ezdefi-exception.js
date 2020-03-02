@@ -214,9 +214,7 @@ $(function () {
                     $('#delete-order-exception').modal('toggle');
                 }
                 $("#btn-delete-exception").prop('disabled', false);
-                let page = $("#current-page-exception").val();
-                let totalNumber = $("#total-number-exception").val();
-                that.searchException(page, totalNumber);
+                that.reloadExceptionTable();
             },
             error: function () {
                 $("#btn-delete-exception").prop('disabled', false);
@@ -224,113 +222,70 @@ $(function () {
         });
     };
 
-    oc_ezdefi_exception.prototype.deleteExceptionByOrderId = function (orderId) {
-        var that = this;
-        let urlDeleteExceptionByOrderId = $("#url-delete-exception-by-order-id").val();
-        $.ajax({
-            url: urlDeleteExceptionByOrderId,
-            method: "POST",
-            data: { order_id: orderId},
-            success: function (response) {
-                let page = $("#current-page-exception").val();
-                let totalNumber = $("#total-number-exception").val();
-                that.searchException(page, totalNumber);
-            }
-        });
-    };
-
     oc_ezdefi_exception.prototype.confirmPaidException = function () {
         $("#btn-confirm-paid-exception").prop('disabled', true);
-        let urlAddOrderHistory = $("#url-add-order-history").val();
         let orderId = $("#exception-order-id--confirm").val();
         let exceptionId = $('#exception-id--confirm').val();
-        var that = this;
+        let that = this;
+
+        let isAssign = $("#confirm-dialog-assign").prop('checked');
+        if(isAssign) {
+            var url = $("#url-assign-order").val();
+        } else {
+            var url = $("#url-confirm-order").val();
+        }
+
         $.ajax({
-            url: urlAddOrderHistory + '&store_id=0&order_id='+orderId,
+            url: url,
             method: "POST",
             data: {
-                order_status_id: ORDER_STATUS.PROCESSING,
-                comment: exceptionId ? text.orderHistoryComment : text.assignOrderComment
+                exception_id: exceptionId,
+                order_id: orderId
             },
             beforeSend:function() {
                 $(".exception-loading-icon__confirm-paid").css('display', 'inline-block');
             },
             success: function (response) {
-                let isAssign = $("#confirm-dialog-assign").prop('checked');
-                let oldOrderId = $("#exception-old-order-id--confirm").val();
-                if(isAssign && oldOrderId) {
-                    that.deleteExceptionByOrderId(oldOrderId);
-                } else if( isAssign && !oldOrderId) {
-                    that.deleteExceptionByOrderId(orderId);
-                    that.deleteException(null, exceptionId);
-                } else {
-                    that.deleteExceptionByOrderId(orderId);
-                }
                 $("#confirm-paid-order-exception").modal('toggle');
                 $("#btn-confirm-paid-exception").prop('disabled', false);
+                that.reloadExceptionTable();
             },
             error: function () {
-                let isAssign = $("#confirm-dialog-assign").prop('checked');
-                let oldOrderId = $("#exception-old-order-id--confirm").val();
-                if(isAssign && oldOrderId) {
-                    that.deleteExceptionByOrderId(oldOrderId);
-                } else if( isAssign && !oldOrderId) {
-                    that.deleteExceptionByOrderId(orderId);
-                    that.deleteException(null, exceptionId);
-                } else {
-                    that.deleteExceptionByOrderId(orderId);
-                }
-                $("#confirm-paid-order-exception").modal('toggle');
-                $("#btn-confirm-paid-exception").prop('disabled', false);
+                alert('Something error');
             }
         });
     };
 
     oc_ezdefi_exception.prototype.revertOrder = function() {
         $("#btn-revert-order").prop('disabled', true);
-        let urlAddOrderHistory = $("#url-add-order-history").val();
-        let orderId = $("#exception-order-id--revert").val();
         let exceptionId = $('#exception-id--revert').val();
-        var that = this;
+        let urlRevert = $("#url-revert-order").val();
+        let that = this;
+
         $.ajax({
-            url: urlAddOrderHistory + '&store_id=0&order_id='+orderId,
+            url: urlRevert,
             method: "POST",
             data: {
-                order_status_id: ORDER_STATUS.PENDING,
-                comment: text.revertOrderComment
+                exception_id: exceptionId,
             },
             beforeSend: function() {
                 $(".exception-loading-icon__revert").css('display', 'inline-block');
             },
             success: function (response) {
-                that.revertException(exceptionId);
                 $("#modal-revert-order-exception").modal('toggle');
                 $("#btn-revert-order").prop('disabled', false);
+                that.reloadExceptionTable();
             },
             error: function () {
-                that.deleteException(null, exceptionId);
-                $("#modal-revert-order-exception").modal('toggle');
-                $("#btn-revert-order").prop('disabled', false);
+                alert('Something error');
             }
         });
     };
 
-    oc_ezdefi_exception.prototype.revertException = function(exceptionId) {
-        var that = this;
-        var url = $("#url-revert-order-exception").val();
-        $.ajax({
-            url: url,
-            method: "POST",
-            data: {
-                exception_id: exceptionId,
-            },
-            success: function (response) {
-                let page = $("#current-page-exception").val();
-                let totalNumber = $("#total-number-exception").val();
-                that.searchException(page, totalNumber);
-            },
-        });
-
+    oc_ezdefi_exception.prototype.reloadExceptionTable = function(exceptionId) {
+        let page = $("#current-page-exception").val();
+        let totalNumber = $("#total-number-exception").val();
+        this.searchException(page, totalNumber);
     };
 
 

@@ -4,8 +4,10 @@
     <input type="hidden" id="url-add-order-history" value="{{ url_add_order_history }}">
     <input type="hidden" id="url-delete-exception-by-order-id" value="{{ url_delete_exception_by_order_id }}">
     <input type="hidden" id="url-get-order-pending" value="{{ url_get_order_pending }}">
-    <input type="hidden" id="url-revert-order-exception" value="{{ url_revert_order_exception }}">
-    <input type="hidden" id="is-first-time-config" value="{{ payment_ezdefi_first_time_config }}">
+    <input type="hidden" id="url-revert-order" value="{{ url_revert_order }}">
+    <input type="hidden" id="url-confirm-order" value="{{ url_confirm_order }}">
+    <input type="hidden" id="url-assign-order" value="{{ url_assign_order }}">
+
     {# Ezdefi header #}
     <div class="page-header">
         <div class="container-fluid">
@@ -62,7 +64,7 @@
                         <div class="col-sm-offset-3 col-sm-9"><a href="{{ text_link_register }}" target="_blank">{{ text_register }}</a></div>
                     </div>
                     <div class="form-group">
-                        <label class="control-label col-sm-3" for="public-key-input"> {{ entry_api_key }} </label>
+                        <label class="control-label col-sm-3" for="public-key-input"> {{ entry_public_key }} </label>
                         <div class="col-sm-9">
                             <input type="text" id="public-key-input" class="form-control" name="payment_ezdefi_public_key" value="{{ payment_ezdefi_public_key }}">
                         </div>

@@ -138,6 +138,7 @@
 
 .label-choose-payment {
     border-bottom: 1px solid #999;
+    margin: 0;
 }
 
 .btn-choose-payment-type:hover {

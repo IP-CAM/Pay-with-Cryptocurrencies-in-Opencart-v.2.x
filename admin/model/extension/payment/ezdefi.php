@@ -5,6 +5,7 @@ class ModelExtensionPaymentEzdefi extends Model
     CONST TIME_REMOVE_AMOUNT_ID    = 3;
     CONST TIME_REMOVE_EXCEPTION    = 7;
     CONST ORDER_STATUS_PENDING     = 0;
+    CONST ORDER_STATUS_PROCESSING  = 2;
     CONST NUMBER_OF_ORDERS_IN_PAGE = 10;
 
     public function install()
@@ -39,6 +40,17 @@ class ModelExtensionPaymentEzdefi extends Model
     }
 
     //-------------------------------------------------Exception------------------------------------------------------
+    public function getExceptionById($exception_id)
+    {
+        $query = $this->db->query("SELECT * FROM `" . DB_PREFIX . "ezdefi_exception` WHERE `id` ='" . $exception_id . "' LIMIT 1");
+        if ($query->num_rows) {
+            $exception = $query->rows;
+            return $exception[0];
+        } else {
+            return false;
+        }
+    }
+
     public function getTotalException($keyword_amount, $keyword_order_id, $keyword_email, $currency)
     {
         $sql = "select count(*) as total_exceptions
@@ -121,6 +133,18 @@ class ModelExtensionPaymentEzdefi extends Model
         return $query->rows;
     }
 
+    public function setProcessingForOrder($order_id)
+    {
+        $this->db->query("UPDATE `" . DB_PREFIX . "order`  SET `order_status_id`='".self::ORDER_STATUS_PROCESSING."' WHERE  `order_id`=" . $order_id);
+        $this->db->query("INSERT INTO `" . DB_PREFIX . "order_history` (`order_id`, `order_status_id`, `notify`, `comment`, `date_added`) VALUES (" . $order_id . ", '".self::ORDER_STATUS_PROCESSING."', '0', 'Set order status to Processing from Ezdefi Exception magement', DATE(NOW()) )");
+    }
+
+    public function setPendingForOrder($order_id)
+    {
+        $this->db->query("UPDATE `" . DB_PREFIX . "order`  SET `order_status_id`='" . self::ORDER_STATUS_PENDING . "' WHERE  `order_id`=" . $order_id);
+        $this->db->query("INSERT INTO `" . DB_PREFIX . "order_history` (`order_id`, `order_status_id`, `notify`, `comment`, `date_added`) VALUES (" . $order_id . ", '" . self::ORDER_STATUS_PENDING . "', '0', 'Set order status to Pending from Ezdefi Exception magement', DATE(NOW()) )");
+    }
+
     // --------------------------------------- curl---------------------------------------------
     public function checkApiKey($apiUrl, $api_key)
     {
@@ -149,11 +173,12 @@ class ModelExtensionPaymentEzdefi extends Model
     }
 
 
-    public function getCurrencies() {
-        $api_url =  $this->config->get('payment_ezdefi_gateway_api_url');
-        $api_key =  $this->config->get('payment_ezdefi_api_key');
-        $public_key =  $this->config->get('payment_ezdefi_public_key');
-        $website_data = $this->sendCurl($api_url.'/website/' . $public_key, 'GET', $api_key);
+    public function getCurrencies()
+    {
+        $api_url      = $this->config->get('payment_ezdefi_gateway_api_url');
+        $api_key      = $this->config->get('payment_ezdefi_api_key');
+        $public_key   = $this->config->get('payment_ezdefi_public_key');
+        $website_data = $this->sendCurl($api_url . '/website/' . $public_key, 'GET', $api_key);
 
         return json_decode($website_data, true)['data']['coins'];
     }
