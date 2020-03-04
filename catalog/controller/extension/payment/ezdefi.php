@@ -89,7 +89,7 @@ class ControllerExtensionPaymentEzdefi extends Controller
         if ($enable_ezdefi_pay) {
             $params       = [
                 'uoid'     => $order_info['order_id'],
-                'amountId' => false,
+                'coinId'   => $coin['_id'],
                 'value'    => $order_info['total'] * (100 - $coin['discount']) / 100,
                 'to'       => $coin['walletAddress'],
                 'currency' => $order_info['currency_code'] . ':' . $coin['token']['symbol'],
