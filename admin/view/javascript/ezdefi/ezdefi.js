@@ -7,8 +7,18 @@ $(function () {
     };
 
     var oc_ezdefi_admin = function () {
-        $(selectors.gatewayApiUrlInput).keyup(this.validateConfigForm.bind(this));
-        
+        $(selectors.gatewayApiUrlInput).keyup(function () {
+            $(selectors.gatewayApiUrlInput).valid()
+        });
+
+        $(selectors.apiKeyInput).keyup(function () {
+            $(selectors.apiKeyInput).valid()
+        });
+
+        $(selectors.publicKeyInput).keyup(function () {
+            $(selectors.publicKeyInput).valid()
+        });
+
         this.initValidate();
     };
 
