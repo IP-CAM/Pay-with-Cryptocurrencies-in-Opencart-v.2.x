@@ -85,19 +85,11 @@ class ModelExtensionPaymentEzdefi extends Model
         $start = ($page - 1) * $limit;
 
         // search exception and prioritize `amount_id` = $amount_id to the top
-        $sql = "select rank, amount_id, currency, exception.id , order.order_id, order.email, exception.expiration, exception.paid, exception.has_amount, exception.explorer_url
-                from (
-                    SELECT 1 as rank, id, payment_id,order_id, amount_id, currency, paid, has_amount, expiration, explorer_url
-                    FROM `" . DB_PREFIX . "ezdefi_exception` 
-                    WHERE amount_id = '" . $keyword_amount . "'
-                    UNION 
-                    SELECT 2 as rank, id, payment_id,order_id, amount_id, currency, paid, has_amount, expiration, explorer_url
-                    FROM `" . DB_PREFIX . "ezdefi_exception` 
-                    WHERE amount_id like '%" . $keyword_amount . "%'
-                        AND amount_id != '" . $keyword_amount . "'
-                ) `exception`
-                    left join `" . DB_PREFIX . "order` `order` on exception.order_id = order.order_id
-                where exception.amount_id like '%" . $keyword_amount . "%'";
+        $sql = "select  amount_id, currency, exception.id , order.order_id, order.email, exception.expiration, exception.paid, exception.has_amount, exception.explorer_url
+                from  `" . DB_PREFIX . "ezdefi_exception` `exception`
+                    left join `" . DB_PREFIX . "order` `order` 
+                    on exception.order_id = order.order_id
+                where exception.amount_id like '" . $keyword_amount . "%'";
         if ($keyword_order_id) {
             $sql .= " AND exception.order_id = '" . $keyword_order_id . "'";
         }
@@ -107,8 +99,14 @@ class ModelExtensionPaymentEzdefi extends Model
         if ($currency) {
             $sql .= " AND exception.currency = '" . strtoupper($currency) . "'";
         }
-        $sql .= " ORDER BY exception.rank, exception.id DESC
+        if ($keyword_amount) {
+            $sql .= "
+                ORDER BY exception.id ASC
+                LIMIT " . $start . ',' . $limit ;
+        } else {
+            $sql .= " ORDER BY exception.id DESC
                 LIMIT " . $start . ',' . $limit;
+        }
 
         $query = $this->db->query($sql);
         return $query->rows;

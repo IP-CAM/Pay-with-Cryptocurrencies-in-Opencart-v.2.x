@@ -49,7 +49,7 @@ class ControllerExtensionPaymentEzdefi extends Controller
 
         if ($enable_simple_pay) {
             $params       = [
-                'uoid'     => $order_info['order_id'],
+                'uoid'     => $order_info['order_id'].'-1',
                 'amountId' => true,
                 'coinId'   => $coin['_id'],
                 'value'    => $amount,
@@ -88,7 +88,7 @@ class ControllerExtensionPaymentEzdefi extends Controller
 
         if ($enable_ezdefi_pay) {
             $params       = [
-                'uoid'     => $order_info['order_id'],
+                'uoid'     => $order_info['order_id'].'-0',
                 'coinId'   => $coin['_id'],
                 'value'    => $order_info['total'] * (100 - $coin['discount']) / 100,
                 'to'       => $coin['walletAddress'],
