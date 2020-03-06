@@ -7,8 +7,18 @@ $(function () {
     };
 
     var oc_ezdefi_admin = function () {
-        $(selectors.gatewayApiUrlInput).keyup(this.validateConfigForm.bind(this));
-        
+        $(selectors.gatewayApiUrlInput).keyup(function () {
+            $(selectors.gatewayApiUrlInput).valid()
+        });
+
+        $(selectors.apiKeyInput).keyup(function () {
+            $(selectors.apiKeyInput).valid()
+        });
+
+        $(selectors.publicKeyInput).keyup(function () {
+            $(selectors.publicKeyInput).valid()
+        });
+
         this.initValidate();
     };
 
@@ -64,19 +74,6 @@ $(function () {
         });
     };
 
-
-    oc_ezdefi_admin.prototype.validateConfigForm = function () {
-        var apiKey = $(selectors.apiKeyInput).val();
-        var publicKey = $(selectors.publicKeyInput).val();
-        $(selectors.apiKeyInput).val('');
-        $(selectors.publicKeyInput).val('');
-
-        $(selectors.apiKeyInput).val(apiKey);
-        $(selectors.publicKeyInput).val(publicKey);
-
-        // $(selectors.apiKeyInput).valid();
-        // $(selectors.publicKeyInput).valid();
-    };
 
     new oc_ezdefi_admin();
 });
