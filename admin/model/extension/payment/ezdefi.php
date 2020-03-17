@@ -3,7 +3,7 @@
 class ModelExtensionPaymentEzdefi extends Model
 {
     CONST TIME_REMOVE_EXCEPTION    = 7;
-    CONST ORDER_STATUS_PENDING     = 1;
+    CONST ORDER_STATUS_PENDING     = 0;
     CONST ORDER_STATUS_PROCESSING  = 2;
     CONST NUMBER_OF_ORDERS_IN_PAGE = 10;
 

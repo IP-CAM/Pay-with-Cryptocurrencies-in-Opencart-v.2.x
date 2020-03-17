@@ -9,7 +9,7 @@ $_['config_gateway_api_url_default'] = 'https://merchant-api.ezdefi.com/api';
 $_['entry_enable_extension'] = 'Enable/Disable';
 $_['entry_gateway_api_url'] = 'Gateway API URL';
 $_['entry_api_key'] = 'API key';
-$_['entry_public_key'] = 'Public key';
+$_['entry_public_key'] = 'Site ID';
 
 //Button
 $_['button_add'] = 'Add more';
