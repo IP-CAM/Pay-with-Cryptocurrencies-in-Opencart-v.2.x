@@ -46,14 +46,16 @@ class ControllerExtensionPaymentEzdefi extends Controller
         $callback          = $this->url->link('extension/payment/ezdefi/callbackConfirmOrder', '', true);
         $coin_id           = $this->request->get['coin_id'];
         $coin              = $this->model_extension_payment_ezdefi->getCurrency($coin_id, json_decode(json_encode($website_data->coins), true));
-        $amount            = round($this->model_extension_payment_ezdefi->getExchange($order_info['currency_code'], $coin['token']['symbol']) * $order_info['total'] * (100 - $coin['discount']) / 100, $coin['decimal']);
+        $amount            = $this->model_extension_payment_ezdefi->getExchange($order_info['currency_code'], $coin['token']['symbol']) * $order_info['total'] * (100 - $coin['discount']) / 100;
+        $value             = $this->model_extension_payment_ezdefi->convertExponentialToFloat($amount);
+
 
         if ($enable_simple_pay) {
             $params       = [
                 'uoid'     => $order_info['order_id'] . '-1',
                 'amountId' => true,
                 'coinId'   => $coin['_id'],
-                'value'    => $amount,
+                'value'    => $value,
                 'to'       => $coin['walletAddress'],
                 'currency' => $coin['token']['symbol'] . ':' . $coin['token']['symbol'],
                 'safedist' => $coin['blockConfirmation'],
@@ -87,12 +89,13 @@ class ControllerExtensionPaymentEzdefi extends Controller
         $callback          = $this->url->link('extension/payment/ezdefi/callbackConfirmOrder', '', true);
         $coin_id           = $this->request->get['coin_id'];
         $coin              = $this->model_extension_payment_ezdefi->getCurrency($coin_id, json_decode(json_encode($website_data->coins), true));
+        $value             = $this->model_extension_payment_ezdefi->convertExponentialToFloat($order_info['total'] * (100 - $coin['discount']) / 100);
 
         if ($enable_simple_pay) {
             $params       = [
                 'uoid'     => $order_info['order_id'] . '-0',
                 'coinId'   => $coin['_id'],
-                'value'    => $order_info['total'] * (100 - $coin['discount']) / 100,
+                'value'    => $value,
                 'to'       => $coin['walletAddress'],
                 'currency' => $order_info['currency_code'] . ':' . $coin['token']['symbol'],
                 'safedist' => $coin['blockConfirmation'],

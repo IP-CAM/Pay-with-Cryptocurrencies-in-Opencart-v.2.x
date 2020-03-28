@@ -69,7 +69,7 @@ $(function () {
                 }
             },
             messages: {
-                remote: "This Public Key is invalid"
+                remote: "This Side Id is invalid"
             }
         });
     };
