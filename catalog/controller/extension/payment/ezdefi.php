@@ -23,6 +23,8 @@ class ControllerExtensionPaymentEzdefi extends Controller
         $data['order_id']                  = $this->session->data['order_id'];
         $data['origin_value']              = (float)$order['total'];
         $data['origin_currency']           = $order['currency_code'];
+
+        //$coins = [$coin_with_price[0]];
         $data['coins']                     = json_decode(json_encode($coin_with_price), true);
         $data['enable_simple_pay']         = $website_data->website->payAnyWallet;
         $data['enable_escrow_pay']         = $website_data->website->payEzdefiWallet;
@@ -65,7 +67,7 @@ class ControllerExtensionPaymentEzdefi extends Controller
             $payment_info = $this->model_extension_payment_ezdefi->createPayment($params);
             $payment_data = json_decode($payment_info)->data;
             if ($payment_info) {
-                $this->model_extension_payment_ezdefi->addException($order_info['order_id'], strtoupper($coin['token']['symbol']), $payment_data->value * pow(10, - $payment_data->decimal), $coin['expiration'], 1, null, null, $payment_data->_id);
+                $this->model_extension_payment_ezdefi->addException($order_info['order_id'], strtoupper($coin['token']['symbol']), $payment_data->value * pow(10, - $payment_data->decimal), $coin['expiration'], 1, null, "NULL", $payment_data->_id);
 
                 return $this->response->setOutput($payment_info);
             } else {
@@ -107,7 +109,7 @@ class ControllerExtensionPaymentEzdefi extends Controller
 
             if ($payment_info) {
                 $crypto_value = $payment_data->value * pow(10, - $payment_data->decimal);
-                $this->model_extension_payment_ezdefi->addException($order_info['order_id'], strtoupper($coin['token']['symbol']), $crypto_value, $coin['expiration'], 0, null, null, $payment_data->_id);
+                $this->model_extension_payment_ezdefi->addException($order_info['order_id'], strtoupper($coin['token']['symbol']), $crypto_value, $coin['expiration'], 0, null, "NULL", $payment_data->_id);
                 return $this->response->setOutput($payment_info);
             } else {
                 return $this->response->setOutput(json_encode(['data' => ['status' => 'failure', 'message' => $this->language->get('error_cant_create_payment')]]));

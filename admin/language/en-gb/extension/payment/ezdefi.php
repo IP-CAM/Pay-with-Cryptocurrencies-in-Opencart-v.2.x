@@ -22,6 +22,7 @@ $_['tab_edit_general'] = 'ezDeFi';
 $_['tab_edit_coin_config'] = 'Coin config';
 $_['tab_config'] = 'Config';
 $_['tab_exception'] = 'ezDeFi exception management';
+$_['tab_exception_history'] = 'exception history';
 
 // text
 $_['text_symbol'] = 'Name';

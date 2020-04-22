@@ -67,7 +67,7 @@ $(function () {
         }
     });
 
-    $(selectors.btnGetQrCode).click(function () {
+    var detectCoinAndCreatePayment = function () {
         var enableSimplePay = $('#enable_simple_pay_input').is(':checked');
         var enableEscrowPay = $('#enable_escrow_pay_input').is(':checked');
         if(enableSimplePay) {
@@ -87,7 +87,10 @@ $(function () {
         $('#selected-coin-discount').val(discount);
 
         createPayment(url, coinId, suffixes, discount);
-    });
+    }
+
+    $(selectors.btnGetQrCode).click(detectCoinAndCreatePayment);
+
 
     $(selectors.btnReloadPayment).click(function () {
         let suffixes = $(this).data('suffixes');
@@ -141,6 +144,7 @@ $(function () {
     };
     
     var createPayment = function (url, coinId, suffixes, discount) {
+        console.log(url, coinId, suffixes, discount);
         showPaymentLoading(suffixes, true);
         $(".payment-error"+suffixes).css('display', 'none');
         $(selectors.selectCoinBox).css('display', 'none');
@@ -278,4 +282,9 @@ $(function () {
     };
 
     checkOrderComplete();
+
+    if($("#have-one-coin").prop('checked')) {
+        detectCoinAndCreatePayment();
+    }
+
 });

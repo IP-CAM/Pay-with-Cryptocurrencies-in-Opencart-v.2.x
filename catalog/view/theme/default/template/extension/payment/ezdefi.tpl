@@ -20,63 +20,74 @@
 	<input type="hidden" id="url-create-payment--simple" value="<?php echo $url_create_simple_payment ?>">
 	<input type="hidden" id="url-create-payment--escrow" value="<?php echo $url_create_escrow_payment ?>">
 
-	<div class="ezdefi-select-coin-box">
-		<div class="ezdefi-select-coin__list">
-			<?php foreach ($coins as $coin) { ?>
-                <label for="select-coin-<?php echo $coin['_id'] ?>" class="ezdefi-change-coin-item">
-                    <?php if (isset($coin['token']['description'])) { ?>
-                        <img src="<?php echo $coin['token']['logo'] ?>" alt="" class="ezdefi-select-coin-item__logo" data-toggle="tooltip" title="<?php echo $coin['token']['description'] ?>">
-                    <?php } else { ?>
-                        <img src="<?php echo $coin['token']['logo'] ?>" alt="" class="ezdefi-select-coin-item__logo">
-                    <?php } ?>
-                    <span class="ezdefi-select-coin-item__price"> <?php echo $coin['token']['price'] ?> </span>
-                    <span class="ezdefi-select-coin-item__symbol"> <?php echo $coin['token']['symbol'] ?></span>
-                    <span class="ezdefi-select-coin-item__discount">-<?php echo (float)$coin['discount'] ?>%</span>
-                    <input type="radio" name="coin-selected-to-order" class="hidden select-coin-checkbox" id="select-coin-<?php echo $coin['_id'] ?>" value="<?php echo $coin['_id'] ?>" data-discount="<?php echo $coin['discount'] ?>">
-                </label>
-			<?php } ?>
-		</div>
-		<a href="<?php echo $link_guide ?>" class="ezapy-guide-link" target="_blank"><?php echo $text_guide ?></a>
-        <?php if($enable_simple_pay) { ?>
-		    <button class="ezdefi-btn-create-payment" data-url_create_payment="<?php echo $url_create_simple_payment ?>" disabled> <?php echo $button_next ?> </button>
-        <?php } else { ?>
-            <button class="ezdefi-btn-create-payment" data-url_create_payment="<?php echo $url_create_escrow_payment ?>" disabled> <?php echo $button_next ?> </button>
-        <?php } ?>
-    </div>
-	<div class="ezdefi-payment-box">
+    <?php if(sizeof($coins) > 1) { ?>
+        <div class="ezdefi-select-coin-box">
+            <div class="ezdefi-select-coin__list">
+                <?php foreach ($coins as $coin) { ?>
+                    <label for="select-coin-<?php echo $coin['_id'] ?>" class="ezdefi-change-coin-item">
+                        <?php if (isset($coin['token']['description'])) { ?>
+                            <img src="<?php echo $coin['token']['logo'] ?>" alt="" class="ezdefi-select-coin-item__logo" data-toggle="tooltip" title="<?php echo $coin['token']['description'] ?>">
+                        <?php } else { ?>
+                            <img src="<?php echo $coin['token']['logo'] ?>" alt="" class="ezdefi-select-coin-item__logo">
+                        <?php } ?>
+                        <span class="ezdefi-select-coin-item__price"> <?php echo $coin['token']['price'] ?> </span>
+                        <span class="ezdefi-select-coin-item__symbol"> <?php echo $coin['token']['symbol'] ?></span>
+                        <span class="ezdefi-select-coin-item__discount">-<?php echo (float)$coin['discount'] ?>%</span>
+                        <input type="radio" name="coin-selected-to-order" class="hidden select-coin-checkbox" id="select-coin-<?php echo $coin['_id'] ?>" value="<?php echo $coin['_id'] ?>" data-discount="<?php echo $coin['discount'] ?>">
+                    </label>
+                <?php } ?>
+            </div>
+            <a href="<?php echo $link_guide ?>" class="ezapy-guide-link" target="_blank"><?php echo $text_guide ?></a>
+            <?php if($enable_simple_pay) { ?>
+                <button class="ezdefi-btn-create-payment" data-url_create_payment="<?php echo $url_create_simple_payment ?>" disabled> <?php echo $button_next ?> </button>
+            <?php } else { ?>
+                <button class="ezdefi-btn-create-payment" data-url_create_payment="<?php echo $url_create_escrow_payment ?>" disabled> <?php echo $button_next ?> </button>
+            <?php } ?>
+        </div>
+    <?php } else { ?>
+        <input type="radio" name="coin-selected-to-order" class="hidden select-coin-checkbox" id="select-coin-<?php echo $coins[0]['_id'] ?>" value="<?php echo $coins[0]['_id'] ?>" data-discount="<?php echo $coins[0]['discount'] ?>" checked>
+        <input type="checkbox" id="have-one-coin" class="hidden" checked>
+    <?php } ?>
+
+    <div class="ezdefi-payment-box">
 		<div class="ezdefi-payment__header">
             <input type="hidden" id="selected-coin-id">
             <input type="hidden" id="selected-coin-discount">
 			<img src="" alt="" class="ezdefi-payment__coin-logo tooltip-show-discount" data-toggle="popover" title="Discount" data-placement="top" data-content="Discount:" data-trigger="hover">
 			<span class="ezdefi-payment__coin-name tooltip-show-discount" data-toggle="popover" title="Discount" data-placement="top" data-content="Discount:" data-trigger="hover"></span>
 			<span class="wide-space"></span>
-			<button class="ezdefi-payment__btn-change-coin"><?php echo $text_change ?></button>
-		</div>
-		<div class="ezdefi-change-coin-box margin-top-md">
-			<div class="ezdefi-select-coin__list">
-				<?php foreach ($coins as $coin) { ?>
-					<label for="select-coin-<?php echo $coin['_id'] ?>" class="ezdefi-change-coin-item">
-                        <?php if(isset($coin['token']['description'])) { ?>
-                            <img src="<?php echo $coin.token.logo?>" alt="" class="ezdefi-select-coin-item__logo" data-toggle="tooltip" title="<?php echo $coin['token']['description'] ?>">
-                        <?php } else { ?>
-                            <img src="<?php echo $coin['token']['logo'] ?>" alt="" class="ezdefi-select-coin-item__logo">
-                        <?php } ?>
-						<span class="ezdefi-select-coin-item__price"> <?php echo $coin['token']['price'] ?> </span>
-						<span class="ezdefi-select-coin-item__symbol"><?php echo $coin['token']['symbol'] ?> </span>
-						<span class="ezdefi-select-coin-item__discount">-<?php echo (float)$coin['discount'] ?>%</span>
-						<input type="radio" name="coin-selected-to-order" class="hidden select-coin-checkbox" id="select-coin-<?php echo $coin._id ?>" value="<?php echo $coin._id ?>" data-discount="<?php echo $coin['discount'] ?>">
-					</label>
-				<?php } ?>
-			</div>
-            <?php if($enable_simple_pay) { ?>
-                <button class="ezdefi-btn-create-payment" data-url_create_payment="<?php echo $url_create_simple_payment ?>" disabled> <?php echo $button_next ?> </button>
-            <?php } else { ?>
-                <button class="ezdefi-btn-create-payment" data-url_create_payment="<?php echo $url_create_escrow_payment ?>" disabled> <?php echo $button_next ?> </button>
+            <?php if(sizeof($coins) > 1 ) { ?>
+	    		<button class="ezdefi-payment__btn-change-coin"><?php echo $text_change ?></button>
             <?php } ?>
 		</div>
-		<div class="ezdefi-payment__content">
+        <?php if(sizeof($coins) > 1 ) { ?>
+            <div class="ezdefi-change-coin-box margin-top-md">
+                <div class="ezdefi-select-coin__list">
+                    <?php foreach ($coins as $coin) { ?>
+                        <label for="select-coin-<?php echo $coin['_id'] ?>" class="ezdefi-change-coin-item">
+                            <?php if(isset($coin['token']['description'])) { ?>
+                                <img src="<?php echo $coin.token.logo?>" alt="" class="ezdefi-select-coin-item__logo" data-toggle="tooltip" title="<?php echo $coin['token']['description'] ?>">
+                            <?php } else { ?>
+                                <img src="<?php echo $coin['token']['logo'] ?>" alt="" class="ezdefi-select-coin-item__logo">
+                            <?php } ?>
+                            <span class="ezdefi-select-coin-item__price"> <?php echo $coin['token']['price'] ?> </span>
+                            <span class="ezdefi-select-coin-item__symbol"><?php echo $coin['token']['symbol'] ?> </span>
+                            <span class="ezdefi-select-coin-item__discount">-<?php echo (float)$coin['discount'] ?>%</span>
+                            <input type="radio" name="coin-selected-to-order" class="hidden select-coin-checkbox" id="select-coin-<?php echo $coin._id ?>" value="<?php echo $coin._id ?>" data-discount="<?php echo $coin['discount'] ?>">
+                        </label>
+                    <?php } ?>
+                </div>
+                <?php if($enable_simple_pay) { ?>
+                    <button class="ezdefi-btn-create-payment" data-url_create_payment="<?php echo $url_create_simple_payment ?>" disabled> <?php echo $button_next ?> </button>
+                <?php } else { ?>
+                    <button class="ezdefi-btn-create-payment" data-url_create_payment="<?php echo $url_create_escrow_payment ?>" disabled> <?php echo $button_next ?> </button>
+                <?php } ?>
+            </div>
+        <?php } ?>
+
+        <div class="ezdefi-payment__content">
             <?php if($enable_simple_pay && !$enable_escrow_pay) { ?>
-                <input type="radio" class="ezdefi-show-payment-radio" id="ezdefi-show-payment--simple" name="show-payment" checked data-suffixes="--simple" checked>
+                <input type="radio" class="ezdefi-show-payment-radio" id="ezdefi-show-payment--simple" name="show-payment" data-suffixes="--simple" checked>
                 <label for="ezdefi-show-payment--simple" class="ezdefi-tab btn-show-payment--simple btn-choose-payment-type" data-suffixes="--simple"> <?php echo $text_pay_with_any_wallet ?> </label>
                 <label class="label-choose-payment"></label>
                 <input type="checkbox" class="hidden" id="check-created-payment--simple">

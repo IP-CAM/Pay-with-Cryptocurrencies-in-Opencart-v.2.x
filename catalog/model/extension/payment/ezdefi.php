@@ -12,9 +12,13 @@ class ModelExtensionPaymentEzdefi extends Model {
 		$this->load->language('extension/payment/ezdefi');
 		$status = true;
 
+		//var_dump($total);die;
+
 		if($total <= 0) {
 			$status = false;
 		}
+
+
 
 		$method_data = array();
 		if ($status) {
@@ -97,10 +101,10 @@ class ModelExtensionPaymentEzdefi extends Model {
     }
 
     // ----------------------------------------------------------Exception model------------------------------------------------------------
-    public function addException($order_id, $currency, $amount_id, $expiration, $has_amount, $paid = 0, $explorer_url = null, $payment_id = null) {
+    public function addException($order_id, $currency, $amount_id, $expiration, $has_amount, $paid = 0, $explorer_url = "NULL", $payment_id = null) {
         if(!$expiration) $expiration = 0;
         $this->db->query("INSERT INTO `". DB_PREFIX . "ezdefi_exception` (`payment_id`, `order_id`, `currency`, `amount_id`, `expiration`, `has_amount`, `paid`, `explorer_url`) VALUES 
-        ('".$payment_id."','".$order_id."', '".$currency."', '".$amount_id."', DATE_ADD(NOW(), INTERVAL ".$expiration." SECOND), '".$has_amount."', '".$paid."', '".$explorer_url."')");
+        ('".$payment_id."','".$order_id."', '".$currency."', '".$amount_id."', DATE_ADD(NOW(), INTERVAL ".$expiration." SECOND), '".$has_amount."', '".$paid."', ".$explorer_url.")");
     }
 
     public function setPaidForException($payment_id, $paid = 0, $explorer_url = null) {

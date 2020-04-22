@@ -80,16 +80,55 @@ class ModelExtensionPaymentEzdefi extends Model
         $this->db->query("DELETE FROM `" . DB_PREFIX . "ezdefi_exception` WHERE `order_id`=" . $order_id);
     }
 
-    public function searchExceptions($keyword_amount, $keyword_order_id, $keyword_email, $currency, $page, $limit)
+    public function searchLogs($keyword_amount, $keyword_order_id, $keyword_email, $currency, $page, $limit)
     {
-        $start = ($page - 1) * $limit;
-
-        // search exception and prioritize `amount_id` = $amount_id to the top
         $sql = "select  amount_id, currency, exception.id , order.order_id, order.email, exception.expiration, exception.paid, exception.has_amount, exception.explorer_url
                 from  `" . DB_PREFIX . "ezdefi_exception` `exception`
                     left join `" . DB_PREFIX . "order` `order` 
                     on exception.order_id = order.order_id
                 where exception.amount_id like '" . $keyword_amount . "%'";
+        $sql .= $this->searchCondition($keyword_amount, $keyword_order_id, $keyword_email, $currency, $page, $limit);
+        $query = $this->db->query($sql);
+        return $query->rows;
+    }
+
+    public function searchException($keyword_amount, $keyword_order_id, $keyword_email, $currency, $page, $limit) {
+        $sql = "select  amount_id, currency, exception.id , exception.expiration, exception.paid, exception.has_amount, exception.explorer_url, order_assigned, 
+                    order.order_id, order.email, CONCAT(order.firstname, ' ', order.lastname) customer, order.total  total, order.date_added date
+                from  `" . DB_PREFIX . "ezdefi_exception` `exception`
+                    left join `" . DB_PREFIX . "order` `order` 
+                    on exception.order_id = order.order_id
+                where exception.amount_id like '" . $keyword_amount . "%'
+                AND exception.explorer_url IS NOT NULL
+                AND exception.order_assigned IS NULL";
+
+        $sql .= $this->searchCondition($keyword_amount, $keyword_order_id, $keyword_email, $currency, $page, $limit);
+        $query = $this->db->query($sql);
+        return $query->rows;
+    }
+
+    public function searchExceptionHistories($keyword_amount, $keyword_order_id, $keyword_email, $currency, $page, $limit) {
+        $sql = "select  amount_id, currency, exception.id , exception.expiration, exception.paid, exception.has_amount, exception.explorer_url, order_assigned, 
+                    order.order_id, order.email, CONCAT(order.firstname, ' ', order.lastname) customer, order.total  total, order.date_added date,
+                    new_order.email new_email, CONCAT(new_order.firstname, ' ', new_order.lastname)  new_customer, new_order.total  new_total, new_order.date_added  new_date   
+                from  `" . DB_PREFIX . "ezdefi_exception` `exception`
+                    left join `" . DB_PREFIX . "order` `order` 
+                    on exception.order_id = order.order_id
+                    join `" . DB_PREFIX . "order` `new_order`
+                    on exception.order_assigned = new_order.order_id
+                where exception.amount_id like '" . $keyword_amount . "%'
+                AND exception.explorer_url IS NOT NULL";
+
+        $sql .= $this->searchCondition($keyword_amount, $keyword_order_id, $keyword_email, $currency, $page, $limit);
+        $query = $this->db->query($sql);
+        return $query->rows;
+    }
+
+
+    private function searchCondition($keyword_amount, $keyword_order_id, $keyword_email, $currency, $page, $limit) {
+        $start = ($page - 1) * $limit;
+
+        $sql = '';
         if ($keyword_order_id) {
             $sql .= " AND exception.order_id = '" . $keyword_order_id . "'";
         }
@@ -107,14 +146,28 @@ class ModelExtensionPaymentEzdefi extends Model
             $sql .= " ORDER BY exception.id DESC
                 LIMIT " . $start . ',' . $limit;
         }
-
-        $query = $this->db->query($sql);
-        return $query->rows;
+        return $sql;
     }
 
     public function revertOrderException($exception_id)
     {
         $this->db->query("UPDATE `" . DB_PREFIX . "ezdefi_exception` SET `order_id` = null, `paid`=3 WHERE `id` = " . (int)$exception_id);
+    }
+
+    public function updateException($conditions, $values) {
+        $sql = "UPDATE `" . DB_PREFIX . "ezdefi_exception` SET ";
+
+        foreach($values as $key => $value) {
+            $sql .= "`".$key."` = ".$value . ",";
+        }
+
+        $sql =  substr($sql, 0, -1) . " WHERE";
+
+        foreach($conditions as $conditionKey => $condition) {
+            $sql .= "`".$conditionKey."` = ".$condition . ",";
+        }
+        $sql =  substr($sql, 0, -1);
+        $this->db->query($sql);
     }
 
     // ------------------------------order------------------------------------
