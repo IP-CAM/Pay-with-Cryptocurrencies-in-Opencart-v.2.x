@@ -38,9 +38,10 @@ $(function () {
                             <th>${language.currency}</th>
                             <th>${language.amount}</th>
                             <th>${language.order}</th>
-                            <th>old order</th>
-                            <th>payment info</th>
-                            <th>action</th>
+                            <th>${language.old_order}</th>
+                            <th>${language.payment_info}</th>
+                            <th>${language.action}</th>
+                            
                         </tr>
                         </thead>
                         <tbody>`;
@@ -74,12 +75,13 @@ $(function () {
                     } else {
                         paymentStatus = 'Paid on expiration';
                     }
+
                     let paymentInfo = `<div id="exception-${exceptionId}" class="order-${orderId} exception-order-box">
                         <div class="exception-order-info">
                             <p><span class="exception-order-label-1">${language.expiration}:</span> <span class="exception-order-info__data"> ${expiration} </span></p>
                             <p><span class="exception-order-label-1">${language.paid}:</span> <span class="exception-order-info__data">${paymentStatus} </span></p>
                             <p><span class="exception-order-label-1">${language.payByEzdefi}:</span> ${hasAmount === '1' ? 'no' : 'yes'} </p>
-                            <p class="${explorerUrl == '' ? 'hidden':''}"><span class="exception-order-label-1">Explorer url:</span><a class="exception-order-info__explorer-url" href="${explorerUrl}" target="_blank">${language.viewTransactionDetail}</a></p>
+                            <p class="${!explorerUrl ? 'hidden':''}"><span class="exception-order-label-1">Explorer url:</span><a class="exception-order-info__explorer-url" href="${explorerUrl}" target="_blank">${language.viewTransactionDetail}</a></p>
                         </div>
                     </div>`;
                     let oldOrderItem = `

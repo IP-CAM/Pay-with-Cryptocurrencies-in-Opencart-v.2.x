@@ -9,7 +9,7 @@ $(function () {
         $("#new-exception-search-by-amount").change(this.searchException.bind(this));
         $("#new-exception-search-by-order").change(this.searchException.bind(this));
         $("#new-exception-search-by-email").change(this.searchException.bind(this));
-        $("#btn-search-exception").click(this.searchException.bind(this));
+        $("#btn-search-new-exception").click(this.searchException.bind(this));
         $("input[name='filter-by-currency']").change(this.searchException.bind(this));
         $(".tab-radio-input").change(this.selectTabListener);
         this.detectTabToShow();
@@ -59,13 +59,15 @@ $(function () {
                             <th>${language.currency}</th>
                             <th>${language.amount}</th>
                             <th>${language.order}</th>
-                            <th>payment Info</th>
-                            <th>action</th>
+                            <th>${language.payment_info}</th>
+                            <th>${language.action}</th>
                         </tr>
                         </thead>
                         <tbody>`;
                 let tmp = (pagination.pageNumber - 1) * pagination.pageSize + 1;
                 $.each(response, function (exceptionKey, exceptionRecord) {
+                    let orderInfo, paymentInfo, paymentStatus
+
                     let currency = exceptionRecord.currency;
                     let amountId = parseFloat(exceptionRecord.amount_id);
                     let exceptionId = exceptionRecord.id;
@@ -80,7 +82,6 @@ $(function () {
                     let total= exceptionRecord.total;
                     let date= exceptionRecord.date;
 
-                    let paymentStatus = ''
                     if(paidStatus === '0') {
                         paymentStatus = 'Have not paid';
                     } else if(paidStatus === '1') {
@@ -88,38 +89,53 @@ $(function () {
                     } else {
                         paymentStatus = 'Paid on expiration';
                     }
-                    let paymentInfo= `<div>
-                        <div id="exception-${exceptionId}" class="order-${orderId} exception-order-box">
-                            <div class="exception-order-info">
-                                <p><span class="exception-order-label-1">${language.expiration}:</span> <span class="exception-order-info__data"> ${expiration} </span></p>
-                                <p><span class="exception-order-label-1">${language.paid}:</span> <span class="exception-order-info__data">${paymentStatus} </span></p>
-                                <p><span class="exception-order-label-1">${language.payByEzdefi}:</span> ${hasAmount === '1' ? 'no' : 'yes'} </p>
-                                <p class="${explorerUrl == '' ? 'hidden':''}"><span class="exception-order-label-1">Explorer url:</span><a class="exception-order-info__explorer-url" href="${explorerUrl}" target="_blank">${language.viewTransactionDetail}</a></p>
-                            </div>
-                        </div>
-                        <div class="exception-order-box">
-                            <div class="exception-order-info">
-                                 <select class="form-control all_order_pending" style="width: 300px" data-list_coin_url="${urlGetAllOrderPending}" id="exception-select-order-${tmp}" data-tmp="${tmp}"></select>
-                            </div>
-                           
-                        </div>
-                    </div>`;
 
-                    let action = `<div class="exception-order-button-box">
-                                <button class="btn btn-danger btn-delete-exception" data-toggle="modal" data-target="#delete-exception-modal" data-exception-id="${exceptionId}">${language.delete}</button>
-                                <button class="btn btn-info btn-show-assign-exception-modal" id="btn-assign-order-${tmp}" data-toggle="modal" data-target="#assign-exception-modal" data-exception-id="${exceptionId}" data-old-order-id="${orderId}" data-order-id="" style="opacity: 0">Assign</button>
-                            </div>`
+                    if(orderId) {
+                        paymentInfo= `<div>
+                            <div id="exception-${exceptionId}" class="order-${orderId} exception-order-box">
+                                <div class="exception-order-info">
+                                    <p><span class="exception-order-label-1">${language.expiration}:</span> <span class="exception-order-info__data"> ${expiration} </span></p>
+                                    <p><span class="exception-order-label-1">${language.paid}:</span> <span class="exception-order-info__data">${paymentStatus} </span></p>
+                                    <p><span class="exception-order-label-1">${language.payByEzdefi}:</span> ${hasAmount === '1' ? 'no' : 'yes'} </p>
+                                    <p class="${explorerUrl == '' ? 'hidden':''}"><span class="exception-order-label-1">Explorer url:</span><a class="exception-order-info__explorer-url" href="${explorerUrl}" target="_blank">${language.viewTransactionDetail}</a></p>
+                                </div>
+                            </div>
+                        </div>`;
 
-                    let orderInfo = `
+                        orderInfo = `
                         <div id="exception-${exceptionId}" class="order-${orderId} exception-order-box">
                             <div class="exception-order-info">
                                 <p><span class="exception-order-label-1">${language.orderId}:</span> <span class="exception-order-info__data"> ${orderId} </span></p>
                                 <p><span class="exception-order-label-1">${language.email}:</span> <span class="exception-order-info__data">${email} </span></p>
                                    <p><span class="exception-order-label-1">Customer:</span> <span class="exception-order-info__data"> ${customer} </span></p>
-                            <p><span class="exception-order-label-1">Price:</span> <span class="exception-order-info__data"> ${total} </span></p>
-                            <p><span class="exception-order-label-1">Create at:</span> <span class="exception-order-info__data"> ${date} </span></p>
+                                <p><span class="exception-order-label-1">Price:</span> <span class="exception-order-info__data"> ${total} </span></p>
+                                <p><span class="exception-order-label-1">Create at:</span> <span class="exception-order-info__data"> ${date} </span></p>
+                                <div class="exception-order-box">
+                                    <div class="exception-order-info">
+                                         <select class="form-control all_order_pending" style="width: 300px" data-list_coin_url="${urlGetAllOrderPending}" id="exception-select-order-${tmp}" data-tmp="${tmp}"></select>
+                                    </div>
+                                </div>
                             </div>
                         </div>`;
+                    } else {
+                        orderInfo = `<div class="exception-order-box">
+                            <div class="exception-order-info">
+                                 <select class="form-control all_order_pending" style="width: 300px" data-list_coin_url="${urlGetAllOrderPending}" id="exception-select-order-${tmp}" data-tmp="${tmp}"></select>
+                            </div>
+                        </div>`
+                        paymentInfo= `<div>
+                            <div id="exception-${exceptionId}" class="order-${orderId} exception-order-box">
+                                <div class="exception-order-info">
+                                    <p class="${explorerUrl == '' ? 'hidden':''}"><span class="exception-order-label-1">Explorer url:</span><a class="exception-order-info__explorer-url" href="${explorerUrl}" target="_blank">${language.viewTransactionDetail}</a></p>
+                                </div>
+                            </div>
+                        </div>`;
+                    }
+
+                    let action = `<div class="exception-order-button-box">
+                                <button class="btn btn-danger btn-delete-exception" data-toggle="modal" data-target="#delete-exception-modal" data-exception-id="${exceptionId}">${language.delete}</button>
+                                <button class="btn btn-info btn-show-assign-exception-modal" id="btn-assign-order-${tmp}" data-toggle="modal" data-target="#assign-exception-modal" data-exception-id="${exceptionId}" data-old-order-id="${orderId}" data-order-id="" style="opacity: 0">Assign</button>
+                            </div>`
 
                     dataHtml += `<tr>
                                 <td>${tmp}</td>
@@ -167,11 +183,9 @@ $(function () {
         })
     };
 
-    oc_ezdefi_exception.prototype.deleteException = function (e, exceptionId = null) {
+    oc_ezdefi_exception.prototype.deleteException = function (e) {
         var that = this;
-        if(exceptionId == null) {
-            exceptionId = $("#exception-id--delete").val();
-        }
+        let exceptionId = $("#exception-id--delete").val();
         $("#btn-delete-exception").prop('disabled', true);
         let url = $("#url-delete-exception").val();
         $.ajax({

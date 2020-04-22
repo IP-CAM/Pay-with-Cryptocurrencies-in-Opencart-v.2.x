@@ -54,21 +54,50 @@ class ModelExtensionPaymentEzdefi extends Model
     public function getTotalException($keyword_amount, $keyword_order_id, $keyword_email, $currency)
     {
         $sql = "select count(*) as total_exceptions
-            from `" . DB_PREFIX . "ezdefi_exception` `exception`
-                    left join `" . DB_PREFIX . "order` `order` on exception.order_id = order.order_id
-                where exception.amount_id like '%" . $keyword_amount . "%'";
-        if ($keyword_order_id) {
-            $sql .= " AND exception.order_id = '" . $keyword_order_id . "'";
-        }
-        if ($keyword_email) {
-            $sql .= " AND order.email = '" . $keyword_email . "'";
-        }
-        if ($currency) {
-            $sql .= " AND exception.currency = '" . strtoupper($currency) . "'";
-        }
+                from  `" . DB_PREFIX . "ezdefi_exception` `exception`
+                    left join `" . DB_PREFIX . "order` `order` 
+                    on exception.order_id = order.order_id
+                where exception.amount_id like '" . $keyword_amount . "%'
+                AND exception.explorer_url IS NOT NULL
+                AND exception.order_assigned IS NULL";
+
+        $sql .= $this->searchCondition($keyword_amount, $keyword_order_id, $keyword_email, $currency);
+
         $query = $this->db->query($sql);
         return $query->row['total_exceptions'];
     }
+
+
+    public function getTotalExceptionHistories($keyword_amount, $keyword_order_id, $keyword_email, $currency) {
+        $sql = "select count(*) as total_exceptions
+                from  `" . DB_PREFIX . "ezdefi_exception` `exception`
+                    left join `" . DB_PREFIX . "order` `order` 
+                    on exception.order_id = order.order_id
+                where exception.amount_id like '" . $keyword_amount . "%'
+                AND exception.confirmed = 1
+                AND exception.order_assigned is NOT NULL";
+
+        $sql .= $this->searchCondition($keyword_amount, $keyword_order_id, $keyword_email, $currency);
+
+        $query = $this->db->query($sql);
+        return $query->row['total_exceptions'];
+    }
+
+    public function getTotalLog($keyword_amount, $keyword_order_id, $keyword_email, $currency) {
+        $sql = "select count(*) as total_exceptions
+                from  `" . DB_PREFIX . "ezdefi_exception` `exception`
+                    left join `" . DB_PREFIX . "order` `order` 
+                    on exception.order_id = order.order_id
+                where exception.amount_id like '" . $keyword_amount . "%'
+                    AND exception.confirmed = 0
+                    AND exception.explorer_url IS NULL";
+
+        $sql .= $this->searchCondition($keyword_amount, $keyword_order_id, $keyword_email, $currency);
+
+        $query = $this->db->query($sql);
+        return $query->row['total_exceptions'];
+    }
+
 
     public function deleteExceptionById($exception_id)
     {
@@ -86,7 +115,9 @@ class ModelExtensionPaymentEzdefi extends Model
                 from  `" . DB_PREFIX . "ezdefi_exception` `exception`
                     left join `" . DB_PREFIX . "order` `order` 
                     on exception.order_id = order.order_id
-                where exception.amount_id like '" . $keyword_amount . "%'";
+                where exception.amount_id like '" . $keyword_amount . "%'
+                AND exception.confirmed = 0
+                AND exception.explorer_url IS NULL";
         $sql .= $this->searchCondition($keyword_amount, $keyword_order_id, $keyword_email, $currency, $page, $limit);
         $query = $this->db->query($sql);
         return $query->rows;
@@ -117,7 +148,7 @@ class ModelExtensionPaymentEzdefi extends Model
                     join `" . DB_PREFIX . "order` `new_order`
                     on exception.order_assigned = new_order.order_id
                 where exception.amount_id like '" . $keyword_amount . "%'
-                AND exception.explorer_url IS NOT NULL";
+                AND exception.confirmed = 1";
 
         $sql .= $this->searchCondition($keyword_amount, $keyword_order_id, $keyword_email, $currency, $page, $limit);
         $query = $this->db->query($sql);
@@ -125,8 +156,10 @@ class ModelExtensionPaymentEzdefi extends Model
     }
 
 
-    private function searchCondition($keyword_amount, $keyword_order_id, $keyword_email, $currency, $page, $limit) {
-        $start = ($page - 1) * $limit;
+    private function searchCondition($keyword_amount, $keyword_order_id, $keyword_email, $currency, $page = null, $limit = null) {
+        if($page) {
+            $start = ($page - 1) * $limit;
+        }
 
         $sql = '';
         if ($keyword_order_id) {
@@ -138,13 +171,16 @@ class ModelExtensionPaymentEzdefi extends Model
         if ($currency) {
             $sql .= " AND exception.currency = '" . strtoupper($currency) . "'";
         }
-        if ($keyword_amount) {
-            $sql .= "
+
+        if($page) {
+            if ($keyword_amount) {
+                $sql .= "
                 ORDER BY exception.id ASC
                 LIMIT " . $start . ',' . $limit ;
-        } else {
-            $sql .= " ORDER BY exception.id DESC
+            } else {
+                $sql .= " ORDER BY exception.id DESC
                 LIMIT " . $start . ',' . $limit;
+            }
         }
         return $sql;
     }

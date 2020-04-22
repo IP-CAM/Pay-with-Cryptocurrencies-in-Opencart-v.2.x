@@ -207,14 +207,19 @@ class ControllerExtensionPaymentEzdefi extends Controller
         $keyword_order_id = isset($this->request->get['order_id']) ? $this->request->get['order_id'] : '';
         $keyword_email    = isset($this->request->get['email']) ? $this->request->get['email'] : '';
         $section          = isset($this->request->get['section']) ? $this->request->get['section'] : '';
+        $total_exceptions = null;
         if($section == 1) {
             $exceptions = $this->model_extension_payment_ezdefi->searchException($keyword_amount, $keyword_order_id, $keyword_email, $currency, $page, self::LIMIT_EXCEPTION_IN_PAGE);
+            $total_exceptions = $this->model_extension_payment_ezdefi->getTotalException($keyword_amount, $keyword_order_id, $keyword_email, $currency);
         } elseif($section == 2) {
             $exceptions = $this->model_extension_payment_ezdefi->searchExceptionHistories($keyword_amount, $keyword_order_id, $keyword_email, $currency, $page, self::LIMIT_EXCEPTION_IN_PAGE);
-        } else {
+            $total_exceptions = $this->model_extension_payment_ezdefi->getTotalExceptionHistories($keyword_amount, $keyword_order_id, $keyword_email, $currency);
+        } elseif($section == 3) {
             $exceptions = $this->model_extension_payment_ezdefi->searchLogs($keyword_amount, $keyword_order_id, $keyword_email, $currency, $page, self::LIMIT_EXCEPTION_IN_PAGE);
+            $total_exceptions = $this->model_extension_payment_ezdefi->getTotalLog($keyword_amount, $keyword_order_id, $keyword_email, $currency);
         }
-        $total_exceptions = $this->model_extension_payment_ezdefi->getTotalException($keyword_amount, $keyword_order_id, $keyword_email, $currency);
+        //$total_exceptions = $this->model_extension_payment_ezdefi->getTotalException($keyword_amount, $keyword_order_id, $keyword_email, $currency);
+
         $result           = ['exceptions' => $exceptions, 'total_exceptions' => $total_exceptions];
 
         return $this->response->setOutput(json_encode($result));
@@ -227,8 +232,10 @@ class ControllerExtensionPaymentEzdefi extends Controller
         $exception_id     = isset($this->request->post['exception_id']) ? $this->request->post['exception_id'] : '';
         $exception = $this->model_extension_payment_ezdefi->getExceptionById($exception_id);
 
+        $this->model_extension_payment_ezdefi->updateException(['id'=>$exception['id']], ['order_assigned' => $exception['order_id']]);
+        $this->model_extension_payment_ezdefi->updateException(['order_id'=>$exception['order_id']], ['confirmed' => 1]);
+
         $this->model_extension_payment_ezdefi->setProcessingForOrder($exception['order_id']);
-        $this->model_extension_payment_ezdefi->deleteExceptionByOrderId($exception['order_id']);
 
         return $this->response->setOutput(json_encode(['status' => 'success']));
     }
@@ -241,7 +248,7 @@ class ControllerExtensionPaymentEzdefi extends Controller
         $order_id_to_assign = isset($this->request->post['order_id']) ? $this->request->post['order_id'] : '';
         $exception = $this->model_extension_payment_ezdefi->getExceptionById($exception_id);
 
-        $this->model_extension_payment_ezdefi->updateException(['id'=>$exception['id']], ['order_assigned' => $order_id_to_assign]);
+        $this->model_extension_payment_ezdefi->updateException(['id'=>$exception['id']], ['order_assigned' => $order_id_to_assign, 'confirmed' => 1]);
 
 
         if($exception['order_id']  && $order_id_to_assign  != $exception['order_id']) {
@@ -264,6 +271,13 @@ class ControllerExtensionPaymentEzdefi extends Controller
             $this->model_extension_payment_ezdefi->setProcessingForOrder($exception['order_id']);
         }
         $this->model_extension_payment_ezdefi->setPendingForOrder($exception['order_assigned']);
+
+        if(!$exception['explorer_url']) {
+            $this->model_extension_payment_ezdefi->updateException(['order_id' => $exception['order_id']], ['confirmed' => 0]);
+        } else {
+            $this->model_extension_payment_ezdefi->updateException(['id' => $exception['id']], ['confirmed' => 0]);
+        }
+
 
         return $this->response->setOutput(json_encode(['status' => 'success']));
     }

@@ -32,9 +32,9 @@
 		<input type="radio" id="ezdefi-new-exception-tab" name="btn-radio-choose-tab" class="hidden tab-radio-input" data-tab="new-exception">
 		<input type="radio" id="ezdefi-exception-tab" name="btn-radio-choose-tab" class="hidden tab-radio-input" data-tab="exception">
 		<label class="ezdefi-btn-tab ezdefi-btn-config-tab" for="ezdefi-config-tab"> <?php echo $tab_config ?> </label>
-        <label class="ezdefi-btn-tab ezdefi-btn-exception-history-tab" for="ezdefi-exception-history-tab"> <?php echo $tab_exception_history ?> </label>
-		<label class="ezdefi-btn-tab ezdefi-btn-new-exception-tab" for="ezdefi-new-exception-tab"> <?php echo $tab_exception_history ?> </label>
-		<label class="ezdefi-btn-tab ezdefi-btn-exception-tab" for="ezdefi-exception-tab"> achive </label>
+        <label class="ezdefi-btn-tab ezdefi-btn-new-exception-tab" for="ezdefi-new-exception-tab"> <?php echo $tab_exception_pending ?> </label>
+        <label class="ezdefi-btn-tab ezdefi-btn-exception-history-tab" for="ezdefi-exception-history-tab"> <?php echo $tab_exception_confirmed ?> </label>
+		<label class="ezdefi-btn-tab ezdefi-btn-exception-tab" for="ezdefi-exception-tab"> <?php echo $tab_exception_archived ?> </label>
 
         <div class="panel panel-default config-content-tab">
             <form action="<?php echo $action ?>"
@@ -115,7 +115,7 @@
                 </div>
             </div>
 
-            <div id="delete-order-exception" class="modal fade" role="dialog">
+            <div id="delete-log-modal" class="modal fade" role="dialog">
                 <div class="modal-dialog">
                     <!-- Modal content-->
                     <div class="modal-content">
@@ -125,18 +125,18 @@
                         </div>
                         <div class="modal-body">
                             <p><?php echo $text_ask_delete_exception ?></p>
-                            <input type="hidden" id="exception-id--delete">
+                            <input type="hidden" id="exception-id--log-delete">
                         </div>
                         <div class="modal-footer" style="text-align: center">
                             <button type="button" class="btn btn-danger" data-dismiss="modal"><?php echo $button_close ?></button>
-                            <button type="button" class="btn btn-primary" id="btn-delete-exception" data-url-delete="<?php echo $url_delete_exception ?>">
+                            <button type="button" class="btn btn-primary" id="btn-delete-log" data-url-delete="<?php echo $url_delete_exception ?>">
                                 <i class="fa fa-refresh fa-spin exception-loading-icon exception-delete-loading"></i><?php echo $button_yes ?>
                             </button>
                         </div>
                     </div>
                 </div>
             </div>
-            <div id="confirm-paid-order-exception" class="modal fade" role="dialog">
+            <div id="confirm-log-modal" class="modal fade" role="dialog">
                 <div class="modal-dialog">
                     <!-- Modal content-->
                     <div class="modal-content">
@@ -146,15 +146,12 @@
                         </div>
                         <div class="modal-body">
                             <p><?php echo $text_ask_confirm_order ?></p>
-                            <input type="hidden" id="exception-id--confirm">
-                            <input type="hidden" id="exception-order-id--confirm">
-                            <input type="checkbox" id="confirm-dialog-assign" class="hidden">
-                            <input type="hidden" id="exception-old-order-id--confirm">
+                            <input type="hidden" id="exception-id--confirm-log">
                         </div>
                         <div class="modal-footer" style="text-align: center">
                             <button type="button" class="btn btn-danger" data-dismiss="modal"><?php echo $button_close ?></button>
-                            <button type="button" class="btn btn-primary" id="btn-confirm-paid-exception" data-url-delete="<?php echo $url_delete_exception ?>" data-url-add-order-history="<?php echo $url_add_order_history ?>">
-                                <i class="fa fa-refresh fa-spin exception-loading-icon exception-loading-icon__confirm-paid"></i><?php echo $button_yes ?>
+                            <button type="button" class="btn btn-primary" id="btn-confirm-log" data-url-delete="<?php echo $url_delete_exception ?>" data-url-add-order-history="<?php echo $url_add_order_history ?>">
+                                <i class="fa fa-refresh fa-spin exception-loading-icon"></i><?php echo $button_yes ?>
                             </button>
                         </div>
                     </div>
@@ -224,10 +221,10 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <button type="button" class="close" data-dismiss="modal">&times;</button>
-                            <h4 class="modal-title"> assign order </h4>
+                            <h4 class="modal-title"> <?php echo $text_assign_exception ?> </h4>
                         </div>
                         <div class="modal-body">
-                            <p> do you want to assign </p>
+                            <p> <?php echo $text_ask_assign_exception ?> </p>
                             <input type="hidden" id="exception-order-id--assign">
                             <input type="hidden" id="exception-id--assign">
                         </div>
@@ -251,7 +248,7 @@
             <div class="panel-body">
                 <div class="exception-filter-currency-box">
                     <div class="exception-filter-currency-item">
-                        <label for="filter-exception-by-currency-all" class="margin-top-5"> All coin </label>
+                        <label for="filter-exception-by-currency-all" class="margin-top-5"> <?php echo $text_all_coin ?> </label>
                         <input type="radio" name="exception-history-search-by-currency" value="" id="filter-exception-by-currency-all" checked>
                     </div>
                     <?php if($coins) { ?>
@@ -303,10 +300,10 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <button type="button" class="close" data-dismiss="modal">&times;</button>
-                            <h4 class="modal-title"> revert order </h4>
+                            <h4 class="modal-title"> <?php echo $text_revert_order ?> </h4>
                         </div>
                         <div class="modal-body">
-                            <p> do you want to revert </p>
+                            <p> <?php echo $text_ask_revert_order ?> </p>
                             <input type="hidden" id="exception-id--revert">
                         </div>
                         <div class="modal-footer" style="text-align: center">
@@ -346,6 +343,9 @@
         confirmPaid: '<?php echo $text_confirm_paid ?>',
         revert: '<?php echo $text_revert ?>',
         assign: '<?php echo $text_assign ?>',
+        old_order: '<?php echo $text_old_order?>',
+        action: '<?php echo $text_action?>',
+        payment_info: '<?php echo $text_payment_info?>',
     }
 </script>
 <?php echo $footer ?>
