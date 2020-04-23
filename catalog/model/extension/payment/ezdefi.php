@@ -50,8 +50,13 @@ class ModelExtensionPaymentEzdefi extends Model {
         return $currencies;
     }
 
-    public function convertExponentialToFloat($amount) {
-        $value = sprintf('%.8f',$amount);
+    public function convertExponentialToFloat($amount, $decimal = null) {
+	    if($decimal) {
+            $value = sprintf('%.'.$decimal.'f',$amount);
+        }
+	    else {
+            $value = sprintf('%.10f',$amount);
+        }
         $afterDot = explode('.', $value)[1];
         $lengthToCut = 0;
         for($i = strlen($afterDot) -1; $i >=0; $i--) {

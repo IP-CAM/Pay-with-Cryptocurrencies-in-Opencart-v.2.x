@@ -47,8 +47,7 @@ class ControllerExtensionPaymentEzdefi extends Controller
         $coin_id           = $this->request->get['coin_id'];
         $coin              = $this->model_extension_payment_ezdefi->getCurrency($coin_id, json_decode(json_encode($website_data->coins), true));
         $amount            = $this->model_extension_payment_ezdefi->getExchange($order_info['currency_code'], $coin['token']['symbol']) * $order_info['total'] * (100 - $coin['discount']) / 100;
-        $value             = $this->model_extension_payment_ezdefi->convertExponentialToFloat($amount);
-
+        $value             = $this->model_extension_payment_ezdefi->convertExponentialToFloat($amount, $coin['decimal']);
 
         if ($enable_simple_pay) {
             $params       = [
