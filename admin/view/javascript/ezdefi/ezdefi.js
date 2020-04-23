@@ -69,7 +69,7 @@ $(function () {
                 }
             },
             messages: {
-                remote: "This Side Id is invalid"
+                remote: "This Site Id is invalid"
             }
         });
     };

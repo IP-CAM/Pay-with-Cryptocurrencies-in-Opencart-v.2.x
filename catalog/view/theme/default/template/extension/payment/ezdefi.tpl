@@ -192,7 +192,7 @@
                             <?php echo $ezdefi_countdown_lifetime_escrow ?>
                         </div>
                         <div class="qrcode-box">
-                            <a href="" class="ezdefi-payment__deeplink" target="_blank">
+                            <a href="" class="ezdefi-payment__deeplink ezdefi-payment__deeplink--escrow" target="_blank">
                                 <img src="" alt="" class="ezdefi-payment__qr-code ezdefi-payment__qr-code--escrow">
                                 <p><?php echo $text_click_to_pay ?></p>
                             </a>
