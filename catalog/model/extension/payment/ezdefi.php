@@ -88,15 +88,15 @@ class ModelExtensionPaymentEzdefi extends Model {
         if ($check_status_response) {
             $response_data = json_decode($check_status_response)->data;
             $value = $response_data->value * pow(10, - $response_data->decimal);
-            if($response_data->status == "PENDING") {
-                return ['status' => "PENDING", 'code' => self::PENDING];
-            } elseif ($response_data->status == "DONE") {
-                return ['status' => "DONE", 'code' => self::DONE, 'uoid'=> $response_data->uoid, 'currency' => $response_data->currency, 'value' => $value, 'explorer_url' => $response_data->explorer->tx . $response_data->transactionHash, '_id' => $response_data->_id];
-            } elseif ($response_data->status == 'EXPIRED_DONE') {
-                return ['status' => 'EXPIRED_DONE', 'uoid'=> $response_data->uoid, 'currency' => $response_data->currency, 'value' => $value, 'explorer_url' => $response_data->explorer->tx . $response_data->transactionHash, '_id' => $response_data->_id];
-            }
-        } else {
-            return ['status' => "failure"];
+            //if($response_data->status == "PENDING") {
+            //    return ['status' => "PENDING", 'code' => self::PENDING];
+            //} elseif ($response_data->status == "DONE") {
+            //    return ['status' => "DONE", 'code' => self::DONE, 'uoid'=> $response_data->uoid, 'currency' => $response_data->currency, 'value' => $value, 'explorer_url' => $response_data->explorer->tx . $response_data->transactionHash, '_id' => $response_data->_id];
+            //} elseif ($response_data->status == 'EXPIRED_DONE') {
+                return ['status' => 'EXPIRED_DONE', 'uoid'=> $response_data->uoid, 'currency' => $response_data->currency, 'value' => $value, 'explorer_url' => $response_data->explorer->tx, '_id' => $response_data->_id];
+            //}
+        //} else {
+        //    return ['status' => "failure"];
         }
     }
 
@@ -124,8 +124,14 @@ class ModelExtensionPaymentEzdefi extends Model {
         return;
 	}
 
-	public function deleteExceptionByOrderId($order_id) {
-        $this->db->query("DELETE FROM `".DB_PREFIX."ezdefi_exception` WHERE `order_id`=".$order_id);
+	public function deleteExceptionByOrderId($order_id, $payment_id = null) {
+	    $sql = "DELETE FROM `".DB_PREFIX."ezdefi_exception` WHERE `order_id`=".$order_id;
+
+	    if($payment_id) {
+            $sql .= " AND `payment_id` <> '".$payment_id."'";
+        }
+
+        $this->db->query($sql);
     }
 
     // --------------------------------------------------------End exception model-----------------------------------------------------------

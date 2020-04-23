@@ -40,13 +40,14 @@ $(function () {
                             <th>${language.order}</th>
                             <th>${language.old_order}</th>
                             <th>${language.payment_info}</th>
-                            <th>${language.action}</th>
+                            <th width="110">${language.action}</th>
                             
                         </tr>
                         </thead>
                         <tbody>`;
                 let tmp = (pagination.pageNumber - 1) * pagination.pageSize + 1;
                 $.each(response, function (exceptionKey, exceptionRecord) {
+                    let oldOrderItem, paymentInfo;
                     let currency = exceptionRecord.currency;
                     let amountId = parseFloat(exceptionRecord.amount_id);
                     let exceptionId = exceptionRecord.id;
@@ -76,15 +77,17 @@ $(function () {
                         paymentStatus = 'Paid on expiration';
                     }
 
-                    let paymentInfo = `<div id="exception-${exceptionId}" class="order-${orderId} exception-order-box">
-                        <div class="exception-order-info">
-                            <p><span class="exception-order-label-1">${language.expiration}:</span> <span class="exception-order-info__data"> ${expiration} </span></p>
-                            <p><span class="exception-order-label-1">${language.paid}:</span> <span class="exception-order-info__data">${paymentStatus} </span></p>
-                            <p><span class="exception-order-label-1">${language.payByEzdefi}:</span> ${hasAmount === '1' ? 'no' : 'yes'} </p>
-                            <p class="${!explorerUrl ? 'hidden':''}"><span class="exception-order-label-1">Explorer url:</span><a class="exception-order-info__explorer-url" href="${explorerUrl}" target="_blank">${language.viewTransactionDetail}</a></p>
-                        </div>
-                    </div>`;
-                    let oldOrderItem = `
+                    if(orderId) {
+                        paymentInfo = `<div id="exception-${exceptionId}" class="order-${orderId} exception-order-box">
+                            <div class="exception-order-info">
+                                <p><span class="exception-order-label-1">${language.expiration}:</span> <span class="exception-order-info__data"> ${expiration} </span></p>
+                                <p><span class="exception-order-label-1">${language.paid}:</span> <span class="exception-order-info__data">${paymentStatus} </span></p>
+                                <p><span class="exception-order-label-1">${language.payByEzdefi}:</span> ${hasAmount === '1' ? 'no' : 'yes'} </p>
+                                <p class="${!explorerUrl ? 'hidden':''}"><span class="exception-order-label-1">Explorer url:</span><a class="exception-order-info__explorer-url" href="${explorerUrl}" target="_blank">${language.viewTransactionDetail}</a></p>
+                            </div>
+                        </div>`;
+
+                        oldOrderItem = `
                         <div id="exception-${exceptionId}" class="order-${orderId} exception-order-box">
                             <div class="exception-order-info">
                                 <p><span class="exception-order-label-1">${language.orderId}:</span> <span class="exception-order-info__data"> ${orderId} </span></p>
@@ -94,6 +97,10 @@ $(function () {
                             <p><span class="exception-order-label-1">Create at:</span> <span class="exception-order-info__data"> ${date} </span></p>
                             </div>
                         </div>`;
+                    } else {
+                        paymentInfo = `<p class="${!explorerUrl ? 'hidden':''}"><span class="exception-order-label-1">Explorer url:</span><a class="exception-order-info__explorer-url" href="${explorerUrl}" target="_blank">${language.viewTransactionDetail}</a></p>`
+                        oldOrderItem = ''
+                    }
 
                     let orderItem= `<div>
                             <p><span class="exception-order-label-1">order id:</span> <span class="exception-order-info__data"> ${newOrderId} </span></p>

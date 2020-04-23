@@ -38,7 +38,7 @@ $(function () {
                             <th>${language.currency}</th>
                             <th>${language.amount}</th>
                             <th>${language.order}</th>
-                            <th>${language.action}</th>
+                            <th width="110">${language.action}</th>
                         </tr>
                         </thead>
                         <tbody>`;

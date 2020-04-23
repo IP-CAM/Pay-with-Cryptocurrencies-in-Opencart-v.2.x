@@ -256,6 +256,10 @@ class ControllerExtensionPaymentEzdefi extends Controller
         }
         $this->model_extension_payment_ezdefi->setProcessingForOrder($order_id_to_assign);
 
+        if(!$exception['order_id']) {
+            $this->model_extension_payment_ezdefi->deleteExceptionByOrderId($order_id_to_assign);
+        }
+
         return $this->response->setOutput(json_encode(['status' => 'success']));
     }
 

@@ -60,7 +60,7 @@ $(function () {
                             <th>${language.amount}</th>
                             <th>${language.order}</th>
                             <th>${language.payment_info}</th>
-                            <th>${language.action}</th>
+                            <th width="110">${language.action}</th>
                         </tr>
                         </thead>
                         <tbody>`;
