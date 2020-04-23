@@ -14,12 +14,14 @@ class ModelExtensionPaymentEzdefi extends Model
                 `id` int auto_increment,
                 `payment_id` varchar(255) default null,
 			    `order_id` int(11),
+			    `order_assigned` int(11) default null,
                 `amount_id` decimal(60,30) not null,
                 `currency` varchar(255) not null,
 		        `paid` int(4) default 0,
 		        `has_amount` tinyint(1) not null,
 		        `expiration` TIMESTAMP,
 		        `explorer_url` varchar(255) default null,
+		        `confirmed` tinyint(4) default 0,
 			    PRIMARY KEY (`id`)
 			) ENGINE=InnoDB DEFAULT COLLATE=utf8_general_ci;");
 
@@ -28,7 +30,7 @@ class ModelExtensionPaymentEzdefi extends Model
             ON SCHEDULE EVERY " . self::TIME_REMOVE_EXCEPTION . " DAY
             STARTS DATE(NOW())
             DO
-            DELETE FROM `" . DB_PREFIX . "ezdefi_exception` WHERE DATEDIFF( NOW( ) ,  expiration ) >= 86400;");
+            DELETE FROM `" . DB_PREFIX . "ezdefi_exception` WHERE DATEDIFF( NOW( ) ,  expiration ) >= 5;");
         $this->db->query("SET GLOBAL event_scheduler='ON';");
     }
 
