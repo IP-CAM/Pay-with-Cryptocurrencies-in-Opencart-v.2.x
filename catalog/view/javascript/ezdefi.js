@@ -158,6 +158,7 @@ $(function () {
             method: "GET",
             data: { coin_id: coinId },
             success: function (response) {
+                console.log(JSON.parse(response));
                 if(JSON.parse(response).error) {
                     alert("Something error, server can't create payment");
                 }

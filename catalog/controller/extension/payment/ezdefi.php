@@ -42,8 +42,12 @@ class ControllerExtensionPaymentEzdefi extends Controller
         $this->load->model('extension/payment/ezdefi');
         $this->load->model('checkout/order');
 
-        $order_info        = $this->model_checkout_order->getOrder($this->session->data['order_id']);
         $website_data      = $this->model_extension_payment_ezdefi->getWebsiteData();
+        if(!$website_data){
+            return $this->response->setOutput(json_encode(['data' => ['status' => 'failure', 'message' => $this->language->get('error_cant_create_payment')]]));
+        }
+
+        $order_info        = $this->model_checkout_order->getOrder($this->session->data['order_id']);
         $enable_simple_pay = $website_data->website->payAnyWallet;
         $callback          = $this->url->link('extension/payment/ezdefi/callbackConfirmOrder', '', true);
         $coin_id           = $this->request->get['coin_id'];
@@ -63,17 +67,16 @@ class ControllerExtensionPaymentEzdefi extends Controller
                 'duration' => $coin['expiration'] * 60,
                 'callback' => $callback
             ];
-            $payment_info = $this->model_extension_payment_ezdefi->createPayment($params);
-            $payment_data = json_decode($payment_info)->data;
-            if ($payment_info) {
+            $payment_data = $this->model_extension_payment_ezdefi->createPayment($params);
+            if ($payment_data) {
                 $this->model_extension_payment_ezdefi->addException($order_info['order_id'], strtoupper($coin['token']['symbol']), $payment_data->value * pow(10, - $payment_data->decimal), $coin['expiration'], 1, null, "NULL", $payment_data->_id);
 
-                return $this->response->setOutput($payment_info);
+                return $this->response->setOutput(json_encode(['data' => $payment_data]));
             } else {
-                return $this->response->setOutput(json_encode(['data' => ['status' => 'failure', 'message' => $this->language->get('error_cant_create_payment_with_amount')]]));
+                return $this->response->setOutput(json_encode(['data' => ['status' => 'failure', 'message' => $this->language->get('error_cant_create_payment')]]));
             }
         } else {
-            return $this->response->setOutput(json_encode(['data' => ['status' => 'failure', 'message' => $this->language->get('error_enable_simple_pay')]]));
+            return $this->response->setOutput(json_encode(['data' => ['status' => 'failure', 'message' => $this->language->get('error_cant_create_payment')]]));
         }
     }
 
@@ -84,8 +87,11 @@ class ControllerExtensionPaymentEzdefi extends Controller
         $this->load->model('extension/payment/ezdefi');
         $this->load->model('checkout/order');
 
-        $order_info        = $this->model_checkout_order->getOrder($this->session->data['order_id']);
         $website_data      = $this->model_extension_payment_ezdefi->getWebsiteData();
+        if(!$website_data){
+            return $this->response->setOutput(json_encode(['data' => ['status' => 'failure', 'message' => $this->language->get('error_cant_create_payment')]]));
+        }
+        $order_info        = $this->model_checkout_order->getOrder($this->session->data['order_id']);
         $enable_simple_pay = $website_data->website->payEzdefiWallet;
         $callback          = $this->url->link('extension/payment/ezdefi/callbackConfirmOrder', '', true);
         $coin_id           = $this->request->get['coin_id'];
@@ -103,13 +109,11 @@ class ControllerExtensionPaymentEzdefi extends Controller
                 'duration' => $coin['expiration'] * 60,
                 'callback' => $callback
             ];
-            $payment_info = $this->model_extension_payment_ezdefi->createPayment($params);
-            $payment_data = json_decode($payment_info)->data;
-
-            if ($payment_info) {
+            $payment_data = $this->model_extension_payment_ezdefi->createPayment($params);
+            if ($payment_data) {
                 $crypto_value = $payment_data->value * pow(10, - $payment_data->decimal);
                 $this->model_extension_payment_ezdefi->addException($order_info['order_id'], strtoupper($coin['token']['symbol']), $crypto_value, $coin['expiration'], 0, null, "NULL", $payment_data->_id);
-                return $this->response->setOutput($payment_info);
+                return $this->response->setOutput(json_encode(['data' => $payment_data]));
             } else {
                 return $this->response->setOutput(json_encode(['data' => ['status' => 'failure', 'message' => $this->language->get('error_cant_create_payment')]]));
             }

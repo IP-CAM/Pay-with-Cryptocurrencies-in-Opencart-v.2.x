@@ -5,6 +5,7 @@ $(function () {
         this.searchException();
         $("#btn-delete-exception").click(this.deleteException.bind(this));
         $("#btn-assign-exception").click(this.assignException.bind(this))
+        $("#btn-confirm-exception").click(this.confirmException.bind(this))
 
         $("#new-exception-search-by-amount").change(this.searchException.bind(this));
         $("#new-exception-search-by-order").change(this.searchException.bind(this));
@@ -133,6 +134,7 @@ $(function () {
                     }
 
                     let action = `<div class="exception-order-button-box">
+                                <button class="btn btn-primary btn-show-confirm-exception-modal" data-toggle="modal" data-target="#confirm-exception-modal" data-exception-id="${exceptionId}">${language.confirmPaid}</button>
                                 <button class="btn btn-danger btn-delete-exception" data-toggle="modal" data-target="#delete-exception-modal" data-exception-id="${exceptionId}">${language.delete}</button>
                                 <button class="btn btn-info btn-show-assign-exception-modal" id="btn-assign-order-${tmp}" data-toggle="modal" data-target="#assign-exception-modal" data-exception-id="${exceptionId}" data-old-order-id="${orderId}" data-order-id="" style="opacity: 0">Assign</button>
                             </div>`
@@ -181,6 +183,12 @@ $(function () {
             $("#exception-id--assign").val(exceptionId);
             $(".exception-loading-icon__confirm-paid").css('display', 'none');
         })
+
+        $('.btn-show-confirm-exception-modal').click(function () {
+            let exceptionId = $(this).data('exception-id');
+            $("#exception-id--confirm-exception").val(exceptionId);
+            $(".exception-loading-icon").css('display', 'none');
+        })
     };
 
     oc_ezdefi_exception.prototype.deleteException = function (e) {
@@ -207,6 +215,38 @@ $(function () {
             }
         });
     };
+
+    oc_ezdefi_exception.prototype.confirmException = function () {
+        $("#btn-confirm-exception").prop('disabled', true);
+        let exceptionId = $('#exception-id--confirm-exception').val();
+        let that = this;
+        var url = $("#url-confirm-order").val();
+
+        console.log(exceptionId, url);
+
+
+        $.ajax({
+            url: url,
+            method: "POST",
+            data: {
+                exception_id: exceptionId,
+            },
+            beforeSend:function() {
+                $(".exception-loading-icon").css('display', 'inline-block');
+            },
+            success: function (response) {
+                if($("#confirm-exception-modal").has('in')){
+                    $("#confirm-exception-modal").modal('toggle');
+                }
+                $("#exception").prop('disabled', false);
+                that.reloadExceptionTable();
+            },
+            error: function () {
+                $("#exception").prop('disabled', false);
+                alert('Something error');
+            }
+        });
+    }
 
     oc_ezdefi_exception.prototype.assignException = function () {
         $("#btn-assign-exception").prop('disabled', true);

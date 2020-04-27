@@ -215,6 +215,29 @@
                 </div>
             </div>
 
+            <div id="confirm-exception-modal" class="modal fade" role="dialog">
+                <div class="modal-dialog">
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title"><?php echo $text_confirm_order ?></h4>
+                        </div>
+                        <div class="modal-body">
+                            123123
+                            <p><?php echo $text_ask_confirm_order ?></p>
+                            <input type="hidden" id="exception-id--confirm-exception">
+                        </div>
+                        <div class="modal-footer" style="text-align: center">
+                            <button type="button" class="btn btn-danger" data-dismiss="modal"><?php echo $button_close ?></button>
+                            <button type="button" class="btn btn-primary" id="btn-confirm-exception">
+                                <i class="fa fa-refresh fa-spin exception-loading-icon"></i><?php echo $button_yes ?>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div id="assign-exception-modal" class="modal fade" role="dialog">
                 <div class="modal-dialog">
                     <!-- Modal content-->

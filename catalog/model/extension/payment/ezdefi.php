@@ -145,13 +145,24 @@ class ModelExtensionPaymentEzdefi extends Model {
 
     // -----------------------------------------------------------Curl--------------------------------------------------------------------
     public function createPayment($param) {
-        return $this->sendCurl('/payment/create', 'POST', $param);
+        $payment = $this->sendCurl('/payment/create', 'POST', $param);
+        if(json_decode($payment)->code == 1) {
+            return json_decode($payment)->data;
+        } else {
+            return false;
+        }
     }
 
     public function getWebsiteData () {
         $public_key = $api_key = $this->config->get('ezdefi_public_key');
         $website_data = $this->sendCurl('/website/' . $public_key, 'GET');
-        return json_decode($website_data)->data;
+
+        if(json_decode($website_data)->code == 1) {
+            return json_decode($website_data)->data;
+        } else {
+            return false;
+        }
+
     }
 
     public function getCurrency($id, $coins = null) {
