@@ -75,15 +75,5 @@ $(function () {
     };
 
 
-    oc_ezdefi_admin.prototype.validateConfigForm = function () {
-        var apiKey = $(selectors.apiKeyInput).val();
-        var publicKey = $(selectors.publicKeyInput).val();
-        $(selectors.apiKeyInput).val('');
-        $(selectors.publicKeyInput).val('');
-
-        $(selectors.apiKeyInput).val(apiKey);
-        $(selectors.publicKeyInput).val(publicKey);
-    };
-
     new oc_ezdefi_admin();
 });

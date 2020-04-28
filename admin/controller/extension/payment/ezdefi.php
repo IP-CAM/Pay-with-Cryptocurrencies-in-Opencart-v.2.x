@@ -22,9 +22,9 @@ class ControllerExtensionPaymentEzdefi extends Controller
         $data['url_search_exceptions']   = $this->url->link('extension/payment/ezdefi/searchExceptions', 'user_token=' . $this->session->data['user_token'], true);
         $data['url_get_order_pending']   = $this->url->link('extension/payment/ezdefi/getAllOrderPending', 'user_token=' . $this->session->data['user_token'], true);
         $data['url_delete_exception']    = $this->url->link('extension/payment/ezdefi/deleteException', 'user_token=' . $this->session->data['user_token'], true);
-        $data['url_revert_order']        = $this->url->link('extension/payment/ezdefi/revertOrder', 'user_token=' . $this->session->data['user_token'], true);
         $data['url_assign_order']        = $this->url->link('extension/payment/ezdefi/assignOrder', 'user_token=' . $this->session->data['user_token'], true);
         $data['url_confirm_order']       = $this->url->link('extension/payment/ezdefi/confirmOrder', 'user_token=' . $this->session->data['user_token'], true);
+        $data['url_revert_exception']    = $this->url->link('extension/payment/ezdefi/revertException', 'user_token=' . $this->session->data['user_token'], true);
 
         if ($this->config->has('payment_ezdefi_status')) {
             $data['payment_ezdefi_status'] = $this->config->get('payment_ezdefi_status');
@@ -63,24 +63,10 @@ class ControllerExtensionPaymentEzdefi extends Controller
         $this->document->addScript('view/javascript/ezdefi/jquery.validate.min.js');
         $this->document->addScript('view/javascript/ezdefi/pagination.min.js');
         $this->document->addScript('view/javascript/ezdefi/ezdefi.js');
+        $this->document->addScript('view/javascript/ezdefi/ezdefi-log.js');
         $this->document->addScript('view/javascript/ezdefi/ezdefi-exception.js');
+        $this->document->addScript('view/javascript/ezdefi/ezdefi-exception-history.js');
 
-        // API login
-        $this->load->model('user/api');
-
-        $api_info = $this->model_user_api->getApi($this->config->get('config_api_id'));
-
-        if ($api_info && $this->user->hasPermission('modify', 'sale/order')) {
-            $session = new Session($this->config->get('session_engine'), $this->registry);
-            $session->start();
-            $this->model_user_api->deleteApiSessionBySessonId($session->getId());
-            $this->model_user_api->addApiSession($api_info['api_id'], $session->getId(), $this->request->server['REMOTE_ADDR']);
-            $session->data['api_id'] = $api_info['api_id'];
-            $api_token               = $session->getId();
-        } else {
-            $api_token = '';
-        }
-        $data['url_add_order_history'] = HTTPS_CATALOG . 'index.php?route=api/order/history&api_token=' . $api_token;
 
         $data['header']      = $this->load->controller('common/header');
         $data['column_left'] = $this->load->controller('common/column_left');
@@ -199,11 +185,21 @@ class ControllerExtensionPaymentEzdefi extends Controller
         $keyword_amount   = isset($this->request->get['amount']) ? $this->request->get['amount'] : '';
         $keyword_order_id = isset($this->request->get['order_id']) ? $this->request->get['order_id'] : '';
         $keyword_email    = isset($this->request->get['email']) ? $this->request->get['email'] : '';
+        $section          = isset($this->request->get['section']) ? $this->request->get['section'] : '';
 
-        $exceptions       = $this->model_extension_payment_ezdefi->searchExceptions($keyword_amount, $keyword_order_id, $keyword_email, $currency, $page, self::LIMIT_EXCEPTION_IN_PAGE);
-        $total_exceptions = $this->model_extension_payment_ezdefi->getTotalException($keyword_amount, $keyword_order_id, $keyword_email, $currency);
+        $total_exceptions = null;
+        if($section == 1) {
+            $exceptions = $this->model_extension_payment_ezdefi->searchException($keyword_amount, $keyword_order_id, $keyword_email, $currency, $page, self::LIMIT_EXCEPTION_IN_PAGE);
+            $total_exceptions = $this->model_extension_payment_ezdefi->getTotalException($keyword_amount, $keyword_order_id, $keyword_email, $currency);
+        } elseif($section == 2) {
+            $exceptions = $this->model_extension_payment_ezdefi->searchExceptionHistories($keyword_amount, $keyword_order_id, $keyword_email, $currency, $page, self::LIMIT_EXCEPTION_IN_PAGE);
+            $total_exceptions = $this->model_extension_payment_ezdefi->getTotalExceptionHistories($keyword_amount, $keyword_order_id, $keyword_email, $currency);
+        } elseif($section == 3) {
+            $exceptions = $this->model_extension_payment_ezdefi->searchLogs($keyword_amount, $keyword_order_id, $keyword_email, $currency, $page, self::LIMIT_EXCEPTION_IN_PAGE);
+            $total_exceptions = $this->model_extension_payment_ezdefi->getTotalLog($keyword_amount, $keyword_order_id, $keyword_email, $currency);
+        }
+
         $result           = ['exceptions' => $exceptions, 'total_exceptions' => $total_exceptions];
-
         return $this->response->setOutput(json_encode($result));
     }
 
@@ -214,8 +210,10 @@ class ControllerExtensionPaymentEzdefi extends Controller
         $exception_id = isset($this->request->post['exception_id']) ? $this->request->post['exception_id'] : '';
         $exception    = $this->model_extension_payment_ezdefi->getExceptionById($exception_id);
 
+        $this->model_extension_payment_ezdefi->updateException(['id'=>$exception['id']], ['order_assigned' => $exception['order_id']]);
+        $this->model_extension_payment_ezdefi->updateException(['order_id'=>$exception['order_id']], ['confirmed' => 1]);
+
         $this->model_extension_payment_ezdefi->setProcessingForOrder($exception['order_id']);
-        $this->model_extension_payment_ezdefi->deleteExceptionByOrderId($exception['order_id']);
 
         return $this->response->setOutput(json_encode(['status' => 'success']));
     }
@@ -228,23 +226,37 @@ class ControllerExtensionPaymentEzdefi extends Controller
         $order_id_to_assign = isset($this->request->post['order_id']) ? $this->request->post['order_id'] : '';
         $exception          = $this->model_extension_payment_ezdefi->getExceptionById($exception_id);
 
-        $this->model_extension_payment_ezdefi->setProcessingForOrder($order_id_to_assign);
-        if ($exception['order_id']) {
-            $this->model_extension_payment_ezdefi->deleteExceptionByOrderId($exception['order_id']);
+        $this->model_extension_payment_ezdefi->updateException(['id'=>$exception['id']], ['order_assigned' => $order_id_to_assign, 'confirmed' => 1]);
+        if($exception['order_id']  && $order_id_to_assign  != $exception['order_id']) {
+            $this->model_extension_payment_ezdefi->setPendingForOrder($exception['order_id']);
         }
-        $this->model_extension_payment_ezdefi->deleteExceptionById($exception_id);
+        $this->model_extension_payment_ezdefi->setProcessingForOrder($order_id_to_assign);
+
+        if(!$exception['order_id']) {
+            $this->model_extension_payment_ezdefi->deleteExceptionByOrderId($order_id_to_assign);
+        }
 
         return $this->response->setOutput(json_encode(['status' => 'success']));
     }
 
-    public function revertOrder()
+    public function revertException()
     {
         $this->load->model('extension/payment/ezdefi');
         $exception_id = isset($this->request->post['exception_id']) ? $this->request->post['exception_id'] : '';
-        $exception    = $this->model_extension_payment_ezdefi->getExceptionById($exception_id);
+        $exception = $this->model_extension_payment_ezdefi->getExceptionById($exception_id);
 
-        $this->model_extension_payment_ezdefi->setPendingForOrder($exception['order_id']);
-        $this->model_extension_payment_ezdefi->revertOrderException($exception_id);
+        $this->model_extension_payment_ezdefi->updateException(['id'=>$exception['id']], ['order_assigned' => "NULL"]);
+
+        if($exception['order_id'] && $exception['order_assigned'] != $exception['order_id']) {
+            $this->model_extension_payment_ezdefi->setProcessingForOrder($exception['order_id']);
+        }
+        $this->model_extension_payment_ezdefi->setPendingForOrder($exception['order_assigned']);
+
+        if(!$exception['explorer_url']) {
+            $this->model_extension_payment_ezdefi->updateException(['order_id' => $exception['order_id']], ['confirmed' => 0]);
+        } else {
+            $this->model_extension_payment_ezdefi->updateException(['id' => $exception['id']], ['confirmed' => 0]);
+        }
 
         return $this->response->setOutput(json_encode(['status' => 'success']));
     }

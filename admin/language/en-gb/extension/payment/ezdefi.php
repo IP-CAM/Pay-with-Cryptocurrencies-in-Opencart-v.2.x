@@ -9,7 +9,7 @@ $_['config_gateway_api_url_default'] = 'https://merchant-api.ezdefi.com/api';
 $_['entry_enable_extension'] = 'Enable/Disable';
 $_['entry_gateway_api_url'] = 'Gateway API URL';
 $_['entry_api_key'] = 'API key';
-$_['entry_site_id'] = 'Site ID';
+$_['entry_public_key'] = 'Site ID';
 
 //Button
 $_['button_add'] = 'Add more';
@@ -18,12 +18,19 @@ $_['button_save'] = 'Save';
 $_['button_yes'] = 'Yes';
 
 // Tab
-$_['tab_edit_general'] = 'ezDeFi';
+$_['tab_edit_general'] = 'Config';
 $_['tab_edit_coin_config'] = 'Coin config';
 $_['tab_config'] = 'Config';
-$_['tab_exception'] = 'ezDeFi exception management';
+$_['tab_exception_pending'] = 'Exception management (Pending)';
+$_['tab_exception_confirmed'] = 'Exception management (Confirmed)';
+$_['tab_exception_archived'] = 'Exception management (Archived)';
 
 // text
+$_['text_exception_management'] = 'Exception Management';
+$_['text_pending'] = 'Pending';
+$_['text_confirmed'] = 'Confirmed';
+$_['text_archived'] = 'Archived';
+
 $_['text_symbol'] = 'Name';
 $_['text_name'] = 'Full Name';
 $_['text_discount'] = 'Discount';
@@ -43,12 +50,15 @@ $_['text_simple_method_description'] = 'This method will adjust payment amount o
 $_['text_recommend_variation'] = '0.01';
 $_['edit_success'] = 'Edit success';
 $_['delete_success'] = 'Delete success';
+$_['text_all_coin'] = 'All coin';
 $_['text_view_transaction'] = 'View Transaction Detail';
 $_['text_delete_exception'] = 'Delete exception';
 $_['text_confirm_order'] = 'Confirm Order';
+$_['text_assign_order'] = 'Assign Order';
 $_['text_revert_order'] = 'Revert Order';
 $_['text_ask_delete_exception'] = 'Do you want to delete this exception';
 $_['text_ask_confirm_order'] = 'Do you want to confirm this order';
+$_['text_ask_assign_order'] = 'Do you want to assign this order';
 $_['text_ask_revert_order'] = 'Do you want to revert this order';
 $_['text_ordinal']  = '#';
 $_['text_currency']  = 'Currency';
@@ -74,6 +84,9 @@ $_['text_revert'] = 'Revert';
 $_['text_assign'] = 'Assign';
 $_['text_register'] = 'Register to get API Key';
 $_['text_link_register'] = 'https://merchant.ezdefi.com/';
+$_['text_old_order'] = 'Old order';
+$_['text_action'] = 'Action';
+$_['text_payment_info'] = 'Payment info';
 
 //warning
 $_['warning_change_decimal'] = 'Changing Decimal can cause to payment interruption';

@@ -3,26 +3,17 @@
     margin-bottom: 5px;
 }
 .ezdefi-btn-tab {
-    color: #007bff;
-    flex:50%;
-    text-align: center;
-    background: #fff;
-    padding: 10px;
-    border-bottom: 1px solid #888;
+    display: block;
+    width: 100%;
+    padding: 5px 15px;
+    margin: 0;
 }
 
 .ezdefi-btn-tab:hover {
-    color: #00509b;
-    border-top: 1px solid #aaa;
-    border-left: 1px solid #aaa;
-    border-right: 1px solid #aaa;
-    border-radius: 4px 4px 0 0;
+    background-color: #eee;
 }
 
 .ezdefi-admin-content-box {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto auto auto;
 }
 
 .ezdefi-btn-config-tab {
@@ -30,29 +21,65 @@
     grid-row: 1/2;
 }
 
-.ezdefi-btn-exception-tab {
+.ezdefi-btn-new-exception-tab {
     grid-column: 2/3;
     grid-row: 1/2
-
 }
+
+.ezdefi-btn-exception-history-tab {
+    grid-column: 3/4;
+    grid-row: 1/2
+}
+
+.ezdefi-btn-exception-tab {
+    grid-column: 4/5;
+    grid-row: 1/2
+}
+
+
+.config-content-tab,
+.exception-content-tab,
+.exception-history-content,
+.new-exception-content
+{
+    display: none;
+}
+
 .config-content-tab {
-    grid-column: 1/3;
+    grid-column: 1/-1;
     grid-row: 2/3;
 }
 
 .exception-content-tab {
-    grid-column: 1/3;
+    grid-column: 1/-1;
     grid-row: 3/4;
 }
 
-#ezdefi-config-tab:checked ~ .ezdefi-btn-config-tab, #ezdefi-exception-tab:checked ~ .ezdefi-btn-exception-tab {
+.exception-history-content {
+    grid-column: 1/-1;
+    grid-row: 4/5;
+}
+
+.new-exception-content {
+    grid-column: 1/-1;
+    grid-row: 5/6;
+}
+
+#ezdefi-config-tab:checked ~ .ezdefi-btn-config-tab,
+#ezdefi-exception-tab:checked ~ .ezdefi-btn-exception-tab,
+#ezdefi-exception-history-tab:checked ~ .ezdefi-btn-exception-history-tab,
+#ezdefi-new-exception-tab:checked ~ .ezdefi-btn-new-exception-tab{
     color: #333;
     border: 1px solid #888;
     border-radius: 4px 4px 0 0;
     border-bottom-color: transparent;
 }
 
-#ezdefi-config-tab:checked ~ .config-content-tab, #ezdefi-exception-tab:checked ~ .exception-content-tab {
+#ezdefi-config-tab:checked ~ .config-content-tab,
+#ezdefi-exception-tab:checked ~ .exception-content-tab,
+#ezdefi-exception-history-tab:checked~ .exception-history-content,
+#ezdefi-new-exception-tab:checked~ .new-exception-content
+{
     display: block;
 }
 
@@ -66,9 +93,7 @@
     text-overflow: ellipsis;
 }
 
-.config-content-tab, .exception-content-tab {
-    display: none;
-}
+
 
 /*config*/
 .coin-config__logo {
@@ -186,10 +211,10 @@
 .exception-order-box {
     display: flex;
     margin-bottom: 10px;
-    justify-content: space-around;
+    /*justify-content: space-around;*/
 }
 .exception-order-info {
-    width: 500px;
+    /*width: 500px;*/
 }
 .exception-order-button-box {
     display: flex;

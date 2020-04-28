@@ -1,12 +1,14 @@
 {{ header }} {{ column_left }}
 <div id="content">
-    <input type="hidden" id="url-delete-exception" value="{{ url_delete_exception }}">
     <input type="hidden" id="url-add-order-history" value="{{ url_add_order_history }}">
     <input type="hidden" id="url-delete-exception-by-order-id" value="{{ url_delete_exception_by_order_id }}">
     <input type="hidden" id="url-get-order-pending" value="{{ url_get_order_pending }}">
-    <input type="hidden" id="url-revert-order" value="{{ url_revert_order }}">
+    <input type="hidden" id="url-delete-exception" value="{{ url_delete_exception }}">
     <input type="hidden" id="url-confirm-order" value="{{ url_confirm_order }}">
     <input type="hidden" id="url-assign-order" value="{{ url_assign_order }}">
+    <input type="hidden" id="url_assign_exception" value="{{ url_assign_exception }}">
+    <input type="hidden" id="url-revert-exception" value="{{ url_revert_exception }}">
+    <input type="hidden" id="url-search-exceptions" value="{{ url_search_exceptions  }}">
 
     {# Ezdefi header #}
     <div class="page-header">
@@ -28,11 +30,30 @@
 
     <div class="container-fluid ezdefi-admin-content-box">
         {# Tab choose setting or show payment exception #}
+{#        <input type="radio" id="ezdefi-config-tab" name="btn-radio-choose-tab" class="hidden tab-radio-input" checked data-tab="config">#}
+{#        <input type="radio" id="ezdefi-exception-tab" name="btn-radio-choose-tab" class="hidden tab-radio-input" data-tab="exception">#}
+{#        <label class="ezdefi-btn-tab ezdefi-btn-config-tab" for="ezdefi-config-tab"> {{ tab_config }} </label>#}
+{#        <label class="ezdefi-btn-tab ezdefi-btn-exception-tab" for="ezdefi-exception-tab"> {{ tab_exception }} </label>#}
         <input type="radio" id="ezdefi-config-tab" name="btn-radio-choose-tab" class="hidden tab-radio-input" checked data-tab="config">
+        <input type="radio" id="ezdefi-exception-history-tab" name="btn-radio-choose-tab" class="hidden tab-radio-input" data-tab="exception-history">
+        <input type="radio" id="ezdefi-new-exception-tab" name="btn-radio-choose-tab" class="hidden tab-radio-input" data-tab="new-exception">
         <input type="radio" id="ezdefi-exception-tab" name="btn-radio-choose-tab" class="hidden tab-radio-input" data-tab="exception">
-        <label class="ezdefi-btn-tab ezdefi-btn-config-tab" for="ezdefi-config-tab"> {{ tab_config }} </label>
-        <label class="ezdefi-btn-tab ezdefi-btn-exception-tab" for="ezdefi-exception-tab"> {{ tab_exception }} </label>
+
         {# End tab choose setting or show payment exception #}
+
+
+        <div class="btn-group">
+            <label type="button" class="btn btn-primary" for="ezdefi-config-tab"> {{ tab_edit_general }} </label>
+            <div class="btn-group">
+                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                    {{ text_exception_management }}<span class="caret"></span></button>
+                <ul class="dropdown-menu" role="menu">
+                    <li><label class="ezdefi-btn-tab" for="ezdefi-new-exception-tab"> {{ text_pending }} </label></li>
+                    <li><label class="ezdefi-btn-tab"  for="ezdefi-exception-history-tab"> {{ text_confirmed }} </label></li>
+                    <li><label class="ezdefi-btn-tab"  for="ezdefi-exception-tab"> {{ text_archived }} </label></li>
+                </ul>
+            </div>
+        </div>
 
         <div class="panel panel-default config-content-tab">
             {# Setting form #}
@@ -80,7 +101,7 @@
             <input type="hidden" id="current-page-exception" value="1">
             <input type="hidden" id="total-number-exception" value="">
             <div class="panel-heading">
-                <h3 class="panel-title"><i class="fa fa-pencil"></i> {{tab_edit_general}} </h3>
+                <h3 class="panel-title"><i class="fa fa-pencil"></i> {{ tab_exception_archived }} </h3>
             </div>
             <div class="panel-body">
                 <div class="exception-filter-currency-box">
@@ -88,28 +109,106 @@
                         <label for="filter-exception-by-currency-all" class="margin-top-5"> All coin </label>
                         <input type="radio" name="filter-by-currency" value="" id="filter-exception-by-currency-all" checked>
                     </div>
-                    {% for coin in coins %}
-                        <div class="exception-filter-currency-item">
-                            <label for="filter-exception-by-currency-{{ coin.token.symbol }}"><img src="{{ coin.token.logo }}" alt="" class="small-logo"> {{ coin.token.symbol }}</label>
-                            <input type="radio" name="filter-by-currency" value="{{ coin.token.symbol }}" id="filter-exception-by-currency-{{ coin.token.symbol }}">
-                        </div>
-                    {% endfor %}
-
+                    {%  if coins  %}
+                        {% for coin in coins %}
+                            <div class="exception-filter-currency-item">
+                                <label for="filter-exception-by-currency-{{ coin['token']['symbol'] }}"><img src="{{ coin['token']['logo'] }}" alt="" class="small-logo"> {{ coin['token']['symbol'] }}</label>
+                                <input type="radio" name="filter-by-currency" value="{{ coin['token']['symbol'] }}" id="filter-exception-by-currency-{{ coin['token']['symbol'] }}">
+                            </div>
+                        {% endfor %}
+                    {% endif %}
                 </div>
                 <br>
                 <div class="ezdefi-search-box">
-                    <input type="text" id="exception-search-by-amount" placeholder="Enter amount" class="search-exception-input">
-                    <input type="text" id="exception-search-by-order" placeholder="Enter order id" class="search-exception-input">
-                    <input type="text" id="exception-search-by-email" placeholder="Enter email" class="search-exception-input">
-                    <button class="btn" id="btn-search-exception"><i class="fa fa-search"></i></button>
-
+                    <input type="text" id="log-search-by-amount" placeholder="Enter amount" class="search-exception-input">
+                    <input type="text" id="log-search-by-order" placeholder="Enter order id" class="search-exception-input">
+                    <input type="text" id="log-search-by-email" placeholder="Enter email" class="search-exception-input">
+                    <button class="btn" id="btn-search-log"><i class="fa fa-search"></i></button>
                 </div>
                 <div class="data-container"></div>
-                <div id="exception-content-box">
+                <div id="log-content-box">
                 </div>
             </div>
 
-            <div id="delete-order-exception" class="modal fade" role="dialog">
+            <div id="delete-log-modal" class="modal fade" role="dialog">
+                <div class="modal-dialog">
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">{{ text_delete_exception }}</h4>
+                        </div>
+                        <div class="modal-body">
+                            <p>{{ text_ask_delete_exception }}</p>
+                            <input type="hidden" id="exception-id--log-delete">
+                        </div>
+                        <div class="modal-footer" style="text-align: center">
+                            <button type="button" class="btn btn-danger" data-dismiss="modal">{{ button_close }}</button>
+                            <button type="button" class="btn btn-primary" id="btn-delete-log" data-url-delete="{{ url_delete_exception }}">
+                                <i class="fa fa-refresh fa-spin exception-loading-icon exception-delete-loading"></i>{{ button_yes }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="confirm-log-modal" class="modal fade" role="dialog">
+                <div class="modal-dialog">
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">{{ text_confirm_order }}</h4>
+                        </div>
+                        <div class="modal-body">
+                            <p>{{ text_ask_confirm_order }}</p>
+                            <input type="hidden" id="exception-id--confirm-log">
+                        </div>
+                        <div class="modal-footer" style="text-align: center">
+                            <button type="button" class="btn btn-danger" data-dismiss="modal">{{ button_close }}</button>
+                            <button type="button" class="btn btn-primary" id="btn-confirm-log" data-url-delete="{{ url_delete_exception }}" data-url-add-order-history="{{ url_add_order_history }}">
+                                <i class="fa fa-refresh fa-spin exception-loading-icon"></i>{{ button_yes }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===========================================new excpetion==================================== -->
+        <div class="panel panel-defaul new-exception-content">
+            <input type="hidden" id="current-page-new-exception" value="1">
+            <input type="hidden" id="total-number-new-exception" value="">
+            <div class="panel-heading">
+                <h3 class="panel-title"><i class="fa fa-pencil"></i> {{ tab_exception_pending }} </h3>
+            </div>
+            <div class="panel-body">
+                <div class="exception-filter-currency-box">
+                    <div class="exception-filter-currency-item">
+                        <label for="filter-exception-by-currency-all" class="margin-top-5"> All coin </label>
+                        <input type="radio" name="new-exception-search-by-currency" value="" id="filter-exception-by-currency-all" checked>
+                    </div>
+                    {%  if coins  %}
+                        {% for coin in coins %}
+                            <div class="exception-filter-currency-item">
+                                <label for="filter-exception-by-currency-{{ coin['token']['symbol'] }}"><img src="{{ coin['token']['logo'] }}" alt="" class="small-logo"> {{ coin['token']['symbol'] }}</label>
+                                <input type="radio" name="new-exception-search-by-currency" value="{{ coin['token']['symbol'] }}" id="filter-exception-by-currency-{{ coin['token']['symbol'] }}">
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                <br>
+                <div class="ezdefi-search-box">
+                    <input type="text" id="new-exception-search-by-amount" placeholder="Enter amount" class="search-exception-input">
+                    <input type="text" id="new-exception-search-by-order" placeholder="Enter order id" class="search-exception-input">
+                    <input type="text" id="new-exception-search-by-email" placeholder="Enter email" class="search-exception-input">
+                    <button class="btn" id="btn-search-new-exception"><i class="fa fa-search"></i></button>
+                </div>
+                <div class="data-container"></div>
+                <div id="new-exception-content-box">
+                </div>
+            </div>
+
+            <div id="delete-exception-modal" class="modal fade" role="dialog">
                 <div class="modal-dialog">
                     <!-- Modal content-->
                     <div class="modal-content">
@@ -130,7 +229,8 @@
                     </div>
                 </div>
             </div>
-            <div id="confirm-paid-order-exception" class="modal fade" role="dialog">
+
+            <div id="confirm-exception-modal" class="modal fade" role="dialog">
                 <div class="modal-dialog">
                     <!-- Modal content-->
                     <div class="modal-content">
@@ -139,43 +239,121 @@
                             <h4 class="modal-title">{{ text_confirm_order }}</h4>
                         </div>
                         <div class="modal-body">
+                            123123
                             <p>{{ text_ask_confirm_order }}</p>
-                            <input type="hidden" id="exception-id--confirm">
-                            <input type="hidden" id="exception-order-id--confirm">
-                            <input type="checkbox" id="confirm-dialog-assign" class="hidden">
-                            <input type="hidden" id="exception-old-order-id--confirm">
+                            <input type="hidden" id="exception-id--confirm-exception">
                         </div>
                         <div class="modal-footer" style="text-align: center">
                             <button type="button" class="btn btn-danger" data-dismiss="modal">{{ button_close }}</button>
-                            <button type="button" class="btn btn-primary" id="btn-confirm-paid-exception" data-url-delete="{{ url_delete_exception }}" data-url-add-order-history="{{ url_add_order_history }}">
-                                <i class="fa fa-refresh fa-spin exception-loading-icon exception-loading-icon__confirm-paid"></i>{{ button_yes }}
+                            <button type="button" class="btn btn-primary" id="btn-confirm-exception">
+                                <i class="fa fa-refresh fa-spin exception-loading-icon"></i>{{ button_yes }}
                             </button>
                         </div>
                     </div>
                 </div>
             </div>
-            <div id="modal-revert-order-exception" class="modal fade" role="dialog">
+
+            <div id="assign-exception-modal" class="modal fade" role="dialog">
                 <div class="modal-dialog">
                     <!-- Modal content-->
                     <div class="modal-content">
                         <div class="modal-header">
                             <button type="button" class="close" data-dismiss="modal">&times;</button>
-                            <h4 class="modal-title">{{ text_revert_order }}</h4>
+                            <h4 class="modal-title"> {{ text_assign_order }} </h4>
                         </div>
                         <div class="modal-body">
-                            <p>{{ text_ask_revert_order }}</p>
-                            <input type="hidden" id="exception-id--revert">
-                            <input type="hidden" id="exception-order-id--revert">
+                            <p> {{ text_ask_assign_order }} </p>
+                            <input type="hidden" id="exception-order-id--assign">
+                            <input type="hidden" id="exception-id--assign">
                         </div>
                         <div class="modal-footer" style="text-align: center">
                             <button type="button" class="btn btn-danger" data-dismiss="modal">{{ button_close }}</button>
-                            <button type="button" class="btn btn-primary" id="btn-revert-order" data-url-delete="{{ url_delete_exception }}" data-url-add-order-history="{{ url_add_order_history }}">
-                                <i class="fa fa-refresh fa-spin exception-loading-icon exception-loading-icon__revert"></i>{{ button_yes }}
+                            <button type="button" class="btn btn-primary" id="btn-assign-exception" data-url-assign="{{ url_assign_exception }}">
+                                <i class="fa fa-refresh fa-spin exception-loading-icon exception-delete-loading"></i>{{ button_yes }}
                             </button>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
+
+        <div class="panel panel-defaul exception-history-content">
+            <input type="hidden" id="current-page-exception-history" value="1">
+            <input type="hidden" id="total-number-exception-history" value="">
+            <div class="panel-heading">
+                <h3 class="panel-title"><i class="fa fa-pencil"></i> {{ tab_exception_confirmed }} </h3>
+            </div>
+            <div class="panel-body">
+                <div class="exception-filter-currency-box">
+                    <div class="exception-filter-currency-item">
+                        <label for="filter-exception-by-currency-all" class="margin-top-5"> {{ text_all_coin }} </label>
+                        <input type="radio" name="exception-history-search-by-currency" value="" id="filter-exception-by-currency-all" checked>
+                    </div>
+                    {%  if coins  %}
+                        {% for coin in coins %}
+                            <div class="exception-filter-currency-item">
+                                <label for="filter-exception-by-currency-{{ coin['token']['symbol'] }}"><img src="{{ coin['token']['logo'] }}" alt="" class="small-logo"> {{ coin['token']['symbol'] }}</label>
+                                <input type="radio" name="exception-history-search-by-currency" value="{{ coin['token']['symbol'] }}" id="filter-exception-by-currency-{{ coin['token']['symbol'] }}">
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                <br>
+                <div class="ezdefi-search-box">
+                    <input type="text" id="exception-history-search-by-amount" placeholder="Enter amount" class="search-exception-input">
+                    <input type="text" id="exception-history-search-by-order" placeholder="Enter order id" class="search-exception-input">
+                    <input type="text" id="exception-history-search-by-email" placeholder="Enter email" class="search-exception-input">
+                    <button class="btn" id="btn-search-exception-history"><i class="fa fa-search"></i></button>
+                </div>
+                <div class="data-container"></div>
+                <div id="exception-history-content-box">
+                </div>
+            </div>
+
+            <div id="delete-exception-modal--history" class="modal fade" role="dialog">
+                <div class="modal-dialog">
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">{{ text_delete_exception }}</h4>
+                        </div>
+                        <div class="modal-body">
+                            <p>{{ text_ask_delete_exception }}</p>
+                            <input type="hidden" id="exception-id--history-delete">
+                        </div>
+                        <div class="modal-footer" style="text-align: center">
+                            <button type="button" class="btn btn-danger" data-dismiss="modal">{{ button_close }}</button>
+                            <button type="button" class="btn btn-primary" id="btn-delete-exception-history" data-url-delete="{{ url_delete_exception }}">
+                                <i class="fa fa-refresh fa-spin exception-loading-icon exception-delete-loading"></i>{{ button_yes }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="revert-exception-modal" class="modal fade" role="dialog">
+                <div class="modal-dialog">
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title"> {{ text_revert_order }} </h4>
+                        </div>
+                        <div class="modal-body">
+                            <p> {{ text_ask_revert_order }} </p>
+                            <input type="hidden" id="exception-id--revert">
+                        </div>
+                        <div class="modal-footer" style="text-align: center">
+                            <button type="button" class="btn btn-danger" data-dismiss="modal">{{ button_close }}</button>
+                            <button type="button" class="btn btn-primary" id="btn-revert-exception-history">
+                                <i class="fa fa-refresh fa-spin exception-loading-icon exception-delete-loading"></i>{{ button_yes }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         {# End payment exception #}
     </div>
 </div>
@@ -203,6 +381,9 @@
         confirmPaid: '{{ text_confirm_paid }}',
         revert: '{{ text_revert }}',
         assign: '{{ text_assign }}',
+        old_order: '{{ text_old_order }}',
+        action: '{{ text_action }}',
+        payment_info: '{{ text_payment_info }}'
     }
 </script>
 {{ footer }}
