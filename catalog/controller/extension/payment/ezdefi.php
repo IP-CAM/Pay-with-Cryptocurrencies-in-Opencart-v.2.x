@@ -45,14 +45,15 @@ class ControllerExtensionPaymentEzdefi extends Controller
         $callback          = $this->url->link('extension/payment/ezdefi/callbackConfirmOrder', '', true);
         $coin_id           = $this->request->get['coin_id'];
         $coin              = $this->model_extension_payment_ezdefi->getCurrency($coin_id, json_decode(json_encode($website_data->coins), true));
-        $amount            = round($this->model_extension_payment_ezdefi->getExchange($order_info['currency_code'], $coin['token']['symbol']) * $order_info['total'] * (100 - $coin['discount']) / 100, $coin['decimal']);
+        $amount            = $this->model_extension_payment_ezdefi->getExchange($order_info['currency_code'], $coin['token']['symbol']) * $order_info['total'] * (100 - $coin['discount']) / 100;
+        $value             = $this->model_extension_payment_ezdefi->convertExponentialToFloat($amount, $coin['decimal']);
 
         if ($enable_simple_pay) {
             $params       = [
                 'uoid'     => $order_info['order_id'].'-1',
                 'amountId' => true,
                 'coinId'   => $coin['_id'],
-                'value'    => $amount,
+                'value'    => $value,
                 'to'       => $coin['walletAddress'],
                 'currency' => $coin['token']['symbol'] . ':' . $coin['token']['symbol'],
                 'safedist' => $coin['blockConfirmation'],
@@ -60,6 +61,7 @@ class ControllerExtensionPaymentEzdefi extends Controller
                 'callback' => $callback
             ];
             $payment_info = $this->model_extension_payment_ezdefi->createPayment($params);
+
             $payment_data = json_decode($payment_info)->data;
             if ($payment_info) {
                 $this->model_extension_payment_ezdefi->addException($order_info['order_id'], strtoupper($coin['token']['symbol']), $payment_data->value * pow(10, - $payment_data->decimal), $coin['expiration'], 1, null, null, $payment_data->_id);
@@ -85,12 +87,13 @@ class ControllerExtensionPaymentEzdefi extends Controller
         $callback          = $this->url->link('extension/payment/ezdefi/callbackConfirmOrder', '', true);
         $coin_id           = $this->request->get['coin_id'];
         $coin              = $this->model_extension_payment_ezdefi->getCurrency($coin_id, json_decode(json_encode($website_data->coins), true));
+        $value             = $this->model_extension_payment_ezdefi->convertExponentialToFloat($order_info['total'] * (100 - $coin['discount']) / 100);
 
         if ($enable_ezdefi_pay) {
             $params       = [
                 'uoid'     => $order_info['order_id'].'-0',
                 'coinId'   => $coin['_id'],
-                'value'    => $order_info['total'] * (100 - $coin['discount']) / 100,
+                'value'    => $value,
                 'to'       => $coin['walletAddress'],
                 'currency' => $order_info['currency_code'] . ':' . $coin['token']['symbol'],
                 'safedist' => $coin['blockConfirmation'],
@@ -168,4 +171,21 @@ class ControllerExtensionPaymentEzdefi extends Controller
         return $this->response->setOutput(json_encode($response));
     }
 
+    private function convertExponentialToFloat($amount) {
+        $value = sprintf('%.8f',$amount);
+        $afterDot = explode('.', $value)[1];
+        $lengthToCut = 0;
+        for($i = strlen($afterDot) -1; $i >=0; $i--) {
+            if($afterDot[$i] === '0') {
+                $lengthToCut++;
+            } else {
+                break;
+            }
+        }
+        $value = substr($value, 0, strlen($value) - $lengthToCut);
+        if ($value [strlen($value ) - 1] === '.') {
+            $value  = substr($value , 0, -1);
+        }
+        return $value;
+    }
 }

@@ -40,12 +40,36 @@ class ModelExtensionPaymentEzdefi extends Model {
             foreach ($exchangesData as $currencyExchange) {
                 foreach ($currencies as $key => $currency) {
                     if ($currency->token->symbol == $currencyExchange->token) {
-                        $currencies[$key]->token->price = round($currencyExchange->amount * ((100 - $currency->discount) / 100), self::DEFAULT_DECIMAL_LIST_COIN);
+                        $price = $currencyExchange->amount * ((100 - $currency->discount) / 100);
+                        $currencies[$key]->token->price = $this->convertExponentialToFloat($price);
                     }
                 }
             }
         }
         return $currencies;
+    }
+
+    public function convertExponentialToFloat($amount, $decimal = null) {
+        if($decimal) {
+            $value = sprintf('%.'.$decimal.'f',$amount);
+        }
+        else {
+            $value = sprintf('%.10f',$amount);
+        }
+        $afterDot = explode('.', $value)[1];
+        $lengthToCut = 0;
+        for($i = strlen($afterDot) -1; $i >=0; $i--) {
+            if($afterDot[$i] === '0') {
+                $lengthToCut++;
+            } else {
+                break;
+            }
+        }
+        $value = substr($value, 0, strlen($value) - $lengthToCut);
+        if ($value [strlen($value ) - 1] === '.') {
+            $value  = substr($value , 0, -1);
+        }
+        return $value;
     }
 
 

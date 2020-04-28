@@ -188,11 +188,11 @@ $(function () {
         $(selectors.deeplink+suffixes).attr('href', data.deepLink);
 
         let originValueBN = BigNumber(originValue);
-        let discountBN = (new BigNumber(100 - discount)).div(new BigNumber(100));
+        let discountBN = new BigNumber(100).plus(new BigNumber(-discount)).div(new BigNumber(100));
         let originValueWithDiscount = originValueBN.multipliedBy(discountBN).toFormat();
         $(selectors.originValue + suffixes).html(originValueWithDiscount);
 
-        let decimalBN = new BigNumber(Math.pow(10, data.decimal));
+        let decimalBN = new BigNumber(10).exponentiatedBy(data.decimal);
         let valueBN = new BigNumber(data.value);
         let currencyValue = valueBN.div(decimalBN).toFormat();            // big number
         $(selectors.currencyValue+suffixes).html(currencyValue);
