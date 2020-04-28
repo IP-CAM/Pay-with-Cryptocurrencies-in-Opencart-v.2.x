@@ -3,26 +3,17 @@
     margin-bottom: 5px;
 }
 .ezdefi-btn-tab {
-    color: #007bff;
-    flex:25%;
-    text-align: center;
-    background: #fff;
-    padding: 10px;
-    border-bottom: 1px solid #888;
+    display: block;
+    width: 100%;
+    padding: 5px 15px;
+    margin: 0;
 }
 
 .ezdefi-btn-tab:hover {
-    color: #00509b;
-    border-top: 1px solid #aaa;
-    border-left: 1px solid #aaa;
-    border-right: 1px solid #aaa;
-    border-radius: 4px 4px 0 0;
+    background-color: #eee;
 }
 
 .ezdefi-admin-content-box {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
-    grid-template-rows: auto auto auto auto auto;
 }
 
 .ezdefi-btn-config-tab {

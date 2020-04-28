@@ -9,7 +9,6 @@
     <input type="hidden" id="url_assign_exception" value="<?php echo $url_assign_exception ?>">
     <input type="hidden" id="url-revert-exception" value="<?php echo $url_revert_exception ?>">
 
-
     <div class="page-header">
         <div class="container-fluid">
             <div class="pull-right">
@@ -31,10 +30,19 @@
         <input type="radio" id="ezdefi-exception-history-tab" name="btn-radio-choose-tab" class="hidden tab-radio-input" data-tab="exception-history">
 		<input type="radio" id="ezdefi-new-exception-tab" name="btn-radio-choose-tab" class="hidden tab-radio-input" data-tab="new-exception">
 		<input type="radio" id="ezdefi-exception-tab" name="btn-radio-choose-tab" class="hidden tab-radio-input" data-tab="exception">
-		<label class="ezdefi-btn-tab ezdefi-btn-config-tab" for="ezdefi-config-tab"> <?php echo $tab_config ?> </label>
-        <label class="ezdefi-btn-tab ezdefi-btn-new-exception-tab" for="ezdefi-new-exception-tab"> <?php echo $tab_exception_pending ?> </label>
-        <label class="ezdefi-btn-tab ezdefi-btn-exception-history-tab" for="ezdefi-exception-history-tab"> <?php echo $tab_exception_confirmed ?> </label>
-		<label class="ezdefi-btn-tab ezdefi-btn-exception-tab" for="ezdefi-exception-tab"> <?php echo $tab_exception_archived ?> </label>
+
+        <div class="btn-group">
+            <label type="button" class="btn btn-primary" for="ezdefi-config-tab"> <?php echo $tab_config ?> </label>
+            <div class="btn-group">
+                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                    <?php echo $text_exception_management ?><span class="caret"></span></button>
+                <ul class="dropdown-menu" role="menu">
+                    <li><label class="ezdefi-btn-tab" for="ezdefi-new-exception-tab"> <?php echo $text_pending ?> </label></li>
+                    <li><label class="ezdefi-btn-tab"  for="ezdefi-exception-history-tab"> <?php echo $text_confirmed ?> </label></li>
+                    <li><label class="ezdefi-btn-tab"  for="ezdefi-exception-tab"> <?php echo $text_archived ?> </label></li>
+                </ul>
+            </div>
+        </div>
 
         <div class="panel panel-default config-content-tab">
             <form action="<?php echo $action ?>"
@@ -86,7 +94,7 @@
             <input type="hidden" id="current-page-exception" value="1">
             <input type="hidden" id="total-number-exception" value="">
             <div class="panel-heading">
-                <h3 class="panel-title"><i class="fa fa-pencil"></i> <?php echo $tab_edit_general ?> </h3>
+                <h3 class="panel-title"><i class="fa fa-pencil"></i> <?php echo $tab_exception_archived ?> </h3>
             </div>
             <div class="panel-body">
                 <div class="exception-filter-currency-box">
@@ -164,7 +172,7 @@
             <input type="hidden" id="current-page-new-exception" value="1">
             <input type="hidden" id="total-number-new-exception" value="">
             <div class="panel-heading">
-                <h3 class="panel-title"><i class="fa fa-pencil"></i> <?php echo $tab_edit_general ?> </h3>
+                <h3 class="panel-title"><i class="fa fa-pencil"></i> <?php echo $tab_exception_pending ?> </h3>
             </div>
             <div class="panel-body">
                 <div class="exception-filter-currency-box">
@@ -266,7 +274,7 @@
             <input type="hidden" id="current-page-exception-history" value="1">
             <input type="hidden" id="total-number-exception-history" value="">
             <div class="panel-heading">
-                <h3 class="panel-title"><i class="fa fa-pencil"></i> <?php echo $tab_edit_general ?> </h3>
+                <h3 class="panel-title"><i class="fa fa-pencil"></i> <?php echo $tab_exception_confirmed ?> </h3>
             </div>
             <div class="panel-body">
                 <div class="exception-filter-currency-box">

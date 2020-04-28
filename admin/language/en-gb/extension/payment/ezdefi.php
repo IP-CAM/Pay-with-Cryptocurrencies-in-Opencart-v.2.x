@@ -18,14 +18,19 @@ $_['button_save'] = 'Save';
 $_['button_yes'] = 'Yes';
 
 // Tab
-$_['tab_edit_general'] = 'ezDeFi';
+$_['tab_edit_general'] = 'Config';
 $_['tab_edit_coin_config'] = 'Coin config';
 $_['tab_config'] = 'Config';
-$_['tab_exception_pending'] = 'Pending';
-$_['tab_exception_confirmed'] = 'Confirmed';
-$_['tab_exception_archived'] = 'Archived';
+$_['tab_exception_pending'] = 'Exception management (Pending)';
+$_['tab_exception_confirmed'] = 'Exception management (Confirmed)';
+$_['tab_exception_archived'] = 'Exception management (Archived)';
 
 // text
+$_['text_exception_management'] = 'Exception Management';
+$_['text_pending'] = 'Pending';
+$_['text_confirmed'] = 'Confirmed';
+$_['text_archived'] = 'Archived';
+
 $_['text_symbol'] = 'Name';
 $_['text_name'] = 'Full Name';
 $_['text_discount'] = 'Discount';
