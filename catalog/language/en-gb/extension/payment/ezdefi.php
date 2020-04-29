@@ -35,6 +35,6 @@ $_['button_close'] = 'Close';
 
 //error
 $_['error_enable_simple_pay'] = 'Simple pay does not enable';
-$_['error_cant_create_payment'] = 'Can not create payment';
+$_['error_cant_create_payment'] = 'Can\'t create payment. Please contact with shop owner.';
 $_['error_cant_create_amount'] = 'Can not generate amountID';
 $_['error_cant_create_payment_with_amount'] = 'Can not generate amountID, please choose other coin or ezDeFi wallet to continue';

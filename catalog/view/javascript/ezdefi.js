@@ -67,7 +67,7 @@ $(function () {
         }
     });
 
-    $(selectors.btnGetQrCode).click(function () {
+    var detectCoinAndCreatePayment = function () {
         var enableSimplePay = $('#enable_simple_pay_input').is(':checked');
         var enableEscrowPay = $('#enable_escrow_pay_input').is(':checked');
         if(enableSimplePay) {
@@ -87,7 +87,10 @@ $(function () {
         $('#selected-coin-discount').val(discount);
 
         createPayment(url, coinId, suffixes, discount);
-    });
+    }
+
+    $(selectors.btnGetQrCode).click(detectCoinAndCreatePayment);
+
 
     $(selectors.btnReloadPayment).click(function () {
         let suffixes = $(this).data('suffixes');
@@ -141,6 +144,7 @@ $(function () {
     };
 
     var createPayment = function (url, coinId, suffixes, discount) {
+        console.log(url, coinId, suffixes, discount);
         showPaymentLoading(suffixes, true);
         $(".payment-error"+suffixes).css('display', 'none');
         $(selectors.selectCoinBox).css('display', 'none');
@@ -154,6 +158,7 @@ $(function () {
             method: "GET",
             data: { coin_id: coinId },
             success: function (response) {
+                console.log(JSON.parse(response));
                 if(JSON.parse(response).error) {
                     alert("Something error, server can't create payment");
                 }
@@ -188,11 +193,11 @@ $(function () {
         $(selectors.deeplink+suffixes).attr('href', data.deepLink);
 
         let originValueBN = BigNumber(originValue);
-        let discountBN = (new BigNumber(100 - discount)).div(new BigNumber(100));
+        let discountBN = new BigNumber(100).plus(new BigNumber(-discount)).div(new BigNumber(100));
         let originValueWithDiscount = originValueBN.multipliedBy(discountBN).toFormat();
         $(selectors.originValue + suffixes).html(originValueWithDiscount);
 
-        let decimalBN = new BigNumber(Math.pow(10, data.decimal));
+        let decimalBN = new BigNumber(10).exponentiatedBy(data.decimal);
         let valueBN = new BigNumber(data.value);
         let currencyValue = valueBN.div(decimalBN).toFormat();            // big number
         $(selectors.currencyValue+suffixes).html(currencyValue);
@@ -278,4 +283,9 @@ $(function () {
     };
 
     checkOrderComplete();
+
+    if($("#have-one-coin").prop('checked')) {
+        detectCoinAndCreatePayment();
+    }
+
 });

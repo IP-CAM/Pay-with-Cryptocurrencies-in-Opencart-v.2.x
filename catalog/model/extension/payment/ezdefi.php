@@ -40,12 +40,36 @@ class ModelExtensionPaymentEzdefi extends Model {
             foreach ($exchangesData as $currencyExchange) {
                 foreach ($currencies as $key => $currency) {
                     if ($currency->token->symbol == $currencyExchange->token) {
-                        $currencies[$key]->token->price = round($currencyExchange->amount * ((100 - $currency->discount) / 100), self::DEFAULT_DECIMAL_LIST_COIN);
+                        $price = $currencyExchange->amount * ((100 - $currency->discount) / 100);
+                        $currencies[$key]->token->price = $this->convertExponentialToFloat($price);
                     }
                 }
             }
         }
         return $currencies;
+    }
+
+    public function convertExponentialToFloat($amount, $decimal = null) {
+        if($decimal) {
+            $value = sprintf('%.'.$decimal.'f',$amount);
+        }
+        else {
+            $value = sprintf('%.10f',$amount);
+        }
+        $afterDot = explode('.', $value)[1];
+        $lengthToCut = 0;
+        for($i = strlen($afterDot) -1; $i >=0; $i--) {
+            if($afterDot[$i] === '0') {
+                $lengthToCut++;
+            } else {
+                break;
+            }
+        }
+        $value = substr($value, 0, strlen($value) - $lengthToCut);
+        if ($value [strlen($value ) - 1] === '.') {
+            $value  = substr($value , 0, -1);
+        }
+        return $value;
     }
 
 
@@ -81,7 +105,7 @@ class ModelExtensionPaymentEzdefi extends Model {
     public function addException($order_id, $currency, $amount_id, $expiration, $has_amount, $paid = 0, $explorer_url = null, $payment_id = null) {
         if(!$expiration) $expiration = 0;
         $this->db->query("INSERT INTO `". DB_PREFIX . "ezdefi_exception` (`payment_id`, `order_id`, `currency`, `amount_id`, `expiration`, `has_amount`, `paid`, `explorer_url`) VALUES 
-        ('".$payment_id."','".$order_id."', '".$currency."', '".$amount_id."', DATE_ADD(NOW(), INTERVAL ".$expiration." SECOND), '".$has_amount."', '".$paid."', '".$explorer_url."')");
+        ('".$payment_id."','".$order_id."', '".$currency."', '".$amount_id."', DATE_ADD(NOW(), INTERVAL ".$expiration." SECOND), '".$has_amount."', '".$paid."', ".$explorer_url.")");
     }
 
     public function setPaidForException($payment_id, $paid = 0, $explorer_url = null) {
@@ -96,13 +120,20 @@ class ModelExtensionPaymentEzdefi extends Model {
         $value_response = $transaction_data->value * pow(10, -$transaction_data->decimal);
 
         if ($transaction_data->status === 'ACCEPTED') {
-            $this->addException(null, $transaction_data->currency, $value_response, null, 1, 3, $transaction_data->explorerUrl);
+            $this->addException(null, $transaction_data->currency, $value_response, null, 1, 3, "'".$transaction_data->explorerUrl."'");
         }
         return;
 	}
 
-	public function deleteExceptionByOrderId($order_id) {
-        $this->db->query("DELETE FROM `".DB_PREFIX."ezdefi_exception` WHERE `order_id`=".$order_id);
+
+    public function deleteExceptionByOrderId($order_id, $payment_id = null) {
+        $sql = "DELETE FROM `".DB_PREFIX."ezdefi_exception` WHERE `order_id`=".$order_id;
+
+        if($payment_id) {
+            $sql .= " AND `payment_id` <> '".$payment_id."'";
+        }
+
+        $this->db->query($sql);
     }
 
     // --------------------------------------------------------End exception model-----------------------------------------------------------
@@ -111,7 +142,12 @@ class ModelExtensionPaymentEzdefi extends Model {
 
     // -----------------------------------------------------------Curl--------------------------------------------------------------------
     public function createPayment($param) {
-        return $this->sendCurl('/payment/create', 'POST', $param);
+        $payment = $this->sendCurl('/payment/create', 'POST', $param);
+        if(json_decode($payment)->code == 1) {
+            return json_decode($payment)->data;
+        } else {
+            return false;
+        }
     }
 
     public function getWebsiteData () {

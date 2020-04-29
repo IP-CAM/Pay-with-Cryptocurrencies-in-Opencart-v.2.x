@@ -69,21 +69,11 @@ $(function () {
                 }
             },
             messages: {
-                remote: "This Public Key is invalid"
+                remote: "This Site Id is invalid"
             }
         });
     };
 
-
-    oc_ezdefi_admin.prototype.validateConfigForm = function () {
-        var apiKey = $(selectors.apiKeyInput).val();
-        var publicKey = $(selectors.publicKeyInput).val();
-        $(selectors.apiKeyInput).val('');
-        $(selectors.publicKeyInput).val('');
-
-        $(selectors.apiKeyInput).val(apiKey);
-        $(selectors.publicKeyInput).val(publicKey);
-    };
 
     new oc_ezdefi_admin();
 });
