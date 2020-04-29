@@ -156,7 +156,7 @@ $(function () {
                 that.reloadExceptionTable();
             },
             error: function () {
-                $("#delete-log-modal").prop('disabled', false);
+                $("#btn-delete-log").prop('disabled', false);
             }
         });
     };

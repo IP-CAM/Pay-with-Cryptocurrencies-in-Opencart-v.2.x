@@ -229,9 +229,6 @@ $(function () {
         let that = this;
         var url = $("#url-confirm-order").val();
 
-        console.log(exceptionId, url);
-
-
         $.ajax({
             url: url,
             method: "POST",
@@ -245,11 +242,11 @@ $(function () {
                 if($("#confirm-exception-modal").has('in')){
                     $("#confirm-exception-modal").modal('toggle');
                 }
-                $("#exception").prop('disabled', false);
+                $("#btn-confirm-exception").prop('disabled', false);
                 that.reloadExceptionTable();
             },
             error: function () {
-                $("#exception").prop('disabled', false);
+                $("#btn-confirm-exception").prop('disabled', false);
                 alert('Something error');
             }
         });
