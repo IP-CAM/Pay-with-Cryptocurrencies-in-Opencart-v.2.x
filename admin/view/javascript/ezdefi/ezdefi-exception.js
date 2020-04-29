@@ -72,7 +72,7 @@ $(function () {
                         <tbody>`;
                 let tmp = (pagination.pageNumber - 1) * pagination.pageSize + 1;
                 $.each(response, function (exceptionKey, exceptionRecord) {
-                    let orderInfo, paymentInfo, paymentStatus
+                    let orderInfo, paymentInfo, paymentStatus, action;
 
                     let currency = exceptionRecord.currency;
                     let amountId = parseFloat(exceptionRecord.amount_id);
@@ -138,13 +138,18 @@ $(function () {
                         </div>`;
                     }
 
-                    let action = `<div class="exception-order-button-box">`
                     if(orderId) {
-                        action += `<button class="btn btn-primary btn-show-confirm-exception-modal" data-toggle="modal" data-target="#confirm-exception-modal" data-exception-id="${exceptionId}">${language.confirmPaid}</button>`
+                        action = `<div class="exception-order-button-box">
+                            <button class="btn btn-primary btn-show-confirm-exception-modal" data-toggle="modal" data-target="#confirm-exception-modal" data-exception-id="${exceptionId}">${language.confirmPaid}</button>
+                            <button class="btn btn-danger btn-delete-exception" data-toggle="modal" data-target="#delete-exception-modal" data-exception-id="${exceptionId}">${language.delete}</button>
+                            <button class="btn btn-info btn-show-assign-exception-modal" id="btn-assign-order-${tmp}" data-toggle="modal" data-target="#assign-exception-modal" data-exception-id="${exceptionId}" data-old-order-id="${orderId}" data-order-id="" style="display: none">Assign</button>
+                        </div>`
+                    } else {
+                        action = `<div class="exception-order-button-box">
+                            <button class="btn btn-info btn-show-assign-exception-modal" id="btn-assign-order-${tmp}" data-toggle="modal" data-target="#assign-exception-modal" data-exception-id="${exceptionId}" data-old-order-id="${orderId}" data-order-id="" style="display: none">Assign</button>
+                            <button class="btn btn-danger btn-delete-exception" data-toggle="modal" data-target="#delete-exception-modal" data-exception-id="${exceptionId}">${language.delete}</button>
+                        </div>`
                     }
-                    action += `<button class="btn btn-danger btn-delete-exception" data-toggle="modal" data-target="#delete-exception-modal" data-exception-id="${exceptionId}">${language.delete}</button>
-                                <button class="btn btn-info btn-show-assign-exception-modal" id="btn-assign-order-${tmp}" data-toggle="modal" data-target="#assign-exception-modal" data-exception-id="${exceptionId}" data-old-order-id="${orderId}" data-order-id="" style="opacity: 0">Assign</button>
-                            </div>`
 
                     dataHtml += `<tr>
                                 <td>${tmp}</td>
@@ -229,9 +234,6 @@ $(function () {
         let that = this;
         var url = $("#url-confirm-order").val();
 
-        console.log(exceptionId, url);
-
-
         $.ajax({
             url: url,
             method: "POST",
@@ -245,11 +247,11 @@ $(function () {
                 if($("#confirm-exception-modal").has('in')){
                     $("#confirm-exception-modal").modal('toggle');
                 }
-                $("#exception").prop('disabled', false);
+                $("#btn-confirm-exception").prop('disabled', false);
                 that.reloadExceptionTable();
             },
             error: function () {
-                $("#exception").prop('disabled', false);
+                $("#btn-confirm-exception").prop('disabled', false);
                 alert('Something error');
             }
         });
@@ -346,7 +348,7 @@ $(function () {
         var data = e.params.data;
         var tmp = $(this).data('tmp');
         var buttonAssign = $("#btn-assign-order-"+tmp);
-        buttonAssign.css('opacity', 100);
+        buttonAssign.css('display', 'block');
         buttonAssign.data('order-id', data.id);
     };
 

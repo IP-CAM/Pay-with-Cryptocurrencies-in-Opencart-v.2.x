@@ -213,6 +213,7 @@ $(function () {
             },
             error: function () {
                 alert('Something error');
+                $("#btn-revert-exception-history").prop('disabled', false);
             }
         });
     };
