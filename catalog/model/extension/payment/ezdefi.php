@@ -142,7 +142,12 @@ class ModelExtensionPaymentEzdefi extends Model {
 
     // -----------------------------------------------------------Curl--------------------------------------------------------------------
     public function createPayment($param) {
-        return $this->sendCurl('/payment/create', 'POST', $param);
+        $payment = $this->sendCurl('/payment/create', 'POST', $param);
+        if(json_decode($payment)->code == 1) {
+            return json_decode($payment)->data;
+        } else {
+            return false;
+        }
     }
 
     public function getWebsiteData () {
