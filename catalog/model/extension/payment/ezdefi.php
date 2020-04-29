@@ -105,7 +105,7 @@ class ModelExtensionPaymentEzdefi extends Model {
     public function addException($order_id, $currency, $amount_id, $expiration, $has_amount, $paid = 0, $explorer_url = null, $payment_id = null) {
         if(!$expiration) $expiration = 0;
         $this->db->query("INSERT INTO `". DB_PREFIX . "ezdefi_exception` (`payment_id`, `order_id`, `currency`, `amount_id`, `expiration`, `has_amount`, `paid`, `explorer_url`) VALUES 
-        ('".$payment_id."','".$order_id."', '".$currency."', '".$amount_id."', DATE_ADD(NOW(), INTERVAL ".$expiration." SECOND), '".$has_amount."', '".$paid."', '".$explorer_url."')");
+        ('".$payment_id."','".$order_id."', '".$currency."', '".$amount_id."', DATE_ADD(NOW(), INTERVAL ".$expiration." SECOND), '".$has_amount."', '".$paid."', ".$explorer_url.")");
     }
 
     public function setPaidForException($payment_id, $paid = 0, $explorer_url = null) {
@@ -125,8 +125,15 @@ class ModelExtensionPaymentEzdefi extends Model {
         return;
 	}
 
-	public function deleteExceptionByOrderId($order_id) {
-        $this->db->query("DELETE FROM `".DB_PREFIX."ezdefi_exception` WHERE `order_id`=".$order_id);
+
+    public function deleteExceptionByOrderId($order_id, $payment_id = null) {
+        $sql = "DELETE FROM `".DB_PREFIX."ezdefi_exception` WHERE `order_id`=".$order_id;
+
+        if($payment_id) {
+            $sql .= " AND `payment_id` <> '".$payment_id."'";
+        }
+
+        $this->db->query($sql);
     }
 
     // --------------------------------------------------------End exception model-----------------------------------------------------------

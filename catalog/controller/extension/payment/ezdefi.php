@@ -64,7 +64,7 @@ class ControllerExtensionPaymentEzdefi extends Controller
 
             $payment_data = json_decode($payment_info)->data;
             if ($payment_info) {
-                $this->model_extension_payment_ezdefi->addException($order_info['order_id'], strtoupper($coin['token']['symbol']), $payment_data->value * pow(10, - $payment_data->decimal), $coin['expiration'], 1, null, null, $payment_data->_id);
+                $this->model_extension_payment_ezdefi->addException($order_info['order_id'], strtoupper($coin['token']['symbol']), $payment_data->value * pow(10, - $payment_data->decimal), $coin['expiration'], 1, null, "NULL", $payment_data->_id);
                 return $this->response->setOutput($payment_info);
             } else {
                 return $this->response->setOutput(json_encode(['data' => ['status' => 'failure', 'message' => $this->language->get('error_cant_create_payment_with_amount')]]));
@@ -105,14 +105,14 @@ class ControllerExtensionPaymentEzdefi extends Controller
 
             if ($payment_info) {
                 $crypto_value = $payment_data->value * pow(10, - $payment_data->decimal);
-                $this->model_extension_payment_ezdefi->addException($order_info['order_id'], strtoupper($coin['token']['symbol']), $crypto_value, $coin['expiration'], 0, null, null, $payment_data->_id);
+                $this->model_extension_payment_ezdefi->addException($order_info['order_id'], strtoupper($coin['token']['symbol']), $crypto_value, $coin['expiration'], 0, null, "NULL", $payment_data->_id);
 
                 return $this->response->setOutput($payment_info);
             } else {
                 return $this->response->setOutput(json_encode(['data' => ['status' => 'failure', 'message' => $this->language->get('error_cant_create_payment')]]));
             }
         } else {
-            return $this->response->setOutput(json_encode(['data' => ['status' => 'failure', 'message' => $this->language->get('error_enable_escrow_pay')]]));
+            return $this->response->setOutput(json_encode(['data' => ['status' => 'failure', 'message' => $this->language->get('error_cant_create_payment')]]));
         }
     }
 
@@ -129,6 +129,7 @@ class ControllerExtensionPaymentEzdefi extends Controller
                 $this->load->model('checkout/order');
                 $message = 'Payment ID: ' . $this->request->get['paymentid'] . ', Status: ' . $payment['status'] . ' Has amountId:' . ($has_amount_id ? 'true' : 'false');
                 if ($has_amount_id == 1) {
+                    $this->model_extension_payment_ezdefi->deleteExceptionByOrderId($order_id, $payment['_id']);
                     $this->model_extension_payment_ezdefi->setPaidForException($payment['_id'], self::PAID_IN_TIME, $payment['explorer_url']);
                 } else {
                     $this->model_extension_payment_ezdefi->deleteExceptionByOrderId($order_id);
@@ -136,6 +137,7 @@ class ControllerExtensionPaymentEzdefi extends Controller
                 $this->model_checkout_order->addOrderHistory($order_id, $payment['code'], $message, false);
             }
             if ($payment['status'] == 'EXPIRED_DONE') {
+                $this->model_extension_payment_ezdefi->deleteExceptionByOrderId($order_id, $payment['_id']);
                 $this->model_extension_payment_ezdefi->setPaidForException($payment['_id'], self::PAID_OUT_TIME, $payment['explorer_url']);
             }
         } elseif (isset($this->request->get['explorerUrl']) && isset($this->request->get['id'])) {
