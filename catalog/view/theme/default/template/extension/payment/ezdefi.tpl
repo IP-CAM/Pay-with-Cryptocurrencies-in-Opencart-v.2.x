@@ -170,7 +170,7 @@
                         <label class="link_use_ezdefi_wallet simple-method-with-alternative-qrcode" for="choose-full-qrcode-radio"><?php echo $text_use_previous_qr ?></label>
                     </div>
                     <div class="payment-error--simple">
-                        <?php echo $error_cant_create_amount ?>
+                        <?php echo $error_cant_create_payment ?>
                     </div>
                 </div>
             <?php } ?>
