@@ -154,13 +154,13 @@ $(function () {
         $(".btn-delete-exception").click(function () {
             let exceptionId = $(this).data('exception-id');
             $("#exception-id--history-delete").val(exceptionId);
-            $(".exception-loading-icon__delete").css('display', 'none');
+            $(".exception-loading-icon").css('display', 'none');
         });
 
         $(".btn-revert-order").click(function () {
             let exceptionId = $(this).data('exception-id');
             $("#exception-id--revert").val(exceptionId);
-            $(".exception-loading-icon__revert").css('display', 'none');
+            $(".exception-loading-icon").css('display', 'none');
         });
 
 
@@ -176,7 +176,7 @@ $(function () {
             method: "POST",
             data: { exception_id: exceptionId },
             beforeSend: function() {
-                $(".exception-loading-icon__delete").css('display', 'inline-block');
+                $(".exception-loading-icon").css('display', 'inline-block');
             },
             success: function (response) {
                 if ($('#delete-exception-modal--history').hasClass('in')) {
@@ -204,7 +204,7 @@ $(function () {
                 exception_id: exceptionId,
             },
             beforeSend: function() {
-                $(".exception-loading-icon__revert").css('display', 'inline-block');
+                $(".exception-loading-icon").css('display', 'inline-block');
             },
             success: function (response) {
                 $("#revert-exception-modal").modal('toggle');

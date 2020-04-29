@@ -138,9 +138,11 @@ $(function () {
                         </div>`;
                     }
 
-                    let action = `<div class="exception-order-button-box">
-                                <button class="btn btn-primary btn-show-confirm-exception-modal" data-toggle="modal" data-target="#confirm-exception-modal" data-exception-id="${exceptionId}">${language.confirmPaid}</button>
-                                <button class="btn btn-danger btn-delete-exception" data-toggle="modal" data-target="#delete-exception-modal" data-exception-id="${exceptionId}">${language.delete}</button>
+                    let action = `<div class="exception-order-button-box">`
+                    if(orderId) {
+                        action += `<button class="btn btn-primary btn-show-confirm-exception-modal" data-toggle="modal" data-target="#confirm-exception-modal" data-exception-id="${exceptionId}">${language.confirmPaid}</button>`
+                    }
+                    action += `<button class="btn btn-danger btn-delete-exception" data-toggle="modal" data-target="#delete-exception-modal" data-exception-id="${exceptionId}">${language.delete}</button>
                                 <button class="btn btn-info btn-show-assign-exception-modal" id="btn-assign-order-${tmp}" data-toggle="modal" data-target="#assign-exception-modal" data-exception-id="${exceptionId}" data-old-order-id="${orderId}" data-order-id="" style="opacity: 0">Assign</button>
                             </div>`
 
@@ -177,7 +179,7 @@ $(function () {
         $(".btn-delete-exception").click(function () {
             let exceptionId = $(this).data('exception-id');
             $("#exception-id--delete").val(exceptionId);
-            $(".exception-loading-icon__delete").css('display', 'none');
+            $(".exception-loading-icon").css('display', 'none');
         });
 
         $(".btn-show-assign-exception-modal").click(function () {
@@ -186,7 +188,7 @@ $(function () {
 
             $("#exception-order-id--assign").val(orderId);
             $("#exception-id--assign").val(exceptionId);
-            $(".exception-loading-icon__confirm-paid").css('display', 'none');
+            $(".exception-loading-icon").css('display', 'none');
         })
 
         $('.btn-show-confirm-exception-modal').click(function () {
@@ -206,7 +208,7 @@ $(function () {
             method: "POST",
             data: { exception_id: exceptionId },
             beforeSend: function() {
-                $(".exception-loading-icon__delete").css('display', 'inline-block');
+                $(".exception-loading-icon").css('display', 'inline-block');
             },
             success: function (response) {
                 if ($('#delete-exception-modal').hasClass('in')) {
@@ -259,7 +261,7 @@ $(function () {
         let exceptionId = $('#exception-id--assign').val();
 
         let that = this;
-        let url = $("#url_assign_exception").val();
+        let url = $("#url-assign-order").val();
 
         $.ajax({
             url: url,
@@ -269,7 +271,7 @@ $(function () {
                 order_id: orderId
             },
             beforeSend:function() {
-                $(".exception-loading-icon__confirm-paid").css('display', 'inline-block');
+                $(".exception-loading-icon").css('display', 'inline-block');
             },
             success: function (response) {
                 $("#assign-exception-modal").modal('toggle');
