@@ -5,11 +5,15 @@ $(function () {
         this.searchException();
         $("#btn-delete-exception").click(this.deleteException.bind(this));
         $("#btn-assign-exception").click(this.assignException.bind(this))
-        $("#btn-confirm-exception").click(this.confirmException.bind(this))
-
+        $("#btn-confirm-exception").click(this.confirmException.bind(this));
         $("#new-exception-search-by-amount").change(this.searchException.bind(this));
         $("#new-exception-search-by-order").change(this.searchException.bind(this));
         $("#new-exception-search-by-email").change(this.searchException.bind(this));
+
+        $("#new-exception-search-by-amount").keyup(function(event) {if (event.keyCode === 13) this.searchException()}.bind(this));
+        $("#new-exception-search-by-order").keyup(function(event) {if (event.keyCode === 13) this.searchException()}.bind(this));
+        $("#new-exception-search-by-email").keyup(function(event) {if (event.keyCode === 13) this.searchException()}.bind(this));
+
         $("#btn-search-new-exception").click(this.searchException.bind(this));
         $("input[name='filter-by-currency']").change(this.searchException.bind(this));
         $(".tab-radio-input").change(this.selectTabListener);

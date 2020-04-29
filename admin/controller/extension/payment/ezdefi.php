@@ -19,14 +19,11 @@ class ControllerExtensionPaymentEzdefi extends Controller
         $data['url_validate_api_key']             = $this->url->link('extension/payment/ezdefi/checkApiKey', 'token=' . $this->session->data['token'], true);
         $data['url_validate_public_key']          = $this->url->link('extension/payment/ezdefi/checkPublicKey', 'token=' . $this->session->data['token'], true);
         $data['url_delete_exception']             = $this->url->link('extension/payment/ezdefi/deleteException', 'token=' . $this->session->data['token'], true);
-        $data['url_delete_exception_by_order_id'] = $this->url->link('extension/payment/ezdefi/deleteExceptionByOrderId', 'token=' . $this->session->data['token'], true);
         $data['url_search_exceptions']            = $this->url->link('extension/payment/ezdefi/searchExceptions', 'token=' . $this->session->data['token'], true);
         $data['url_get_order_pending']            = $this->url->link('extension/payment/ezdefi/getAllOrderPending', 'token=' . $this->session->data['token'], true);
-        $data['url_revert_order_exception']       = $this->url->link('extension/payment/ezdefi/revertOrderException', 'token=' . $this->session->data['token'], true);
-        $data['url_confirm_order']       = $this->url->link('extension/payment/ezdefi/confirmOrder', 'token=' . $this->session->data['token'], true);
-        $data['url_assign_order']       = $this->url->link('extension/payment/ezdefi/assignOrder', 'token=' . $this->session->data['token'], true);
-        $data['url_assign_exception']       = $this->url->link('extension/payment/ezdefi/assignOrder', 'token=' . $this->session->data['token'], true);
-        $data['url_revert_exception']       = $this->url->link('extension/payment/ezdefi/revertException', 'token=' . $this->session->data['token'], true);
+        $data['url_confirm_order']                = $this->url->link('extension/payment/ezdefi/confirmOrder', 'token=' . $this->session->data['token'], true);
+        $data['url_assign_order']                 = $this->url->link('extension/payment/ezdefi/assignOrder', 'token=' . $this->session->data['token'], true);
+        $data['url_revert_exception']             = $this->url->link('extension/payment/ezdefi/revertException', 'token=' . $this->session->data['token'], true);
 
         $data['breadcrumbs'] = array();
 
@@ -218,10 +215,8 @@ class ControllerExtensionPaymentEzdefi extends Controller
             $exceptions = $this->model_extension_payment_ezdefi->searchLogs($keyword_amount, $keyword_order_id, $keyword_email, $currency, $page, self::LIMIT_EXCEPTION_IN_PAGE);
             $total_exceptions = $this->model_extension_payment_ezdefi->getTotalLog($keyword_amount, $keyword_order_id, $keyword_email, $currency);
         }
-        //$total_exceptions = $this->model_extension_payment_ezdefi->getTotalException($keyword_amount, $keyword_order_id, $keyword_email, $currency);
 
         $result           = ['exceptions' => $exceptions, 'total_exceptions' => $total_exceptions];
-
         return $this->response->setOutput(json_encode($result));
     }
 
@@ -243,14 +238,11 @@ class ControllerExtensionPaymentEzdefi extends Controller
     public function assignOrder() {
         $this->load->model('extension/payment/ezdefi');
 
-
         $exception_id     = isset($this->request->post['exception_id']) ? $this->request->post['exception_id'] : '';
         $order_id_to_assign = isset($this->request->post['order_id']) ? $this->request->post['order_id'] : '';
         $exception = $this->model_extension_payment_ezdefi->getExceptionById($exception_id);
 
         $this->model_extension_payment_ezdefi->updateException(['id'=>$exception['id']], ['order_assigned' => $order_id_to_assign, 'confirmed' => 1]);
-
-
         if($exception['order_id']  && $order_id_to_assign  != $exception['order_id']) {
             $this->model_extension_payment_ezdefi->setPendingForOrder($exception['order_id']);
         }
@@ -281,7 +273,6 @@ class ControllerExtensionPaymentEzdefi extends Controller
         } else {
             $this->model_extension_payment_ezdefi->updateException(['id' => $exception['id']], ['confirmed' => 0]);
         }
-
 
         return $this->response->setOutput(json_encode(['status' => 'success']));
     }

@@ -6,6 +6,11 @@ $(function () {
         $("#exception-history-search-by-amount").change(this.searchExceptionHistory.bind(this));
         $("#exception-history-search-by-order").change(this.searchExceptionHistory.bind(this));
         $("#exception-history-search-by-email").change(this.searchExceptionHistory.bind(this));
+
+        $("#exception-history-search-by-amount").keyup(function(event) {if (event.keyCode === 13) this.searchExceptionHistory()}.bind(this));
+        $("#exception-history-search-by-order").keyup(function(event) {if (event.keyCode === 13) this.searchExceptionHistory()}.bind(this));
+        $("#exception-history-search-by-email").keyup(function(event) {if (event.keyCode === 13) this.searchExceptionHistory()}.bind(this));
+
         $("#btn-search-exception-history").click(this.searchExceptionHistory.bind(this));
         $("input[name='exception-history-search-by-currency']").change(this.searchExceptionHistory.bind(this));
     };

@@ -3,9 +3,14 @@ $(function () {
         this.searchLog();
         $("#btn-delete-log").click(this.deleteLog.bind(this));
         $("#btn-confirm-log").click(this.confirmLog.bind(this));
-        $("#exception-search-by-amount").change(this.searchLog.bind(this));
-        $("#exception-search-by-order").change(this.searchLog.bind(this));
-        $("#exception-search-by-email").change(this.searchLog.bind(this));
+        $("#log-search-by-amount").change(this.searchLog.bind(this));
+        $("#log-search-by-order").change(this.searchLog.bind(this));
+        $("#log-search-by-email").change(this.searchLog.bind(this));
+
+        $("#log-search-by-amount").keyup(function(event) {if (event.keyCode === 13) this.searchLog()}.bind(this));
+        $("#log-search-by-order").keyup(function(event) {if (event.keyCode === 13) this.searchLog()}.bind(this));
+        $("#log-search-by-email").keyup(function(event) {if (event.keyCode === 13) this.searchLog()}.bind(this));
+
         $("#btn-search-log").click(this.searchLog.bind(this));
         $("input[name='filter-by-currency']").change(this.searchLog.bind(this));
     };

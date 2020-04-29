@@ -8,6 +8,7 @@
     <input type="hidden" id="url-assign-order" value="<?php echo $url_assign_order ?>">
     <input type="hidden" id="url_assign_exception" value="<?php echo $url_assign_exception ?>">
     <input type="hidden" id="url-revert-exception" value="<?php echo $url_revert_exception ?>">
+    <input type="hidden" id="url-search-exceptions" value="<?php echo $url_search_exceptions ?>">
 
     <div class="page-header">
         <div class="container-fluid">
@@ -87,7 +88,6 @@
                 </div>
             </form>
         </div>
-        <input type="hidden" id="url-search-exceptions" value="<?php echo $url_search_exceptions ?>">
 
         <div class="panel panel-defaul exception-content-tab">
             <input type="hidden" id="url-search-exceptions" value="<?php echo $url_search_exceptions ?>">
@@ -232,7 +232,6 @@
                             <h4 class="modal-title"><?php echo $text_confirm_order ?></h4>
                         </div>
                         <div class="modal-body">
-                            123123
                             <p><?php echo $text_ask_confirm_order ?></p>
                             <input type="hidden" id="exception-id--confirm-exception">
                         </div>

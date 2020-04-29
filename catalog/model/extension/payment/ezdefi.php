@@ -124,7 +124,7 @@ class ModelExtensionPaymentEzdefi extends Model {
         $value_response = $transaction_data->value * pow(10, -$transaction_data->decimal);
 
         if ($transaction_data->status === 'ACCEPTED') {
-            $this->addException(null, $transaction_data->currency, $value_response, null, 1, 3, $transaction_data->explorerUrl);
+            $this->addException(null, $transaction_data->currency, $value_response, null, 1, 3, "'".$transaction_data->explorerUrl."'");
         }
         return;
 	}
