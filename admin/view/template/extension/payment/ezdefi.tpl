@@ -6,7 +6,6 @@
     <input type="hidden" id="url-delete-exception" value="<?php echo $url_delete_exception ?>">
     <input type="hidden" id="url-confirm-order" value="<?php echo $url_confirm_order ?>">
     <input type="hidden" id="url-assign-order" value="<?php echo $url_assign_order ?>">
-    <input type="hidden" id="url_assign_exception" value="<?php echo $url_assign_exception ?>">
     <input type="hidden" id="url-revert-exception" value="<?php echo $url_revert_exception ?>">
     <input type="hidden" id="url-search-exceptions" value="<?php echo $url_search_exceptions ?>">
 
