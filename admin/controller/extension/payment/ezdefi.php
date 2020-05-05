@@ -81,8 +81,8 @@ class ControllerExtensionPaymentEzdefi extends Controller
         $this->document->addScript('view/javascript/ezdefi/pagination.min.js');
         $this->document->addScript('view/javascript/ezdefi/ezdefi.js');
         $this->document->addScript('view/javascript/ezdefi/ezdefi-log.js');
-        $this->document->addScript('view/javascript/ezdefi/ezdefi-exception.js');
         $this->document->addScript('view/javascript/ezdefi/ezdefi-exception-history.js');
+        $this->document->addScript('view/javascript/ezdefi/ezdefi-exception.js');
 
         // API login
         $this->load->model('user/api');

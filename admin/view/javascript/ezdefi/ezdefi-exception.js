@@ -1,5 +1,7 @@
 $(function () {
     var global = {};
+    var ezdefiLog = new ezdefi_log()
+    var ezdefiExceptionHistory = new ezdefi_exception_history();
 
     var oc_ezdefi_exception = function () {
         var that = this;
@@ -17,13 +19,20 @@ $(function () {
 
         $("#btn-search-new-exception").click(this.searchException.bind(this));
         $("input[name='filter-by-currency']").change(this.searchException.bind(this));
-        $(".tab-radio-input").change(this.selectTabListener);
+        $(".tab-radio-input").change(this.selectTabListener.bind(this));
         this.detectTabToShow();
     };
 
     oc_ezdefi_exception.prototype.selectTabListener = function() {
-        let tab = $(this).data('tab');
+        let tab = $(".tab-radio-input:checked").data('tab');
         localStorage.setItem('tab', tab);
+        if(tab === 'new-exception') {
+            this.searchException()
+        } else if( tab === 'exception-history') {
+            ezdefiExceptionHistory.searchExceptionHistory()
+        } else if (tab === 'exception') {
+            ezdefiLog.searchLog()
+        }
     };
 
     oc_ezdefi_exception.prototype.detectTabToShow = function () {
