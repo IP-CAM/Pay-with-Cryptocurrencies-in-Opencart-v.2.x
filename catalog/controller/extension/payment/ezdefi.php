@@ -130,7 +130,10 @@ class ControllerExtensionPaymentEzdefi extends Controller
             $has_amount_id = explode('-', $uoid)[1];
             if ($payment['status'] == 'DONE') {
                 $this->load->model('checkout/order');
-                $message = 'Payment ID: ' . $this->request->get['paymentid'] . ', Status: ' . $payment['status'] . ' Has amountId:' . ($has_amount_id ? 'true' : 'false');
+                $message = 'Payment ID: ' . $this->request->get['paymentid'] . '<br> 
+                            Status: ' . $payment['status'] . '</br>
+                            Use Ezdefi Wallet: ' . ($has_amount_id ? 'false' : 'true').'<br>
+                            tx: '.($payment['explorer_url'] ? $payment['explorer_url'] : 'none');
                 if ($has_amount_id == 1) {
                     $this->model_extension_payment_ezdefi->deleteExceptionByOrderId($order_id, $payment['_id']);
                     $this->model_extension_payment_ezdefi->setPaidForException($payment['_id'], self::PAID_IN_TIME, $payment['explorer_url']);
