@@ -47,9 +47,12 @@
                 <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
                     {{ text_exception_management }}<span class="caret"></span></button>
                 <ul class="dropdown-menu" role="menu">
-                    <li><label class="ezdefi-btn-tab" for="ezdefi-new-exception-tab"> {{ text_pending }} </label></li>
-                    <li><label class="ezdefi-btn-tab"  for="ezdefi-exception-history-tab"> {{ text_confirmed }} </label></li>
-                    <li><label class="ezdefi-btn-tab"  for="ezdefi-exception-tab"> {{ text_archived }} </label></li>
+                    <li><label class="ezdefi-btn-tab" for="ezdefi-new-exception-tab" data-toggle="tooltip" data-placement="right" title="The orders waiting confirmation.">
+                            {{ text_pending }} </label></li>
+                    <li><label class="ezdefi-btn-tab"  for="ezdefi-exception-history-tab" data-toggle="tooltip" data-placement="right" title="The confirmed orders.">
+                            {{ text_confirmed }} </label></li>
+                    <li><label class="ezdefi-btn-tab"  for="ezdefi-exception-tab" data-toggle="tooltip" data-placement="right" title="The unpaid orders.">
+                            {{ text_archived }} </label></li>
                 </ul>
             </div>
         </div>
