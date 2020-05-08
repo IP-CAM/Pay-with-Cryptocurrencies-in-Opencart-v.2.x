@@ -248,9 +248,7 @@ class ControllerExtensionPaymentEzdefi extends Controller
         }
         $this->model_extension_payment_ezdefi->setProcessingForOrder($order_id_to_assign);
 
-        if(!$exception['order_id']) {
-            $this->model_extension_payment_ezdefi->updateException(['order_id'=>$order_id_to_assign], ['confirmed' => 2]);
-        }
+        $this->model_extension_payment_ezdefi->updateException(['order_id'=>$order_id_to_assign], ['confirmed' => 2]);
 
         return $this->response->setOutput(json_encode(['status' => 'success']));
     }
@@ -271,11 +269,7 @@ class ControllerExtensionPaymentEzdefi extends Controller
         if(!$exception['explorer_url']) {
             $this->model_extension_payment_ezdefi->updateException(['order_id' => $exception['order_id']], ['confirmed' => 0]);
         } else {
-            $this->model_extension_payment_ezdefi->updateException(['id' => $exception['id']], ['confirmed' => 0]);
-        }
-
-        if(!$exception['order_id']) {
-            $this->model_extension_payment_ezdefi->updateException(['order_id'=>$exception['order_assigned']], ['confirmed' => 0]);
+            $this->model_extension_payment_ezdefi->updateException(['id' => $exception['id'], 'order_id'=>$exception['order_assigned']], ['confirmed' => 0]);
         }
 
         return $this->response->setOutput(json_encode(['status' => 'success']));

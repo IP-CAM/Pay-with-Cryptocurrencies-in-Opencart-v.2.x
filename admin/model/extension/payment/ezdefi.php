@@ -202,9 +202,9 @@ class ModelExtensionPaymentEzdefi extends Model
         $sql =  substr($sql, 0, -1) . " WHERE";
 
         foreach($conditions as $conditionKey => $condition) {
-            $sql .= "`".$conditionKey."` = ".$condition . ",";
+            $sql .= " `".$conditionKey."` = ".$condition . " OR";
         }
-        $sql =  substr($sql, 0, -1);
+        $sql =  substr($sql, 0, -2);
         $this->db->query($sql);
     }
 
