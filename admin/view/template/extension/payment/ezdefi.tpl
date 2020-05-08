@@ -34,12 +34,15 @@
         <div class="btn-group">
             <label type="button" class="btn btn-primary" for="ezdefi-config-tab"> <?php echo $tab_config ?> </label>
             <div class="btn-group">
-                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" >
                     <?php echo $text_exception_management ?><span class="caret"></span></button>
                 <ul class="dropdown-menu" role="menu">
-                    <li><label class="ezdefi-btn-tab" for="ezdefi-new-exception-tab"> <?php echo $text_pending ?> </label></li>
-                    <li><label class="ezdefi-btn-tab"  for="ezdefi-exception-history-tab"> <?php echo $text_confirmed ?> </label></li>
-                    <li><label class="ezdefi-btn-tab"  for="ezdefi-exception-tab"> <?php echo $text_archived ?> </label></li>
+                    <li><label class="ezdefi-btn-tab" for="ezdefi-new-exception-tab" data-toggle="tooltip" data-placement="right" title="The orders waiting confirmation.">
+                            <?php echo $text_pending ?></label></li>
+                    <li><label class="ezdefi-btn-tab"  for="ezdefi-exception-history-tab" data-toggle="tooltip" data-placement="right" title="The confirmed orders.">
+                            <?php echo $text_confirmed ?> </label></li>
+                    <li><label class="ezdefi-btn-tab"  for="ezdefi-exception-tab" data-toggle="tooltip" data-placement="right" title="The unpaid orders.">
+                            <?php echo $text_archived ?> </label></li>
                 </ul>
             </div>
         </div>
