@@ -190,7 +190,7 @@ $(function () {
         $(selectors.paymentIdInput+suffixes).val(paymentId);
         enablePaymentTimeout(suffixes, false);
         countDownTime(paymentId, data.expiredTime, suffixes);
-        $(selectors.deeplink+suffixes).attr('href', data.deepLink);
+        $(selectors.deeplink+suffixes).attr('href', (suffixes === '--escrow' ? 'ezdefi://' : '') + data.deepLink);
 
         let originValueBN = BigNumber(originValue);
         let discountBN = new BigNumber(100).plus(new BigNumber(-discount)).div(new BigNumber(100));
