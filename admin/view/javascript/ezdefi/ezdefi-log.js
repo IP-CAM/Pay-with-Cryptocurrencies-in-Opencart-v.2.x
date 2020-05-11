@@ -35,6 +35,10 @@ ezdefi_log.prototype.searchLog = function (page = 1, totalNumber = null) {
         },
         callback: function(response, pagination) {
             $("#current-page-exception").val(pagination.pageNumber);
+            if(response.length === 0) {
+                container.prev().html("<div class='text-center padding-lg'><h2>Not results</h2></div>");
+                return;
+            }
             var dataHtml = `<table class="table">
                     <thead>
                     <tr>

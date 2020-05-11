@@ -165,7 +165,7 @@ class ModelExtensionPaymentEzdefi extends Model
 
         $sql = '';
         if ($keyword_order_id) {
-            $sql .= " AND exception.order_id = '" . $keyword_order_id . "'";
+            $sql .= " AND (exception.order_id = '" . $keyword_order_id . "' OR exception.order_assigned = '".$keyword_order_id."')";
         }
         if ($keyword_email) {
             $sql .= " AND order.email = '" . $keyword_email . "'";

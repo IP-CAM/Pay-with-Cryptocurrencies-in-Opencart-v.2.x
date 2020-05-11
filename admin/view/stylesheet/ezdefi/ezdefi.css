@@ -257,6 +257,10 @@
     padding-top: 10px;
 }
 
+.padding-lg {
+    padding: 40px;
+}
+
 .table tbody > tr > td {
     vertical-align: top;
 }
@@ -264,7 +268,6 @@
 .align-left {
     text-align: left !important;
 }
-
 .padding-none {
     padding: 0;
 }
