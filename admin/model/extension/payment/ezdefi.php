@@ -262,6 +262,12 @@ class ModelExtensionPaymentEzdefi extends Model
         }
     }
 
+    public function updateCallbackUrl($callback) {
+        $api_url      = $this->config->get('payment_ezdefi_gateway_api_url');
+        $api_key      = $this->config->get('payment_ezdefi_api_key');
+        $public_key   = $this->config->get('payment_ezdefi_public_key');
+        $this->sendCurl($api_url . '/website/update_callback?callback=' . $callback . '&websiteId=' . $public_key, "PUT", $api_key);
+    }
 
     public function getCurrencies()
     {
