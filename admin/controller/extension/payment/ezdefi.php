@@ -97,15 +97,17 @@ class ControllerExtensionPaymentEzdefi extends Controller
     public function update()
     {
         if (($this->request->server['REQUEST_METHOD'] == 'POST') && ($this->validate())) {
+            $this->load->model('setting/setting');
+            $this->load->model('extension/payment/ezdefi');
+
             $data_setting['ezdefi_gateway_api_url'] = $this->request->post['ezdefi_gateway_api_url'];
             $data_setting['ezdefi_api_key']         = $this->request->post['ezdefi_api_key'];
             $data_setting['ezdefi_public_key']      = $this->request->post['ezdefi_public_key'];
             $data_setting['ezdefi_status']          = $this->request->post['ezdefi_status'];
 
-            $this->load->model('setting/setting');
             $this->model_setting_setting->editSetting('ezdefi', $data_setting);
-
             $this->session->data['success'] = $this->language->get('text_success');
+            $this->model_extension_payment_ezdefi->updateCallbackUrl(HTTP_CATALOG . '?route=extension/payment/ezdefi/callbackConfirmOrder');
         }
         $this->response->redirect($this->url->link('extension/payment/ezdefi', 'token=' . $this->session->data['token'], true));
     }
