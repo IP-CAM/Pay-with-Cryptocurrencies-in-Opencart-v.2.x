@@ -154,6 +154,10 @@
     border-radius: 4px 4px 0 0;
 }
 
+.btn-show-payment--escrow > img{
+    margin-bottom: 3px;
+}
+
 #ezdefi-show-payment--simple:checked ~ div.simple-pay-box, #ezdefi-show-payment--escrow:checked ~ div.escrow-pay-box {
     display: block;
 }
@@ -196,7 +200,7 @@ div.escrow-pay-box, div.simple-pay-box {
     margin: 0;
     background: #3333;
     border-radius: 10px;
-    padding: 2px;
+    padding: 2px 8px;
     cursor: pointer;
 }
 
@@ -304,7 +308,7 @@ div.escrow-pay-box, div.simple-pay-box {
 .ezdefi-copy-icon {
     font-size: 16px;
     color: #999;
-    padding-left: 6px;
+    /*padding-left: 6px;*/
 }
 
 .link_use_ezdefi_wallet {
@@ -312,6 +316,10 @@ div.escrow-pay-box, div.simple-pay-box {
     font-weight: 600;
     text-decoration-line: underline;
     cursor: pointer;
+}
+
+.ezdefi-payment__wallet-address--simple {
+    margin-right: 3px;
 }
 
 /* General */
