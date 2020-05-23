@@ -24,20 +24,11 @@ class ModelExtensionPaymentEzdefi extends Model
 		        `confirmed` tinyint(4) default 0,
 			    PRIMARY KEY (`id`)
 			) ENGINE=InnoDB DEFAULT COLLATE=utf8_general_ci;");
-
-        $this->db->query("
-            CREATE EVENT  IF NOT EXISTS `ezdefi_remove_exception_event`
-            ON SCHEDULE EVERY " . self::TIME_REMOVE_EXCEPTION . " DAY
-            STARTS DATE(NOW())
-            DO
-            DELETE FROM `" . DB_PREFIX . "ezdefi_exception` WHERE DATEDIFF( NOW( ) ,  expiration ) >= 5;");
-        $this->db->query("SET GLOBAL event_scheduler='ON';");
     }
 
     public function uninstall()
     {
         $this->db->query("DROP TABLE IF EXISTS `" . DB_PREFIX . "ezdefi_exception`;");
-        $this->db->query("DROP EVENT IF EXISTS `ezdefi_remove_exception_event`;");
     }
 
     //-------------------------------------------------Exception------------------------------------------------------
@@ -126,6 +117,13 @@ class ModelExtensionPaymentEzdefi extends Model
     }
 
     public function searchException($keyword_amount, $keyword_order_id, $keyword_email, $currency, $page, $limit) {
+        $this->load->model('setting/setting');
+        $last_time_delete = $this->config->get('ezdefi_cron_last_time_delete');
+        if(time() - (int)$last_time_delete > 86400 * 7) {
+            $this->db->query("DELETE FROM `" . DB_PREFIX . "ezdefi_exception` WHERE DATEDIFF( NOW( ) ,  expiration ) >= 5");
+            $this->model_setting_setting->editSetting('ezdefi_cron', ['ezdefi_cron_last_time_delete' => time()]);
+        }
+
         $sql = "select  amount_id, currency, exception.id , exception.expiration, exception.paid, exception.has_amount, exception.explorer_url, order_assigned, 
                     order.order_id, order.email, CONCAT(order.firstname, ' ', order.lastname) customer, order.total  total, order.date_added date
                 from  `" . DB_PREFIX . "ezdefi_exception` `exception`
