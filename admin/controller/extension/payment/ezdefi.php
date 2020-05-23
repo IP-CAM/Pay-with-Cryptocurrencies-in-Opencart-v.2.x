@@ -158,6 +158,11 @@ class ControllerExtensionPaymentEzdefi extends Controller
 
         $this->load->model('setting/setting');
 
+        $this->model_setting_setting->editSetting('ezdefi', [
+            'ezdefi_gateway_api_url'   => $this->language->get('config_gateway_api_url_default'),
+        ]);
+        $this->model_setting_setting->editSetting('ezdefi_cron', ['ezdefi_cron_last_time_delete' => time()]);
+
         $this->load->model('extension/payment/ezdefi');
         $this->model_extension_payment_ezdefi->install();
     }
