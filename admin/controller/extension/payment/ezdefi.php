@@ -53,19 +53,19 @@ class ControllerExtensionPaymentEzdefi extends Controller
         $data['coins'] = $this->model_extension_payment_ezdefi->getCurrencies();
 
         $this->document->addStyle('view/javascript/jquery/jquery-ui/jquery-ui.css');
-        $this->document->addStyle('view/stylesheet/ezdefi/jquery-validation.min.css');
-        $this->document->addStyle('view/stylesheet/ezdefi/pagination.min.css');
-        $this->document->addStyle('view/stylesheet/ezdefi/select2.min.css');
-        $this->document->addStyle('view/stylesheet/ezdefi/ezdefi.css');
+        $this->document->addStyle('view/stylesheet/jquery-validation.min.css');
+        $this->document->addStyle('view/stylesheet/pagination.min.css');
+        $this->document->addStyle('view/stylesheet/select2.min.css');
+        $this->document->addStyle('view/stylesheet/ezdefi.css');
 
         $this->document->addScript('view/javascript/jquery/jquery-ui/jquery-ui.js');
-        $this->document->addScript('view/javascript/ezdefi/select2.min.js');
-        $this->document->addScript('view/javascript/ezdefi/jquery.validate.min.js');
-        $this->document->addScript('view/javascript/ezdefi/pagination.min.js');
-        $this->document->addScript('view/javascript/ezdefi/ezdefi.js');
-        $this->document->addScript('view/javascript/ezdefi/ezdefi-log.js');
-        $this->document->addScript('view/javascript/ezdefi/ezdefi-exception.js');
-        $this->document->addScript('view/javascript/ezdefi/ezdefi-exception-history.js');
+        $this->document->addScript('view/javascript/select2.min.js');
+        $this->document->addScript('view/javascript/jquery.validate.min.js');
+        $this->document->addScript('view/javascript/pagination.min.js');
+        $this->document->addScript('view/javascript/ezdefi.js');
+        $this->document->addScript('view/javascript/ezdefi-log.js');
+        $this->document->addScript('view/javascript/ezdefi-exception.js');
+        $this->document->addScript('view/javascript/ezdefi-exception-history.js');
 
 
         $data['header']      = $this->load->controller('common/header');

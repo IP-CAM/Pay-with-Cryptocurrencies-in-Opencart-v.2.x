@@ -11,7 +11,7 @@ $_['text_change'] = 'Change';
 $_['text_guide'] = 'How to pay by ezDeFi?';
 $_['payment_time_out'] = 'Time out <br> Click to recreate payment';
 $_['text_pay_with_any_wallet'] = 'Pay with any crypto wallet';
-$_['text_pay_with_ezdefi_wallet'] = '<img src="catalog/view/theme/default/image/ezdefi/ezdefi.png" alt="ezdefi"/> Pay with ezDeFi wallet';
+$_['text_pay_with_ezdefi_wallet'] = '<img src="catalog/view/theme/default/image/ezdefi.png" alt="ezdefi"/> Pay with ezDeFi wallet';
 $_['text_notify_pay_exact_amount'] = 'You have to pay exact amount so that your order can be handle property. <br> If you have difficulty for sending exact amount try to use';
 $_['text_ezdefi_wallet'] = ' ezDeFi Wallet.';
 $_['text_create_payment_success'] = ' Create payment success';
