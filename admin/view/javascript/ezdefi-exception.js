@@ -18,7 +18,7 @@ $(function () {
         $("#new-exception-search-by-email").keyup(function(event) {if (event.keyCode === 13) this.searchException()}.bind(this));
 
         $("#btn-search-new-exception").click(this.searchException.bind(this));
-        $("input[name='filter-by-currency']").change(this.searchException.bind(this));
+        $("input[name='new-exception-search-by-currency']").change(this.searchException.bind(this));
         $(".tab-radio-input").change(this.selectTabListener.bind(this));
         this.detectTabToShow();
     };
@@ -53,7 +53,7 @@ $(function () {
         var keywordEmail = $("#new-exception-search-by-email").val();
         var urlGetException = $("#url-search-exceptions").val();
         var urlGetAllOrderPending = $("#url-get-order-pending").val();
-        var currency = $("input[name='filter-by-currency']:checked").val() ? $("input[name='filter-by-currency']:checked").val() : '';
+        var currency = $("input[name='new-exception-search-by-currency']:checked").val() ? $("input[name='new-exception-search-by-currency']:checked").val() : '';
 
         var paginationObject = {
             dataSource: urlGetException + '&amount=' +keywordAmount + '&order_id='+ keywordOrder + '&email=' + keywordEmail + '&currency=' + currency + '&section=1',
