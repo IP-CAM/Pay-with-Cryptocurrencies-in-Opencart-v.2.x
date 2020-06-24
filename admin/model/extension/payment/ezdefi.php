@@ -274,6 +274,9 @@ class ModelExtensionPaymentEzdefi extends Model
         $public_key   = $this->config->get('ezdefi_public_key');
         $website_data = $this->sendCurl($api_url . '/website/' . $public_key, 'GET', $api_key);
 
+        if(json_decode($website_data, true)['code'] == -1) {
+            return [];
+        }
         return json_decode($website_data, true)['data']['coins'];
     }
 
